@@ -1,0 +1,86 @@
+<template>
+    <lightning-card>
+        <h1 slot="title" class="slds-text-heading_small" style={titleStyle}>
+            {cardTitle}
+        </h1>
+
+        <div slot="actions">
+            <lightning-button-group>
+                <lightning-button
+                    label="Download PDF"
+                    icon-name="utility:download"
+                    disabled={docError}
+                    onclick={handleDownload}></lightning-button>
+                <lightning-button
+                    label="Save to Record"
+                    icon-name="utility:attach"
+                    disabled={saving}
+                    onclick={handleSave}></lightning-button>
+            </lightning-button-group>
+        </div>
+
+        <div class="slds-var-p-horizontal_medium">
+
+            <template lwc:if={docError}>
+                <div class="slds-text-color_error slds-var-p-vertical_small">
+                    {docError}
+                </div>
+            </template>
+
+            <template lwc:if={saving}>
+                <lightning-spinner alternative-text="Generating PDF"
+                                   size="small"></lightning-spinner>
+            </template>
+
+            <template lwc:if={hasDocument}>
+                <!-- accent rule ties the card to the PDF it produces -->
+                <div class="accent-rule" style={accentStyle}></div>
+
+                <dl class="slds-list_horizontal slds-wrap slds-var-m-top_small">
+                    <template for:each={doc.details} for:item="row">
+                        <dt key={row.label}
+                            class="slds-item_label slds-text-color_weak slds-truncate">
+                            {row.label}
+                        </dt>
+                        <dd key={row.label} class="slds-item_detail slds-truncate">
+                            {row.value}
+                        </dd>
+                    </template>
+                </dl>
+
+                <template lwc:if={doc.hasTotals}>
+                    <div class="totals slds-var-m-top_small slds-var-p-top_small">
+                        <span class="slds-text-color_weak">Total including tax</span>
+                        <span class="total-value" style={titleStyle}>
+                            {doc.grandTotal}
+                        </span>
+                    </div>
+                </template>
+            </template>
+
+            <template lwc:if={hasFiles}>
+                <h2 class="slds-text-title_caps slds-text-color_weak
+                           slds-var-m-top_medium slds-var-m-bottom_xx-small">
+                    Saved documents
+                </h2>
+                <ul class="slds-has-dividers_bottom-space">
+                    <template for:each={files} for:item="file">
+                        <li key={file.contentDocumentId} class="slds-item">
+                            <a data-id={file.contentDocumentId} onclick={handleOpenFile}>
+                                <lightning-icon icon-name="doctype:pdf" size="x-small"
+                                                class="slds-var-m-right_x-small"></lightning-icon>
+                                {file.title}
+                            </a>
+                            <span class="slds-text-body_small slds-text-color_weak
+                                         slds-var-m-left_x-small">
+                                {file.createdDate}
+                            </span>
+                        </li>
+                    </template>
+                </ul>
+            </template>
+
+            <div class="slds-var-p-bottom_small"></div>
+        </div>
+    </lightning-card>
+</template>

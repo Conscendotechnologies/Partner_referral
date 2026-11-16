@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  The "Purchase Order" rename does NOT live here. Metadata API silently
+  ignores <label> on standard objects. The rename is carried by
+  objectTranslations/Order-en_US. The Order record page is Order_GFS_Record_Page,
+  which already existed in this org and now also hosts the documentGenerator LWC.
+-->
+<CustomObject xmlns="http://soap.sforce.com/2006/04/metadata">
+    <enableFeeds>false</enableFeeds>
+</CustomObject>

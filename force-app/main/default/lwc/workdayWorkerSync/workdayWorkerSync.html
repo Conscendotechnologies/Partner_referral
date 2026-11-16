@@ -1,0 +1,79 @@
+<template>
+    <lightning-card title="Workday Worker Sync" icon-name="standard:employee">
+        <div slot="actions">
+            <lightning-button-group>
+                <lightning-button label="Compare with Workday" icon-name="utility:refresh"
+                    onclick={handleCompare} disabled={busy}></lightning-button>
+                <lightning-button variant="brand" label="Sync now" icon-name="utility:sync"
+                    onclick={handleSync} disabled={busy}></lightning-button>
+            </lightning-button-group>
+        </div>
+
+        <div class="slds-p-horizontal_medium">
+            <div class="slds-grid slds-wrap slds-gutters_small slds-m-bottom_medium">
+                <div class="slds-col slds-size_1-of-2 slds-medium-size_1-of-5">
+                    <div class="slds-box slds-box_x-small">
+                        <p class="slds-text-title">Workday tenant</p>
+                        <p class="slds-text-heading_small">{overview.tenant}</p>
+                    </div>
+                </div>
+                <div class="slds-col slds-size_1-of-2 slds-medium-size_1-of-5">
+                    <div class="slds-box slds-box_x-small">
+                        <p class="slds-text-title">Active contacts</p>
+                        <p class="slds-text-heading_small">{overview.activeContacts}</p>
+                    </div>
+                </div>
+                <div class="slds-col slds-size_1-of-2 slds-medium-size_1-of-5">
+                    <div class="slds-box slds-box_x-small">
+                        <p class="slds-text-title">Workers in Workday</p>
+                        <p class="slds-text-heading_small">{workdayTotalLabel}</p>
+                    </div>
+                </div>
+                <div class="slds-col slds-size_1-of-2 slds-medium-size_1-of-5">
+                    <div class="slds-box slds-box_x-small">
+                        <p class="slds-text-title">Out of sync</p>
+                        <p class="slds-text-heading_small">{outOfSyncLabel}</p>
+                    </div>
+                </div>
+                <div class="slds-col slds-size_1-of-1 slds-medium-size_1-of-5">
+                    <div class="slds-box slds-box_x-small">
+                        <p class="slds-text-title">Last synced</p>
+                        <p class="slds-text-heading_small">
+                            <lightning-formatted-date-time value={overview.lastSynced} year="numeric"
+                                month="short" day="2-digit" hour="2-digit" minute="2-digit" second="2-digit">
+                            </lightning-formatted-date-time>
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <template lwc:if={syncMessage}>
+                <div class="slds-m-bottom_small">
+                    <lightning-badge label={syncMessage} icon-name="utility:sync"></lightning-badge>
+                </div>
+            </template>
+            <template lwc:if={error}>
+                <div class="slds-text-color_error slds-m-bottom_small">{error}</div>
+            </template>
+
+            <template lwc:if={hasRows}>
+                <lightning-input type="toggle" label="Only show differences" checked={onlyDifferences}
+                    onchange={handleToggle} message-toggle-active="" message-toggle-inactive=""
+                    class="slds-m-bottom_small"></lightning-input>
+                <div class="table-wrap">
+                    <lightning-datatable key-field="workdayId" data={visibleRows} columns={columns}
+                        hide-checkbox-column></lightning-datatable>
+                </div>
+            </template>
+            <template lwc:else>
+                <p class="slds-text-color_weak slds-p-vertical_medium">
+                    Click "Compare with Workday" to load live worker data from Workday.
+                </p>
+            </template>
+
+            <template lwc:if={busy}>
+                <lightning-spinner alternative-text="Working" size="small"></lightning-spinner>
+            </template>
+        </div>
+    </lightning-card>
+</template>

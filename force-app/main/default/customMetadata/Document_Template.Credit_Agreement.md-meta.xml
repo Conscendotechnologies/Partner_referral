@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomMetadata xmlns="http://soap.sforce.com/2006/04/metadata" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    <label>Credit Agreement</label>
+    <protected>false</protected>
+    <values>
+        <field>Object_API_Name__c</field>
+        <value xsi:type="xsd:string">Contract</value>
+    </values>
+    <values>
+        <field>Document_Title__c</field>
+        <value xsi:type="xsd:string">CREDIT AGREEMENT</value>
+    </values>
+    <values>
+        <field>Accent_Color__c</field>
+        <value xsi:type="xsd:string">#333A56</value>
+    </values>
+    <values>
+        <field>Detail_Fields__c</field>
+        <value xsi:type="xsd:string">ContractNumber,StartDate,EndDate,ContractTerm,Status</value>
+    </values>
+    <values>
+        <field>Show_Line_Items__c</field>
+        <value xsi:type="xsd:boolean">false</value>
+    </values>
+    <values>
+        <field>Active__c</field>
+        <value xsi:type="xsd:boolean">true</value>
+    </values>
+    <values>
+        <field>Account_Path__c</field>
+        <value xsi:type="xsd:string">AccountId</value>
+    </values>
+</CustomMetadata>

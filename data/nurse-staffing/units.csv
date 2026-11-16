@@ -1,0 +1,5 @@
+Unit_Code__c,Name,Hospital__c,Patients_Per_Nurse__c,Required_Certifications__c,Agency_Hourly_Rate__c,Staff_Hourly_Rate__c
+ICU,Intensive Care Unit,St. Mercy General,2,RN;BLS;ACLS;CCRN,145,62
+MEDS,Medical-Surgical,St. Mercy General,5,RN;BLS,110,48
+ED,Emergency Department,St. Mercy General,4,RN;BLS;ACLS,125,55
+PEDS,Pediatrics,St. Mercy General,4,RN;BLS;PALS,120,52

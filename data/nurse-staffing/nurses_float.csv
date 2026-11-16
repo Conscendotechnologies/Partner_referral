@@ -1,0 +1,4 @@
+Workday_Worker_ID__c,Name,Employee_Number__c,Email__c,Home_Unit__r.Unit_Code__c,Position__c,Certifications__c,Certification_Expiry__c,Seniority_Date__c,Max_Weekly_Hours__c,Union_Member__c
+WD-N10049,Yusuf Okoro,N10049,yusuf.okoro@stmercy.example,FLOAT,Float Pool Nurse,ACLS;BLS;CCRN;RN,2027-08-31,2012-04-16,48,true
+WD-N10050,Rina Castillo,N10050,rina.castillo@stmercy.example,FLOAT,Float Pool Nurse,ACLS;BLS;CCRN;PALS;RN,2027-03-15,2016-09-01,40,true
+WD-N10051,Theo Lindqvist,N10051,theo.lindqvist@stmercy.example,FLOAT,Float Pool Nurse,ACLS;BLS;CCRN;RN,2027-11-20,2019-02-11,40,false

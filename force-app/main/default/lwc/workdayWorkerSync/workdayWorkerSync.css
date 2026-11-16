@@ -1,0 +1,8 @@
+:host {
+    position: relative;
+    display: block;
+}
+
+.table-wrap {
+    height: 480px;
+}

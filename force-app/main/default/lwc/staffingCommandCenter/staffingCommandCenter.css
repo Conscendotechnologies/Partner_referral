@@ -1,0 +1,88 @@
+:host {
+    position: relative;
+    display: block;
+}
+
+.kpis {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 0.75rem;
+    margin-bottom: 1rem;
+}
+
+.kpi {
+    border: 1px solid #dddbda;
+    border-radius: 0.25rem;
+    padding: 0.5rem 0.75rem;
+}
+
+.kpi-label {
+    font-size: 0.75rem;
+    color: #706e6b;
+}
+
+.kpi-value {
+    font-size: 1.5rem;
+    font-weight: 700;
+}
+
+.section {
+    font-size: 0.95rem;
+    font-weight: 700;
+    margin: 1rem 0 0.5rem;
+}
+
+.grid-wrap {
+    overflow-x: auto;
+}
+
+.grid {
+    border-collapse: collapse;
+    width: 100%;
+    font-size: 0.75rem;
+}
+
+.grid th,
+.grid td {
+    border: 1px solid #e5e5e5;
+    padding: 0.35rem;
+    text-align: center;
+    white-space: nowrap;
+}
+
+.unit-col {
+    text-align: left !important;
+    font-weight: 600;
+}
+
+.cell-low {
+    background: #e5f4e4;
+}
+
+.cell-mid {
+    background: #f9eeda;
+}
+
+.cell-high {
+    background: #ea001e;
+    color: #ffffff;
+    font-weight: 700;
+}
+
+.legend,
+.sub,
+.muted {
+    color: #706e6b;
+    font-size: 0.75rem;
+}
+
+.ranked li,
+.excluded li {
+    margin-bottom: 0.4rem;
+}
+
+.wb {
+    font-size: 0.7rem;
+    white-space: normal;
+    max-width: 16rem;
+}

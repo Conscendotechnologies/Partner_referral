@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Reason__c</fullName>
+    <label>Reason</label>
+    <required>false</required>
+    <trackHistory>false</trackHistory>
+    <type>Picklist</type>
+    <valueSet>
+        <restricted>true</restricted>
+        <valueSetDefinition>
+            <sorted>false</sorted>
+                <value>
+                    <fullName>Price Adjustment</fullName>
+                    <default>true</default>
+                    <label>Price Adjustment</label>
+                </value>
+                <value>
+                    <fullName>Goods Returned</fullName>
+                    <default>false</default>
+                    <label>Goods Returned</label>
+                </value>
+                <value>
+                    <fullName>Billing Error</fullName>
+                    <default>false</default>
+                    <label>Billing Error</label>
+                </value>
+                <value>
+                    <fullName>Additional Charges</fullName>
+                    <default>false</default>
+                    <label>Additional Charges</label>
+                </value>
+                <value>
+                    <fullName>Other</fullName>
+                    <default>false</default>
+                    <label>Other</label>
+                </value>
+        </valueSetDefinition>
+    </valueSet>
+</CustomField>

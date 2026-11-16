@@ -1,0 +1,108 @@
+<template>
+    <lightning-card title="Predictive Nurse Staffing — St. Mercy General" icon-name="standard:shift">
+        <div slot="actions">
+            <lightning-button-group>
+                <lightning-button label="Refresh" icon-name="utility:refresh" onclick={handleRefresh}></lightning-button>
+                <lightning-button variant="brand" label="Run forecast" icon-name="utility:einstein" onclick={handleRunForecast} disabled={busy}></lightning-button>
+            </lightning-button-group>
+        </div>
+
+        <div class="slds-p-horizontal_medium">
+            <template lwc:if={error}>
+                <div class="slds-text-color_error slds-m-bottom_small">{error}</div>
+            </template>
+
+            <div class="kpis">
+                <template for:each={kpis} for:item="k">
+                    <div key={k.label} class="kpi">
+                        <p class="kpi-label">{k.label}</p>
+                        <p class="kpi-value">{k.value}</p>
+                    </div>
+                </template>
+            </div>
+
+            <h3 class="section">7-day shortage forecast by unit and shift</h3>
+            <div class="grid-wrap">
+                <table class="grid">
+                    <thead>
+                        <tr>
+                            <th class="unit-col">Unit</th>
+                            <template for:each={columns} for:item="col">
+                                <th key={col}>{col}</th>
+                            </template>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <template for:each={rows} for:item="row">
+                            <tr key={row.unitCode}>
+                                <td class="unit-col">{row.unitName}</td>
+                                <template for:each={row.cells} for:item="c">
+                                    <td key={c.key} class={c.cls} title={c.title}>{c.label}</td>
+                                </template>
+                            </tr>
+                        </template>
+                    </tbody>
+                </table>
+            </div>
+            <p class="legend">Shortage probability. Red = 70%+ (an open shift is raised automatically), amber = 50–69%.</p>
+
+            <h3 class="section">Open shifts</h3>
+            <template lwc:if={hasOpenShifts}>
+                <table class="slds-table slds-table_cell-buffer slds-table_bordered">
+                    <thead>
+                        <tr class="slds-line-height_reset">
+                            <th>Shift</th><th>Unit</th><th>When</th><th>Status</th><th>Filled</th><th>Booked</th>
+                            <th>Agency cost avoided</th><th>Workday write-back</th><th></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <template for:each={openShifts} for:item="s">
+                            <tr key={s.id}>
+                                <td>{s.name}</td>
+                                <td>{s.unitName}</td>
+                                <td>{s.shiftLabel}</td>
+                                <td><span class={s.badgeClass}>{s.status}</span></td>
+                                <td>{s.progress}</td>
+                                <td>{s.assignedText}</td>
+                                <td>{s.saved}</td>
+                                <td class="wb">{s.writeback}</td>
+                                <td>
+                                    <lightning-button label="Eligible nurses" data-id={s.id} onclick={handleShowNurses}></lightning-button>
+                                </td>
+                            </tr>
+                        </template>
+                    </tbody>
+                </table>
+            </template>
+            <template lwc:else>
+                <p class="slds-text-color_weak">No open shifts. Run the forecast to raise them.</p>
+            </template>
+
+            <template lwc:if={selectedShift}>
+                <h3 class="section">Eligible nurses for {selectedShift.name} · {selectedShift.unitName} · {selectedShift.shiftLabel}</h3>
+                <div class="slds-grid slds-gutters">
+                    <div class="slds-col slds-size_1-of-2">
+                        <p class="sub">Ranked: qualification, fairness (least overtime), union seniority</p>
+                        <ol class="ranked">
+                            <template for:each={eligibleCandidates} for:item="c">
+                                <li key={c.nurseId}><b>{c.rank}. {c.name}</b> <span class="muted">({c.homeUnit})</span><br/><span class="muted">{c.basis}</span></li>
+                            </template>
+                        </ol>
+                    </div>
+                    <div class="slds-col slds-size_1-of-2">
+                        <p class="sub">Excluded by guardrails ({excludedCount}), examples</p>
+                        <ul class="excluded">
+                            <template for:each={excludedCandidates} for:item="c">
+                                <li key={c.nurseId}><b>{c.name}</b> — <span class="muted">{c.why}</span></li>
+                            </template>
+                        </ul>
+                    </div>
+                </div>
+            </template>
+
+            <template lwc:if={busy}>
+                <lightning-spinner alternative-text="Working" size="small"></lightning-spinner>
+            </template>
+        </div>
+    </lightning-card>
+</template>

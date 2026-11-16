@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Acuity_Score__c</fullName>
+    <label>Acuity Score</label>
+    <description>Average acuity, 1 (low) to 5 (high).</description>
+    <precision>3</precision>
+    <scale>2</scale>
+    <required>false</required>
+    <type>Number</type>
+    <unique>false</unique>
+    <externalId>false</externalId>
+</CustomField>

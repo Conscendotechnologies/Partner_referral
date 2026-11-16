@@ -1,0 +1,28 @@
+.accent-rule {
+    height: 3px;
+    width: 100%;
+    border-radius: 2px;
+}
+
+.totals {
+    border-top: 1px solid #e5e5e5;
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+}
+
+.total-value {
+    font-size: 1.15rem;
+    font-weight: 700;
+    font-variant-numeric: tabular-nums;
+}
+
+.slds-item_label {
+    width: 45%;
+    padding-right: 0.5rem;
+}
+
+.slds-item_detail {
+    width: 55%;
+    font-weight: 600;
+}

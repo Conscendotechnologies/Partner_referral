@@ -1,0 +1,238 @@
+<apex:page controller="DocumentPdfController"
+           renderAs="pdf"
+           applyHtmlTag="false"
+           applyBodyTag="false"
+           showHeader="false"
+           sidebar="false"
+           standardStylesheets="false"
+           cache="false">
+<html>
+<head>
+<title>{!IF(hasError, 'Document', doc.documentTitle + ' ' + doc.recordName)}</title>
+<style type="text/css">
+    /* Flying Saucer (the Visualforce PDF renderer) supports CSS 2.1 only.
+       Everything below is table + block layout on purpose - no flexbox, no grid. */
+    @page {
+        size: A4;
+        margin: 18mm 16mm 20mm 16mm;
+        @bottom-center {
+            content: "Page " counter(page) " of " counter(pages);
+            font-family: Arial, sans-serif;
+            font-size: 8pt;
+            color: #8A8F98;
+        }
+    }
+    body {
+        font-family: Arial, Helvetica, sans-serif;
+        font-size: 9.5pt;
+        color: #24272E;
+        line-height: 1.45;
+    }
+    table { border-collapse: collapse; width: 100%; }
+    td, th { vertical-align: top; }
+
+    .masthead { border-bottom: 2pt solid {!doc.accentColor}; padding-bottom: 8pt; }
+    .company {
+        font-size: 15pt;
+        font-weight: bold;
+        color: {!doc.accentColor};
+        letter-spacing: -0.3pt;
+    }
+    .company-sub { font-size: 8pt; color: #6B7078; padding-top: 2pt; }
+    .doctitle {
+        font-size: 17pt;
+        font-weight: bold;
+        color: {!doc.accentColor};
+        text-align: right;
+        letter-spacing: 1pt;
+    }
+    .docnum { font-size: 10pt; text-align: right; padding-top: 3pt; color: #40454E; }
+
+    .section-label {
+        font-size: 7.5pt;
+        font-weight: bold;
+        letter-spacing: 1pt;
+        color: #8A8F98;
+        text-transform: uppercase;
+        padding-bottom: 3pt;
+    }
+    .party-name { font-size: 11pt; font-weight: bold; color: #24272E; }
+    .party-addr { font-size: 9pt; color: #55595F; padding-top: 2pt; }
+
+    .detail-tbl td {
+        padding: 4pt 8pt 4pt 0;
+        border-bottom: 0.5pt solid #E6E7EA;
+        font-size: 9pt;
+    }
+    .detail-key { color: #6B7078; width: 42%; }
+    .detail-val { color: #24272E; font-weight: bold; }
+
+    .items-tbl { margin-top: 4pt; }
+    .items-tbl th {
+        background-color: {!doc.accentColor};
+        color: #FFFFFF;
+        font-size: 8pt;
+        letter-spacing: 0.6pt;
+        text-transform: uppercase;
+        text-align: left;
+        padding: 6pt 7pt;
+        font-weight: bold;
+    }
+    .items-tbl td {
+        padding: 6pt 7pt;
+        border-bottom: 0.5pt solid #E6E7EA;
+        font-size: 9pt;
+    }
+    .num { text-align: right; }
+
+    .totals-tbl td { padding: 4pt 7pt; font-size: 9.5pt; }
+    .totals-label { text-align: right; color: #6B7078; }
+    .totals-value { text-align: right; width: 90pt; font-weight: bold; }
+    .grand td {
+        border-top: 1.5pt solid {!doc.accentColor};
+        font-size: 11.5pt;
+        font-weight: bold;
+        color: {!doc.accentColor};
+        padding-top: 6pt;
+    }
+
+    .stamp {
+        border: 1.5pt solid {!doc.accentColor};
+        color: {!doc.accentColor};
+        font-size: 10pt;
+        font-weight: bold;
+        letter-spacing: 1pt;
+        padding: 5pt 10pt;
+        text-align: center;
+    }
+    .footnote {
+        margin-top: 22pt;
+        border-top: 0.5pt solid #E6E7EA;
+        padding-top: 7pt;
+        font-size: 7.5pt;
+        color: #8A8F98;
+        line-height: 1.5;
+    }
+    .spacer { height: 16pt; }
+    .err { color: #9E2B25; font-size: 11pt; font-weight: bold; }
+</style>
+</head>
+<body>
+
+<apex:outputPanel rendered="{!hasError}" layout="block">
+    <div class="err">This document could not be generated</div>
+    <p>{!errorMessage}</p>
+</apex:outputPanel>
+
+<apex:outputPanel rendered="{!NOT(hasError)}" layout="block">
+
+    <!-- masthead -->
+    <table class="masthead">
+        <tr>
+            <td style="width:55%;">
+                <div class="company">{!doc.companyName}</div>
+                <div class="company-sub">
+                    Office 1704, Almas Tower, Jumeirah Lakes Towers<br/>
+                    PO Box 48800, Dubai, United Arab Emirates<br/>
+                    TRN 100123456700003 &#183; accounts@globalfeeder.example
+                </div>
+            </td>
+            <td style="width:45%;">
+                <div class="doctitle">{!doc.documentTitle}</div>
+                <div class="docnum">{!doc.recordName}</div>
+            </td>
+        </tr>
+    </table>
+
+    <div class="spacer"></div>
+
+    <!-- parties + details -->
+    <table>
+        <tr>
+            <td style="width:48%; padding-right:16pt;">
+                <div class="section-label">Bill To</div>
+                <div class="party-name">
+                    <apex:outputText value="{!IF(ISBLANK(doc.accountName), 'Account not set', doc.accountName)}"/>
+                </div>
+                <apex:outputPanel rendered="{!NOT(ISBLANK(doc.accountAddress))}" layout="block">
+                    <div class="party-addr">{!doc.accountAddress}</div>
+                </apex:outputPanel>
+
+                <div style="height:12pt;"></div>
+                <div class="section-label">Issued</div>
+                <div class="party-addr">{!doc.generatedOn}</div>
+            </td>
+            <td style="width:52%;">
+                <div class="section-label">Document Details</div>
+                <table class="detail-tbl">
+                    <apex:repeat value="{!doc.details}" var="row">
+                        <tr>
+                            <td class="detail-key">{!row.label}</td>
+                            <td class="detail-val">{!row.value}</td>
+                        </tr>
+                    </apex:repeat>
+                </table>
+            </td>
+        </tr>
+    </table>
+
+    <!-- line items -->
+    <apex:outputPanel rendered="{!doc.showLineItems}" layout="block">
+        <div class="spacer"></div>
+        <div class="section-label">Items</div>
+        <table class="items-tbl">
+            <tr>
+                <th style="width:52%;">Description</th>
+                <th class="num" style="width:12%;">Qty</th>
+                <th class="num" style="width:18%;">Unit Price</th>
+                <th class="num" style="width:18%;">Amount</th>
+            </tr>
+            <apex:repeat value="{!doc.lineItems}" var="li">
+                <tr>
+                    <td>{!li.description}</td>
+                    <td class="num">{!li.quantity}</td>
+                    <td class="num">{!li.unitPrice}</td>
+                    <td class="num">{!li.lineTotal}</td>
+                </tr>
+            </apex:repeat>
+        </table>
+    </apex:outputPanel>
+
+    <!-- totals -->
+    <apex:outputPanel rendered="{!doc.hasTotals}" layout="block">
+        <table style="margin-top:10pt;">
+            <tr>
+                <td style="width:55%;">
+                    <div class="stamp">{!doc.documentTitle}</div>
+                </td>
+                <td style="width:45%;">
+                    <table class="totals-tbl">
+                        <tr>
+                            <td class="totals-label">Subtotal</td>
+                            <td class="totals-value">{!doc.subtotal}</td>
+                        </tr>
+                        <tr>
+                            <td class="totals-label">VAT (5%)</td>
+                            <td class="totals-value">{!doc.taxAmount}</td>
+                        </tr>
+                        <tr class="grand">
+                            <td class="totals-label">Total</td>
+                            <td class="totals-value">{!doc.grandTotal}</td>
+                        </tr>
+                    </table>
+                </td>
+            </tr>
+        </table>
+    </apex:outputPanel>
+
+    <div class="footnote">
+        This document was generated from Salesforce on {!doc.generatedOn} and is
+        provided for demonstration purposes only. Figures shown are sample data and
+        do not represent an actual liability. Registered office: Dubai, United Arab Emirates.
+    </div>
+
+</apex:outputPanel>
+
+</body>
+</html>
+</apex:page>

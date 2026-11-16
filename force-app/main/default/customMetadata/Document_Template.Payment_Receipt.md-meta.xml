@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomMetadata xmlns="http://soap.sforce.com/2006/04/metadata" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    <label>Payment Receipt</label>
+    <protected>false</protected>
+    <values>
+        <field>Object_API_Name__c</field>
+        <value xsi:type="xsd:string">Payment_Receipt__c</value>
+    </values>
+    <values>
+        <field>Document_Title__c</field>
+        <value xsi:type="xsd:string">PAYMENT RECEIPT</value>
+    </values>
+    <values>
+        <field>Accent_Color__c</field>
+        <value xsi:type="xsd:string">#1E5B41</value>
+    </values>
+    <values>
+        <field>Detail_Fields__c</field>
+        <value xsi:type="xsd:string">Name,Payment_Date__c,Payment_Method__c,Payment_Reference__c,Amount__c,Status__c</value>
+    </values>
+    <values>
+        <field>Show_Line_Items__c</field>
+        <value xsi:type="xsd:boolean">false</value>
+    </values>
+    <values>
+        <field>Active__c</field>
+        <value xsi:type="xsd:boolean">true</value>
+    </values>
+    <values>
+        <field>Account_Path__c</field>
+        <value xsi:type="xsd:string">Invoice__r.Account__c</value>
+    </values>
+</CustomMetadata>

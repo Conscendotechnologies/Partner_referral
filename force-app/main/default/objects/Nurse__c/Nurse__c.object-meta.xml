@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomObject xmlns="http://soap.sforce.com/2006/04/metadata">
+    <deploymentStatus>Deployed</deploymentStatus>
+    <description>Nurse worker extract from Workday HCM (positions, skills, certifications).</description>
+    <enableActivities>false</enableActivities>
+    <enableHistory>false</enableHistory>
+    <enableReports>true</enableReports>
+    <enableSearch>true</enableSearch>
+    <label>Nurse</label>
+    <nameField>
+        <label>Nurse Name</label>
+        <type>Text</type>
+    </nameField>
+    <pluralLabel>Nurses</pluralLabel>
+    <sharingModel>ReadWrite</sharingModel>
+</CustomObject>

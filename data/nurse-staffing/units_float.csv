@@ -1,0 +1,2 @@
+Unit_Code__c,Name,Hospital__c,Patients_Per_Nurse__c,Required_Certifications__c,Agency_Hourly_Rate__c,Staff_Hourly_Rate__c
+FLOAT,Resource Float Pool,St. Mercy General,4,RN;BLS,0,58

@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Required_Certifications__c</fullName>
+    <label>Required Certifications</label>
+    <visibleLines>4</visibleLines>
+    <type>MultiselectPicklist</type>
+    <valueSet>
+        <restricted>true</restricted>
+        <valueSetDefinition>
+            <sorted>false</sorted>
+            <value>
+                <fullName>RN</fullName>
+                <default>false</default>
+                <label>RN</label>
+            </value>
+            <value>
+                <fullName>BLS</fullName>
+                <default>false</default>
+                <label>BLS</label>
+            </value>
+            <value>
+                <fullName>ACLS</fullName>
+                <default>false</default>
+                <label>ACLS</label>
+            </value>
+            <value>
+                <fullName>CCRN</fullName>
+                <default>false</default>
+                <label>CCRN</label>
+            </value>
+            <value>
+                <fullName>PALS</fullName>
+                <default>false</default>
+                <label>PALS</label>
+            </value>
+            <value>
+                <fullName>NRP</fullName>
+                <default>false</default>
+                <label>NRP</label>
+            </value>
+        </valueSetDefinition>
+    </valueSet>
+</CustomField>

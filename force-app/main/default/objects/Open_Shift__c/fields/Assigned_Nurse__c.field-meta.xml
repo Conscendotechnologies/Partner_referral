@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Assigned_Nurse__c</fullName>
+    <label>Assigned Nurse</label>
+    <deleteConstraint>SetNull</deleteConstraint>
+    <referenceTo>Nurse__c</referenceTo>
+    <relationshipLabel>Assigned Open Shifts</relationshipLabel>
+    <relationshipName>Assigned_Open_Shifts</relationshipName>
+    <required>false</required>
+    <type>Lookup</type>
+</CustomField>

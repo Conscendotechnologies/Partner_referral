@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomMetadata xmlns="http://soap.sforce.com/2006/04/metadata" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+    <label>Workday</label>
+    <protected>false</protected>
+    <values>
+        <field>Client_Id__c</field>
+        <value xsi:type="xsd:string">NGY1ZjdhMDEtYzU2ZS00ZWZmLTgxYzQtYmNlZGI5Mjc2MmY2</value>
+    </values>
+    <values>
+        <field>Client_Secret__c</field>
+        <value xsi:nil="true"/>
+    </values>
+    <values>
+        <field>Authorize_URL__c</field>
+        <value xsi:type="xsd:string">https://api.odp.wcp.workday.com/auth/v1/authorize</value>
+    </values>
+    <values>
+        <field>Token_URL__c</field>
+        <value xsi:type="xsd:string">https://api.odp.wcp.workday.com/auth/v1/token</value>
+    </values>
+    <values>
+        <field>Redirect_URL__c</field>
+        <value xsi:type="xsd:string">https://co1778135180529.my.salesforce.com/services/authcallback/Workday</value>
+    </values>
+</CustomMetadata>

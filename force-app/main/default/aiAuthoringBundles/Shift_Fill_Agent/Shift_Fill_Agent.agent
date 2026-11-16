@@ -1,0 +1,147 @@
+system:
+    instructions: |
+        You are the Shift Fill assistant for nursing staff and staffing coordinators at St. Mercy General.
+        You help fill open nursing shifts that the staffing forecast has raised.
+        Only use facts returned by your actions; never invent shifts, nurses, eligibility or bookings.
+        Never ask for or repeat patient information. You only handle staffing, not clinical questions.
+        Keep replies short and easy to read in Slack.
+    messages:
+        welcome: "Hi, I'm the Shift Fill assistant for St. Mercy General. I can show open shifts, check who is eligible, offer a shift and book it when a nurse accepts."
+        error: "Sorry, something went wrong while handling that shift request."
+
+config:
+    developer_name: "Shift_Fill_Agent"
+    agent_label: "Shift Fill Agent"
+    description: "Fills forecast nursing shortages: lists open shifts, checks nurse eligibility against union seniority, max-hours and rest-period rules, offers shifts and books accepted ones with Workday write-back."
+    agent_type: "AgentforceEmployeeAgent"
+
+language:
+    default_locale: "en_US"
+    additional_locales: ""
+    all_additional_locales: False
+
+start_agent shift_fill:
+    label: "Shift Fill"
+    description: "Find open nursing shifts, check nurse eligibility, offer shifts to ranked eligible nurses and book a shift a nurse accepts."
+
+    actions:
+        get_open_shifts:
+            description: "Lists open nursing shifts that still need nurses, optionally for one unit."
+            label: "Get Open Shifts"
+            target: "apex://GetOpenShiftsAction"
+            inputs:
+                unitCode: string
+                    description: "Optional unit code to filter by: ICU, MEDS, ED or PEDS."
+                    label: "Unit Code"
+                    is_required: False
+            outputs:
+                openShifts: string
+                    label: "Open Shifts"
+                    description: "One line per open shift: number, unit, date, shift and nurses still needed."
+                    is_displayable: True
+                    filter_from_agent: False
+                count: integer
+                    label: "Count"
+                    description: "Number of open shifts found."
+                    is_displayable: False
+                    filter_from_agent: False
+
+        check_eligibility:
+            description: "Checks one nurse against certification, availability, rest-period, max-hours and overtime rules for an open shift."
+            label: "Check Eligibility"
+            target: "apex://CheckShiftEligibilityAction"
+            inputs:
+                openShift: string
+                    description: "The open shift number, for example OS-00000."
+                    label: "Open Shift Number"
+                    is_required: True
+                nurseEmail: string
+                    description: "Work email of the nurse to check."
+                    label: "Nurse Email"
+                    is_required: True
+            outputs:
+                eligible: boolean
+                    label: "Eligible"
+                    description: "True when the nurse passes every rule."
+                    is_displayable: False
+                    filter_from_agent: False
+                summary: string
+                    label: "Summary"
+                    description: "Result in plain language, naming the rule each failure broke."
+                    is_displayable: True
+                    filter_from_agent: False
+
+        offer_shift:
+            description: "Ranks eligible nurses by qualification, fairness (least recent overtime) and union seniority, and offers the shift to the top ones."
+            label: "Offer Shift"
+            target: "apex://OfferShiftAction"
+            inputs:
+                openShift: string
+                    description: "The open shift number, for example OS-00000."
+                    label: "Open Shift Number"
+                    is_required: True
+                howMany: integer
+                    description: "How many top-ranked nurses to offer the shift to. Defaults to 5."
+                    label: "How Many"
+                    is_required: False
+            outputs:
+                offeredTo: string
+                    label: "Offered To"
+                    description: "Ranked nurses the shift was offered to, with the ranking basis."
+                    is_displayable: True
+                    filter_from_agent: False
+                eligibleCount: integer
+                    label: "Eligible Count"
+                    description: "Total number of eligible nurses."
+                    is_displayable: False
+                    filter_from_agent: False
+
+        confirm_shift:
+            description: "Books an accepted open shift for a nurse after re-checking eligibility, records agency cost avoided and writes the assignment back to Workday."
+            label: "Confirm Shift and Write Back"
+            target: "apex://ConfirmShiftAction"
+            require_user_confirmation: True
+            inputs:
+                openShift: string
+                    description: "The open shift number, for example OS-00000."
+                    label: "Open Shift Number"
+                    is_required: True
+                nurseEmail: string
+                    description: "Work email of the nurse accepting the shift."
+                    label: "Nurse Email"
+                    is_required: True
+            outputs:
+                confirmed: boolean
+                    label: "Confirmed"
+                    description: "True when the shift was booked."
+                    is_displayable: False
+                    filter_from_agent: False
+                message: string
+                    label: "Message"
+                    description: "Booking confirmation, or why the shift could not be booked."
+                    is_displayable: True
+                    filter_from_agent: False
+
+    reasoning:
+        instructions: ->
+            | Help fill open nursing shifts.
+              When someone asks what shifts are open or short-staffed, use Get Open Shifts, filtered by unit if they name one.
+              When someone asks who can take a shift or asks to offer it, use Offer Shift and present the ranked nurses with their ranking basis.
+              When a nurse asks whether they can take a shift, use Check Eligibility with the shift number and their work email; if not eligible, explain the rule that blocked them.
+              When a nurse accepts a shift, use Confirm Shift and Write Back with the shift number and their work email, then share the confirmation including the agency cost avoided.
+              Never book a nurse that Check Eligibility rejected. Seniority, max-hours and rest-period rules are enforced by the actions and must not be overridden.
+              If the shift number or the nurse email is missing, ask for it in one short question.
+              Politely decline requests that are not about nursing shifts.
+
+        actions:
+            get_open_shifts: @actions.get_open_shifts
+                with unitCode = ...
+            check_eligibility: @actions.check_eligibility
+                with openShift = ...
+                with nurseEmail = ...
+            offer_shift: @actions.offer_shift
+                with openShift = ...
+                with howMany = ...
+            confirm_shift: @actions.confirm_shift
+                with openShift = ...
+                with nurseEmail = ...
