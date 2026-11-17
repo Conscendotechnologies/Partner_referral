@@ -1,0 +1,119 @@
+:host {
+    display: block;
+}
+.pr-home {
+    max-width: 52rem;
+    margin: 0 auto;
+    padding: 1rem;
+    box-sizing: border-box;
+    overflow-x: hidden;
+}
+.pr-hero {
+    margin-bottom: 1rem;
+}
+.pr-hero__eyebrow {
+    font-size: 0.75rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: #0b7a75;
+    margin: 0;
+}
+.pr-hero__title {
+    font-size: 1.5rem;
+    font-weight: 700;
+    margin: 0.25rem 0 0;
+    line-height: 1.2;
+}
+.pr-tiles {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0.625rem;
+    margin-bottom: 1.25rem;
+}
+@media (min-width: 40rem) {
+    .pr-tiles {
+        grid-template-columns: repeat(5, minmax(0, 1fr));
+    }
+    .pr-tile_money {
+        grid-column: span 2;
+    }
+}
+.pr-tile {
+    border-radius: 0.75rem;
+    padding: 0.75rem;
+    background: #f4f6f9;
+    display: flex;
+    flex-direction: column;
+    gap: 0.125rem;
+    min-width: 0;
+}
+.pr-tile_total {
+    grid-column: span 2;
+    background: #0b2e4f;
+    color: #fff;
+}
+@media (min-width: 40rem) {
+    .pr-tile_total {
+        grid-column: span 1;
+    }
+}
+.pr-tile__label {
+    font-size: 0.75rem;
+    font-weight: 600;
+    opacity: 0.85;
+}
+.pr-tile__value {
+    font-size: 1.5rem;
+    font-weight: 700;
+    font-variant-numeric: tabular-nums;
+}
+.pr-tile__hint {
+    font-size: 0.6875rem;
+    opacity: 0.7;
+}
+.pr-tile_received {
+    background: #eef1f6;
+}
+.pr-tile_progress {
+    background: #e5f1fb;
+}
+.pr-tile_connected {
+    background: #e3f5e8;
+}
+.pr-tile_lost {
+    background: #f4eded;
+}
+.pr-tile_money {
+    background: #fff7e6;
+}
+.pr-switch {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    background: #eef1f6;
+    border-radius: 999px;
+    padding: 0.25rem;
+    margin-bottom: 0.5rem;
+}
+.pr-tab {
+    min-height: 2.75rem;
+    border: 0;
+    border-radius: 999px;
+    background: transparent;
+    font: inherit;
+    font-weight: 600;
+    cursor: pointer;
+    color: #3e4a5b;
+}
+.pr-tab_on {
+    background: #fff;
+    color: #0b2e4f;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12);
+}
+.pr-error {
+    background: #fdecea;
+    color: #8c1d18;
+    border-radius: 0.5rem;
+    padding: 0.75rem 1rem;
+    margin-bottom: 0.75rem;
+}

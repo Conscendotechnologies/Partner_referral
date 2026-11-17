@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Total_Ex_GST__c</fullName>
+    <label>Total (ex GST)</label>
+    <summarizedField>Payout_Line__c.Total_Ex_GST__c</summarizedField>
+    <summaryForeignKey>Payout_Line__c.Payout_Batch__c</summaryForeignKey>
+    <summaryOperation>sum</summaryOperation>
+    <type>Summary</type>
+</CustomField>

@@ -1,0 +1,67 @@
+<template>
+    <lightning-card title="Commission payouts" icon-name="custom:custom17">
+        <div class="slds-p-horizontal_medium">
+            <template lwc:if={loading}>
+                <lightning-spinner alternative-text="Working" size="small"></lightning-spinner>
+            </template>
+            <template lwc:if={errorMessage}>
+                <div class="slds-notify slds-notify_alert slds-alert_error slds-m-bottom_small" role="alert">{errorMessage}</div>
+            </template>
+            <template lwc:if={message}>
+                <div class="slds-notify slds-notify_alert slds-alert_offline slds-m-bottom_small pr-ok" role="status">{message}</div>
+            </template>
+
+            <template lwc:if={showRun}>
+                <div class="pr-ready">
+                    <div>
+                        <div class="slds-text-title">Approved, not yet in a batch</div>
+                        <div class="slds-text-heading_medium">
+                            {readyCount} commissions ·
+                            <lightning-formatted-number value={readyTotal} format-style="currency" currency-code="AUD"></lightning-formatted-number>
+                        </div>
+                    </div>
+                    <div class="pr-run">
+                        <lightning-input type="text" label="Payout month" value={period} onchange={handlePeriod} placeholder="YYYY-MM"
+                            pattern="[0-9]{4}-(0[1-9]|1[0-2])" message-when-pattern-mismatch="Use YYYY-MM." class="pr-period"></lightning-input>
+                        <lightning-button variant="brand" label="Run payout" onclick={handleRun} disabled={cannotManage}></lightning-button>
+                    </div>
+                </div>
+            </template>
+
+            <table class="slds-table slds-table_cell-buffer slds-table_bordered slds-m-top_small">
+                <thead>
+                    <tr class="slds-line-height_reset">
+                        <th scope="col">Month</th>
+                        <th scope="col">Status</th>
+                        <th scope="col" class="slds-text-align_right">Agencies</th>
+                        <th scope="col" class="slds-text-align_right">Total ex GST</th>
+                        <th scope="col" class="slds-text-align_right">Runs</th>
+                        <th scope="col"><span class="slds-assistive-text">Actions</span></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <template for:each={batches} for:item="b">
+                        <tr key={b.id}>
+                            <th scope="row"><a href={b.url}>{b.period}</a></th>
+                            <td><span class={b.badge}>{b.status}</span></td>
+                            <td class="slds-text-align_right">{b.lineCount}</td>
+                            <td class="slds-text-align_right">
+                                <lightning-formatted-number value={b.total} format-style="currency" currency-code="AUD"></lightning-formatted-number>
+                            </td>
+                            <td class="slds-text-align_right">{b.runCount}</td>
+                            <td class="slds-text-align_right">
+                                <lightning-button-group>
+                                    <lightning-button label="Download Xero CSV" data-id={b.id} onclick={handleExport} disabled={b.cannotExport}></lightning-button>
+                                    <lightning-button label="Mark paid" data-id={b.id} onclick={handlePaid} disabled={b.cannotPay}></lightning-button>
+                                </lightning-button-group>
+                            </td>
+                        </tr>
+                    </template>
+                </tbody>
+            </table>
+            <template lwc:if={noBatches}>
+                <p class="slds-p-vertical_medium slds-text-color_weak">No payout batches yet.</p>
+            </template>
+        </div>
+    </lightning-card>
+</template>

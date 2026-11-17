@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Commission_Rate__c</fullName>
+    <label>Commission Rate</label>
+    <inlineHelpText>Flat commission per connected service, ex GST, in AUD.</inlineHelpText>
+    <precision>10</precision>
+    <required>false</required>
+    <scale>2</scale>
+    <type>Currency</type>
+    <trackHistory>true</trackHistory>
+</CustomField>

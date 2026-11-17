@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Reopened_After_Approval__c</fullName>
+    <label>Reopened After Approval</label>
+    <inlineHelpText>The won Opportunity was reopened after this commission was approved. Finance to review (clawback).</inlineHelpText>
+    <defaultValue>false</defaultValue>
+    <type>Checkbox</type>
+</CustomField>

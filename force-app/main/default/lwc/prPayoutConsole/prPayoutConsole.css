@@ -1,0 +1,22 @@
+.pr-ready {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    align-items: flex-end;
+    gap: 1rem;
+    padding: 0.75rem 1rem;
+    border-radius: 0.5rem;
+    background: var(--slds-g-color-neutral-base-95, #f3f3f3);
+}
+.pr-run {
+    display: flex;
+    align-items: flex-end;
+    gap: 0.5rem;
+}
+.pr-period {
+    width: 8rem;
+}
+.pr-ok {
+    background: #e3f5e8;
+    color: #1d6b38;
+}

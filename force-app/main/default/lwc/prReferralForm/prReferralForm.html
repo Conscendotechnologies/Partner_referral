@@ -1,0 +1,107 @@
+<template>
+    <div class="pr-form">
+        <template lwc:if={loading}>
+            <lightning-spinner alternative-text="Loading" size="small"></lightning-spinner>
+        </template>
+
+        <template lwc:if={blockedMessage}>
+            <div class="pr-notice pr-notice_error" role="alert">{blockedMessage}</div>
+        </template>
+
+        <template lwc:elseif={result}>
+            <div class="pr-success" role="status">
+                <lightning-icon icon-name="utility:success" variant="success" size="medium" alternative-text="Sent"></lightning-icon>
+                <h2 class="pr-success__title">Referral sent</h2>
+                <p class="pr-success__text">
+                    {result.referralNumber} is with the Connectnow team. You can follow its status under My referrals.
+                </p>
+                <lightning-button variant="brand" label="Refer another mover" onclick={handleReset} class="pr-full" stretch></lightning-button>
+            </div>
+        </template>
+
+        <template lwc:else>
+            <h2 class="pr-title">Refer a mover</h2>
+            <p class="pr-subtitle">{agencyName}</p>
+
+            <template lwc:if={errorMessage}>
+                <div class="pr-notice pr-notice_error" role="alert">{errorMessage}</div>
+            </template>
+
+            <fieldset class="pr-section">
+                <legend class="pr-legend">Mover</legend>
+                <div class="pr-row">
+                    <lightning-input class="pr-field" data-id="firstName" label="First name" required max-length="80"
+                        value={form.firstName} onchange={handleChange} autocomplete="given-name"></lightning-input>
+                    <lightning-input class="pr-field" data-id="lastName" label="Last name" required max-length="80"
+                        value={form.lastName} onchange={handleChange} autocomplete="family-name"></lightning-input>
+                </div>
+                <lightning-input class="pr-field" data-id="mobile" type="tel" label="Mobile" required
+                    placeholder="04XX XXX XXX" pattern={mobilePattern}
+                    message-when-pattern-mismatch="Use 04 and 8 digits, or +614 and 8 digits."
+                    value={form.mobile} onchange={handleChange} autocomplete="tel"></lightning-input>
+                <lightning-input class="pr-field" data-id="email" type="email" label="Email (optional)"
+                    value={form.email} onchange={handleChange} autocomplete="email"></lightning-input>
+            </fieldset>
+
+            <fieldset class="pr-section">
+                <legend class="pr-legend">New address</legend>
+                <lightning-input class="pr-field" data-id="street" label="Street" required max-length="255"
+                    value={form.street} onchange={handleChange} autocomplete="address-line1"></lightning-input>
+                <lightning-input class="pr-field" data-id="suburb" label="Suburb" required max-length="80"
+                    value={form.suburb} onchange={handleChange} autocomplete="address-level2"></lightning-input>
+                <div class="pr-row">
+                    <lightning-combobox class="pr-field" data-id="state" label="State" required options={stateOptions}
+                        value={form.state} onchange={handleChange} placeholder="Select"></lightning-combobox>
+                    <lightning-input class="pr-field" data-id="postcode" label="Postcode" required pattern="[0-9]{4}"
+                        message-when-pattern-mismatch="4 digits." max-length="4" inputmode="numeric"
+                        value={form.postcode} onchange={handleChange} autocomplete="postal-code"></lightning-input>
+                </div>
+                <lightning-input class="pr-field" data-id="moveInDate" type="date" label="Move-in date" required
+                    min={minMoveIn} max={maxMoveIn} date-style="medium"
+                    message-when-range-underflow="No more than 7 days ago."
+                    message-when-range-overflow="No more than 6 months ahead."
+                    value={form.moveInDate} onchange={handleChange}></lightning-input>
+            </fieldset>
+
+            <fieldset class="pr-section">
+                <legend class="pr-legend">Services to connect</legend>
+                <lightning-checkbox-group class="pr-field pr-utilities" data-id="utilities" label="Choose at least one"
+                    options={utilityOptions} value={form.utilities} onchange={handleChange} required></lightning-checkbox-group>
+            </fieldset>
+
+            <details class="pr-more">
+                <summary>More details (optional)</summary>
+                <lightning-textarea class="pr-field" data-id="previousAddress" label="Previous address" max-length="255"
+                    value={form.previousAddress} onchange={handleChange}></lightning-textarea>
+                <lightning-textarea class="pr-field" data-id="notes" label="Notes for Connectnow" max-length="2000"
+                    value={form.notes} onchange={handleChange}></lightning-textarea>
+            </details>
+
+            <div class="pr-consent">
+                <lightning-input class="pr-field" data-id="consent" type="checkbox" label="The customer gives consent"
+                    checked={form.consent} onchange={handleChange} required></lightning-input>
+                <p class="pr-consent__text">{consentText}</p>
+            </div>
+
+            <template lwc:if={duplicates}>
+                <div class="pr-notice pr-notice_warning" role="alert">
+                    <p><strong>Your agency already referred this mover:</strong></p>
+                    <ul class="pr-dupes">
+                        <template for:each={duplicates} for:item="d">
+                            <li key={d}>{d}</li>
+                        </template>
+                    </ul>
+                    <p>Send it anyway only if this is a different move.</p>
+                    <div class="pr-actions">
+                        <lightning-button label="Cancel" onclick={handleCancelDuplicate}></lightning-button>
+                        <lightning-button variant="brand" label="Send anyway" onclick={handleSubmitAnyway}></lightning-button>
+                    </div>
+                </div>
+            </template>
+            <template lwc:else>
+                <lightning-button variant="brand" label="Send referral" onclick={handleSubmit} class="pr-full pr-submit" stretch
+                    disabled={loading}></lightning-button>
+            </template>
+        </template>
+    </div>
+</template>
