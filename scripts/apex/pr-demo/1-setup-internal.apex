@@ -24,5 +24,10 @@ List<GroupMember> members = new List<GroupMember>();
 for (Group q : [SELECT Id FROM Group WHERE Type = 'Queue' AND DeveloperName LIKE 'PR%']) {
     if (!inQueue.contains(q.Id)) members.add(new GroupMember(GroupId = q.Id, UserOrGroupId = me.Id));
 }
+// Report and dashboard access (KAN-51): the Partner Referral folders are shared only with PR_Report_Viewers.
+List<Group> viewers = [SELECT Id FROM Group WHERE Type = 'Regular' AND DeveloperName = 'PR_Report_Viewers' LIMIT 1];
+if (!viewers.isEmpty() && !inQueue.contains(viewers[0].Id)) {
+    members.add(new GroupMember(GroupId = viewers[0].Id, UserOrGroupId = me.Id));
+}
 insert members;
-System.debug('PR-DEMO step 1 done: role set, ' + psas.size() + ' permission sets, ' + members.size() + ' queues');
+System.debug('PR-DEMO step 1 done: role set, ' + psas.size() + ' permission sets, ' + members.size() + ' queue and group memberships');
