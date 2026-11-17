@@ -71,6 +71,21 @@ PR Report Viewers → Edit**, then add the sales team leads, the Partner Manager
 share one). Because the dashboards run as the logged-in user, each viewer sees only the records their own access
 allows. The demo script `1-setup-internal.apex` adds the running admin.
 
+## Page layouts and record pages (KAN-55)
+
+- **Referral, Partner Commission, Payout Batch, Payout Line**: the default layouts now carry every field, grouped by
+  purpose, with related lists (Referral: Leads, Opportunities, Commissions; Payout Batch: Lines; Payout Line:
+  Commissions; Partner Commission: field history). On commissions, amount, rate, services, Opportunity and agency
+  are read-only on the layout as well as locked by the trigger.
+- **Lead and Opportunity, Partner Referral record type**: new layouts `Lead-Partner Referral Lead Layout` and
+  `Opportunity-Partner Referral Opportunity Layout`, assigned to that record type for the System Administrator and
+  Standard User profiles (`profiles/Admin` and `profiles/Standard` contain only those two assignments, so deploying them
+  changes nothing else on the profiles). Other internal profiles that should work partner referrals need the same
+  assignment.
+- **Payout Batch record page**: `PR_Payout_Batch_Record_Page` (highlights, the Payouts console for that batch, details,
+  related lists) is the default View page through the object's action override.
+- Partner users are not affected: the portal uses the partner LWCs, not these layouts.
+
 ## Queue staff
 
 Referrals are routed to five queues by the new address's state: `PR_NSW_ACT`, `PR_VIC_TAS`, `PR_QLD`, `PR_SA_WA_NT`, and

@@ -63,7 +63,15 @@ public without sharing class PR_SystemData {
     @TestVisible
     private static Integer DUPLICATE_CANDIDATE_CAP = 10000;
 
-    /** AC-02.9: marks existing referrals (and their Leads) as possible duplicates of a referral from another agency. */
+    /** Tests set this to make the Lead flag update fail, to prove the submission then saves nothing. */
+    @TestVisible
+    private static Boolean failLeadFlagForTest = false;
+
+    /**
+     * AC-02.9: marks existing referrals (and their Leads) as possible duplicates of a referral from another agency.
+     * All or nothing: if a Lead cannot be flagged, the DmlException propagates and the caller rolls the submission
+     * back. A Referral flagged without its Lead would never be retried, because flagged referrals are skipped.
+     */
     public static void flagPossibleDuplicates(Set<Id> referralIds) {
         if (referralIds == null || referralIds.isEmpty()) {
             return;
@@ -72,10 +80,14 @@ public without sharing class PR_SystemData {
         List<Lead> leads = new List<Lead>();
         for (Referral__c r : [SELECT Id, Lead__c, Lead__r.IsConverted FROM Referral__c WHERE Id IN :referralIds AND Possible_Duplicate__c = FALSE]) {
             refs.add(new Referral__c(Id = r.Id, Possible_Duplicate__c = true));
-            if (r.Lead__c != null && !r.Lead__r.IsConverted) leads.add(new Lead(Id = r.Lead__c, Possible_Duplicate__c = true));
+            if (r.Lead__c != null && !r.Lead__r.IsConverted) {
+                Lead l = new Lead(Id = r.Lead__c, Possible_Duplicate__c = true);
+                if (failLeadFlagForTest) l.LastName = null; // a required field: the update fails
+                leads.add(l);
+            }
         }
         update refs;
-        Database.update(leads, false);
+        update leads;
     }
 
     /** Inserts the referrals, then their Partner Referral Leads (routed by the Lead trigger), and links them. */

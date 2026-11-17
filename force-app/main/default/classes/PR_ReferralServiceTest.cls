@@ -265,6 +265,27 @@ private class PR_ReferralServiceTest {
         return r;
     }
 
+    @IsTest
+    static void aMatchWhoseLeadCannotBeFlaggedSavesNothing() {
+        Referral__c existing = otherAgencyReferral('0488888888', false, true);
+        PR_SystemData.failLeadFlagForTest = true;
+        Test.startTest();
+        System.runAs(PR_TestFactory.user('pa_ag1')) {
+            try {
+                PR_ReferralService.submit(inputFor('0488888888'));
+                Assert.fail('a Lead that cannot be flagged must fail the submission');
+            } catch (PR_Exception e) {
+                Assert.isTrue(e.getMessage().contains('Nothing was saved'), e.getMessage());
+            }
+        }
+        Test.stopTest();
+        Assert.areEqual(1, [SELECT COUNT() FROM Referral__c], 'the new referral was rolled back');
+        Assert.areEqual(0, [SELECT COUNT() FROM Lead WHERE MobilePhone = '0488888888'], 'and its Lead');
+        Referral__c after = [SELECT Possible_Duplicate__c, Lead__r.Possible_Duplicate__c FROM Referral__c WHERE Id = :existing.Id];
+        Assert.isFalse(after.Possible_Duplicate__c, 'the match is not left half flagged, so the next submission flags both');
+        Assert.isFalse(after.Lead__r.Possible_Duplicate__c);
+    }
+
     private static PR_ReferralInput inputFor(String mobile) {
         PR_ReferralInput i = PR_TestFactory.input(mobile, 'NSW', 20, new List<String>{ 'Gas' });
         i.email = null;
