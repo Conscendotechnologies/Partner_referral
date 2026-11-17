@@ -49,9 +49,9 @@ jobs:
             exit 1
           fi
           auth_file="$(mktemp)"
+          trap 'rm -f "$auth_file"' EXIT
           printf %s "$SFDX_AUTH_URL" > "$auth_file"
-          sf org login sfdx-url --sfdx-url-file "$auth_file" --alias target --set-default
-          rm -f "$auth_file"
+          sf org login sfdx-url --sfdx-url-file "$auth_file" --alias target --set-default --json | node -e "let s='';process.stdin.on('data',d=>s+=d).on('end',()=>{const j=JSON.parse(s);if(j.status){console.log('::error::Org login failed: '+j.name+': '+j.message);process.exit(1)}console.log('Logged in as '+j.result.username+' ('+j.result.instanceUrl+')')})"
 
       - name: Work out what the merge changed
         env:
