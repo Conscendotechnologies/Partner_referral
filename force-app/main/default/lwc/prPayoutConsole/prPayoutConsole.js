@@ -36,18 +36,21 @@ export default class PrPayoutConsole extends LightningElement {
     set recordId(value) {
         const changed = value !== this._recordId;
         this._recordId = value;
-        if (changed && this._connected) {
-            // Drop the previous batch at once: if the new load fails, nothing from the old batch stays on screen
-            // or behind the Export and Mark paid buttons.
-            this.data = null;
-            this.message = null;
-            this.errorMessage = null;
-            this.load();
-        }
+        if (!changed) return;
+        // A new record context, connected or not: drop the previous batch at once, so nothing from it stays on
+        // screen or behind the Export and Mark paid buttons (also after a reconnect), and retire results still
+        // in flight for it.
+        this._contextSeq++;
+        this.data = null;
+        this.message = null;
+        this.errorMessage = null;
+        if (this._connected) this.load();
     }
 
     /** Each load gets a number; only the latest one may update data, errors or the loading state. */
     _requestSeq = 0;
+    /** Changes whenever the record changes or the component disconnects; actions only report into their own. */
+    _contextSeq = 0;
 
     connectedCallback() {
         this._connected = true;
@@ -56,7 +59,8 @@ export default class PrPayoutConsole extends LightningElement {
 
     disconnectedCallback() {
         this._connected = false;
-        this._requestSeq++; // invalidate anything still in flight
+        this._requestSeq++; // invalidate loads still in flight
+        this._contextSeq++; // and action results
     }
 
     /** Tells sibling components (the record detail panel) that the batch changed on the server. */
@@ -155,18 +159,26 @@ export default class PrPayoutConsole extends LightningElement {
         // The batch the action changes: on a record page the console shows only that batch, so it is the record
         // shown when the action starts. Captured now, so navigating away mid-action still refreshes the right one.
         const actionBatchId = this.recordId;
+        const context = this._contextSeq;
+        const stillHere = () => context === this._contextSeq;
         this.errorMessage = null;
         this.message = null;
         this.loading = true;
         try {
             await fn();
-            await this.load();
-            // On a Payout Batch record page, refresh the detail panel (status, paid date) next to this console.
+            if (stillHere()) {
+                await this.load();
+            } else {
+                // The user moved to another record (or left) while this ran: its result belongs to the old batch,
+                // so it must not appear on the new one. The record itself is still refreshed below.
+                this.message = null;
+            }
+            // On a Payout Batch record page, refresh the detail panel (status, paid date) of the batch changed.
             await this.refreshRecord(actionBatchId);
         } catch (err) {
-            this.errorMessage = this.msg(err);
+            if (stillHere()) this.errorMessage = this.msg(err);
         } finally {
-            this.loading = false;
+            if (stillHere()) this.loading = false;
         }
     }
 

@@ -33,6 +33,11 @@ jobs:
         with:
           node-version: 22
 
+      - name: LWC Jest tests
+        run: |
+          npm install --no-audit --no-fund --loglevel=error
+          npx sfdx-lwc-jest --ci
+
       - name: Install Salesforce CLI and sfdx-git-delta
         run: |
           npm install --global @salesforce/cli
