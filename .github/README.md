@@ -18,9 +18,11 @@ a merge they run against the merged code.
 1. Create the secret `SFDX_AUTH_URL` from your logged-in CLI. This pipes the value straight into GitHub without printing it:
 
    ```
-   sf org display -o salesOrgSDO --verbose --json | node -e "let s='';process.stdin.on('data',d=>s+=d).on('end',()=>process.stdout.write(JSON.parse(s).result.sfdxAuthUrl))" | gh secret set SFDX_AUTH_URL -R Conscendotechnologies/Partner_referral
+   sf org auth show-sfdx-auth-url -o salesOrgSDO --json | node -e "let s='';process.stdin.on('data',d=>s+=d).on('end',()=>process.stdout.write(JSON.parse(s).result.sfdxAuthUrl))" | gh secret set SFDX_AUTH_URL -R Conscendotechnologies/Partner_referral
    ```
 
+   Use `sf org auth show-sfdx-auth-url`, not `sf org display --verbose`: newer CLI versions redact the URL in
+   `org display` ("[REDACTED] Use 'sf org auth show-sfdx-auth-url' to view"), and that text is not a valid secret.
    The org must be logged in with the web flow (`sf org login web`), so the auth URL carries a refresh token.
 2. Optional: in **Settings → Environments → production**, add required reviewers so merges wait for approval before deploying.
 3. Optional: in **Settings → Branches**, protect `main` and require the "Dry-run deploy and Apex tests" check before merging.
