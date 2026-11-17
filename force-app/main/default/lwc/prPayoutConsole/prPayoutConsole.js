@@ -123,12 +123,13 @@ export default class PrPayoutConsole extends LightningElement {
     async handleRun() {
         const input = this.template.querySelector('.pr-period');
         if (input && !input.reportValidity()) return;
+        const period = this.period;
         await this.act(async () => {
-            await runPayout({ period: this.period });
-            this.message = `Payout for ${this.period} is running. Refresh in a few seconds to see the lines.`;
+            await runPayout({ period });
             // the batch job is asynchronous: refresh once it has had time to run
             // eslint-disable-next-line @lwc/lwc/no-async-operation
             setTimeout(() => this.load(), 4000);
+            return `Payout for ${period} is running. Refresh in a few seconds to see the lines.`;
         });
     }
 
@@ -143,7 +144,7 @@ export default class PrPayoutConsole extends LightningElement {
             link.download = file.fileName;
             link.click();
             URL.revokeObjectURL(url);
-            this.message = `${file.fileName} downloaded. Upload it to Xero, then mark the batch paid.`;
+            return `${file.fileName} downloaded. Upload it to Xero, then mark the batch paid.`;
         });
     }
 
@@ -152,15 +153,20 @@ export default class PrPayoutConsole extends LightningElement {
         await this.act(async () => {
             const result = await markPaid({ batchId });
             if (result === 'Processing') {
-                this.message =
+                return (
                     'This is a large batch, so its commissions are being marked Paid in the background. ' +
-                    'The batch shows Paid once every commission is done. Refresh in a minute.';
-            } else {
-                this.message = 'Batch marked paid. Every commission in it is now Paid.';
+                    'The batch shows Paid once every commission is done. Refresh in a minute.'
+                );
             }
+            return 'Batch marked paid. Every commission in it is now Paid.';
         });
     }
 
+    /**
+     * Runs one action. Each action returns its message instead of writing it, and the message and any error are
+     * shown only while the action still owns the screen (same record, still connected). A stale action neither
+     * writes nor clears the current message, so it can never overwrite another action's result.
+     */
     async act(fn) {
         // The batch the action changes: on a record page the console shows only that batch, so it is the record
         // shown when the action starts. Captured now, so navigating away mid-action still refreshes the right one.
@@ -171,13 +177,14 @@ export default class PrPayoutConsole extends LightningElement {
         this.message = null;
         this.loading = true;
         try {
-            await fn();
+            const message = await fn();
             if (stillHere()) {
+                this.message = message;
                 await this.load();
-            } else {
-                // The user moved to another record (or left) while this ran: its result belongs to the old batch,
-                // so it must not appear on the new one. The record itself is still refreshed below.
-                this.message = null;
+            } else if (this._connected && this.recordId === actionBatchId) {
+                // The user went away and came back to this batch (A -> B -> A) while the action ran: the screen
+                // belongs to a newer context, so the message stays off, but the batch's data must be current.
+                await this.load();
             }
             // On a Payout Batch record page, refresh the detail panel (status, paid date) of the batch changed.
             await this.refreshRecord(actionBatchId);

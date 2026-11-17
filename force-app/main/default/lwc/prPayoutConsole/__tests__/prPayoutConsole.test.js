@@ -2,6 +2,7 @@ import { createElement } from 'lwc';
 import PrPayoutConsole from 'c/prPayoutConsole';
 import getConsole from '@salesforce/apex/PR_PayoutController.getConsole';
 import markPaid from '@salesforce/apex/PR_PayoutController.markPaid';
+import exportCsv from '@salesforce/apex/PR_PayoutController.exportCsv';
 import { notifyRecordUpdateAvailable } from 'lightning/uiRecordApi';
 
 jest.mock('@salesforce/apex/PR_PayoutController.getConsole', () => ({ default: jest.fn() }), { virtual: true });
@@ -64,6 +65,7 @@ describe('c-pr-payout-console on a Payout Batch record page', () => {
         jest.clearAllMocks();
         getConsole.mockReset();
         markPaid.mockReset();
+        exportCsv.mockReset();
     });
 
     it('ignores an older response that arrives after the newer one (out-of-order loads)', async () => {
@@ -174,5 +176,59 @@ describe('c-pr-payout-console on a Payout Batch record page', () => {
         await flush();
         await flush();
         expect(text(element)).toContain('Only Finance can mark batches paid');
+    });
+
+    describe('with a CSV export', () => {
+        beforeEach(() => {
+            global.URL.createObjectURL = jest.fn(() => 'blob:csv');
+            global.URL.revokeObjectURL = jest.fn();
+        });
+
+        it('reloads the batch when the user is back on it (A -> B -> A) before the export finishes', async () => {
+            // A starts as Draft; after the export the server reports it Exported.
+            let aStatus = 'Draft';
+            getConsole.mockImplementation(({ batchId }) => Promise.resolve(consoleFor(batchId, batchId === 'a01A' ? aStatus : 'Draft')));
+            const exporting = deferred();
+            exportCsv.mockReturnValueOnce(exporting.promise);
+            const element = await mountOn('a01A');
+            expect(button(element, 'Mark paid').disabled).toBe(true); // Draft: not exported yet
+
+            button(element, 'Download Xero CSV').dispatchEvent(new CustomEvent('click'));
+            await flush();
+            element.recordId = 'a01B';
+            await flush();
+            element.recordId = 'a01A'; // back on A; A reloads while the export is still running
+            await flush();
+            aStatus = 'Exported';
+            exporting.resolve({ fileName: 'connectnow-commissions-2026-10.csv', body: 'a,b\n' });
+            await flush();
+            await flush();
+
+            expect(button(element, 'Mark paid').disabled).toBe(false); // A's data reflects the finished export
+            expect(text(element)).not.toContain('downloaded'); // the message belongs to the earlier visit
+        });
+
+        it('a stale action never erases the current record\x27s message', async () => {
+            getConsole.mockImplementation(({ batchId }) => Promise.resolve(consoleFor(batchId, batchId === 'a01B' ? 'Draft' : 'Exported')));
+            const paidA = deferred();
+            markPaid.mockReturnValueOnce(paidA.promise);
+            exportCsv.mockResolvedValueOnce({ fileName: 'connectnow-commissions-2026-11.csv', body: 'a,b\n' });
+            const element = await mountOn('a01A');
+
+            button(element, 'Mark paid').dispatchEvent(new CustomEvent('click')); // on A, still running
+            await flush();
+            element.recordId = 'a01B';
+            await flush();
+            button(element, 'Download Xero CSV').dispatchEvent(new CustomEvent('click')); // on B, finishes
+            await flush();
+            await flush();
+            expect(text(element)).toContain('connectnow-commissions-2026-11.csv downloaded');
+
+            paidA.resolve('Paid'); // A's action lands late
+            await flush();
+            await flush();
+            expect(text(element)).toContain('connectnow-commissions-2026-11.csv downloaded');
+            expect(text(element)).not.toContain('marked paid');
+        });
     });
 });
