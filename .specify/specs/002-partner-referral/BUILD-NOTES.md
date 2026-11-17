@@ -97,6 +97,21 @@ default currency is not AUD (for example AED, the corporate currency) therefore 
 blank. **Every manual insert must set `CurrencyIsoCode = 'AUD'` explicitly**: Finance picks AUD in the Currency field
 when creating a commission by hand. The services (commission creation, payout) always set it.
 
+## Marking payouts Paid at scale (KAN-54)
+
+`PR_PayoutService.markPaid` marks up to 9,000 commissions Paid in the same transaction, as before. A larger batch (for
+example after several missed monthly runs, since the payout run picks up every approved, unbatched commission) is
+handed to `PR_MarkPaidBatchJob`, which marks the commissions Paid 2,000 at a time. The Payouts console then says the
+batch is being processed in the background.
+
+- The batch stays **Exported** while the job runs, and becomes **Paid** (with Paid On) only when no commission in it
+  is still Included in Payout.
+- If a chunk fails, the batch stays Exported. Finance marks it Paid again, and the second run picks up only the
+  commissions that are left.
+- A second mark-paid request is refused while one is running.
+
+The zero-test CI check (AC-11.3 on KAN-54) is not built yet: it waits for the Architect's decision.
+
 ## Demo data (S10)
 
 Run in order with `sf apex run -f scripts/apex/pr-demo/<file>`:

@@ -99,8 +99,14 @@ export default class PrPayoutConsole extends LightningElement {
     async handlePaid(e) {
         const batchId = e.target.dataset.id;
         await this.act(async () => {
-            await markPaid({ batchId });
-            this.message = 'Batch marked paid. Every commission in it is now Paid.';
+            const result = await markPaid({ batchId });
+            if (result === 'Processing') {
+                this.message =
+                    'This is a large batch, so its commissions are being marked Paid in the background. ' +
+                    'The batch shows Paid once every commission is done. Refresh in a minute.';
+            } else {
+                this.message = 'Batch marked paid. Every commission in it is now Paid.';
+            }
         });
     }
 
