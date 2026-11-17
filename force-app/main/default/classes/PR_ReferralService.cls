@@ -174,6 +174,7 @@ public with sharing class PR_ReferralService {
             otherAgencyMatches.addAll(others);
         }
 
+        requireDmlBudget(toCreate.size(), otherAgencyMatches.size());
         PR_SystemData.createReferralsAndLeads(toCreate);
         // AC-02.9: a cross-agency match is flagged on both referrals (internal only, never shown to partners).
         PR_SystemData.flagPossibleDuplicates(otherAgencyMatches);
@@ -184,6 +185,31 @@ public with sharing class PR_ReferralService {
             createdResults[n].referralNumber = numbers.get(toCreate[n].Id);
         }
         return results;
+    }
+
+    /** DML rows the platform still allows in this transaction; tests can lower it to exercise the guard. */
+    @TestVisible
+    private static Integer dmlRowsAvailableOverride;
+
+    /**
+     * Refuses a submission whose writes would exceed the transaction's DML-row limit (10,000), which would otherwise
+     * fail with an uncatchable governor exception part-way through. Checked before any write, so nothing is saved.
+     * Rows per new referral: Referral insert, Lead insert, Referral link update, and the status sync the Lead
+     * trigger performs (4). Rows per flagged cross-agency match: the Referral and its open Lead (2).
+     */
+    @TestVisible
+    private static void requireDmlBudget(Integer newReferrals, Integer flaggedMatches) {
+        Integer needed = newReferrals * 4 + flaggedMatches * 2;
+        Integer available = dmlRowsAvailableOverride != null
+            ? dmlRowsAvailableOverride
+            : Limits.getLimitDmlRows() - Limits.getDmlRows();
+        if (needed > available) {
+            throw new PR_Exception(
+                'This submission would update too many records at once (' + needed + ' rows, ' + available +
+                ' available), usually because many existing referrals share these mobile numbers. ' +
+                'Submit fewer referrals at a time.'
+            );
+        }
     }
 
     /** AC-02.8: same mover = same mobile (either format) and, when both referrals have an email, the same email. */

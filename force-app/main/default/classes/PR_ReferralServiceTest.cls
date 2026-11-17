@@ -251,6 +251,37 @@ private class PR_ReferralServiceTest {
     }
 
     @IsTest
+    static void submissionOverTheDmlBudgetIsRefusedBeforeAnyWrite() {
+        // One open cross-agency match to flag: 1 new referral (4 rows) + 1 flagged match (2 rows) = 6 rows needed.
+        Account other = PR_TestFactory.agencyByName(PR_TestFactory.AGENCY_B);
+        Referral__c existing = new Referral__c(First_Name__c = 'Elsewhere', Last_Name__c = 'Mover', Mobile__c = '0499999999', Referring_Agency__c = other.Id, Partner_Status__c = 'Received');
+        existing.put('CurrencyIsoCode', 'AUD');
+        insert existing;
+        PR_ReferralInput i = PR_TestFactory.input('0499999999', 'NSW', 20, new List<String>{ 'Gas' });
+        i.email = null;
+
+        Test.startTest();
+        System.runAs(PR_TestFactory.user('pa_ag1')) {
+            PR_ReferralService.dmlRowsAvailableOverride = 5;
+            try {
+                PR_ReferralService.submit(i);
+                Assert.fail('over budget must be refused, not fail with a governor exception part-way');
+            } catch (PR_Exception e) {
+                Assert.isTrue(e.getMessage().contains('6 rows, 5 available'), e.getMessage());
+            }
+        }
+        // Counted as the test runner: the agent can't see the other agency's referral.
+        Assert.areEqual(1, [SELECT COUNT() FROM Referral__c], 'nothing was written');
+        System.runAs(PR_TestFactory.user('pa_ag1')) {
+            // Exactly on budget: saved, and the existing referral is flagged.
+            PR_ReferralService.dmlRowsAvailableOverride = 6;
+            Assert.isTrue(PR_ReferralService.submit(i).saved);
+        }
+        Test.stopTest();
+        Assert.isTrue([SELECT Possible_Duplicate__c FROM Referral__c WHERE Id = :existing.Id].Possible_Duplicate__c);
+    }
+
+    @IsTest
     static void portalUsersGetRoleAndPermissionSet() {
         User prin = PR_TestFactory.user('pa_prin');
         User ag = PR_TestFactory.user('pa_ag1');
