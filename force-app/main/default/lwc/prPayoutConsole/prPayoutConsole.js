@@ -1,4 +1,5 @@
 import { LightningElement, api } from 'lwc';
+import { notifyRecordUpdateAvailable } from 'lightning/uiRecordApi';
 import getConsole from '@salesforce/apex/PR_PayoutController.getConsole';
 import runPayout from '@salesforce/apex/PR_PayoutController.runPayout';
 import exportCsv from '@salesforce/apex/PR_PayoutController.exportCsv';
@@ -16,15 +17,49 @@ const BADGE = {
  * On a Payout Batch record page it shows only that batch.
  */
 export default class PrPayoutConsole extends LightningElement {
-    @api recordId;
     data;
     period;
     loading = false;
     errorMessage;
     message;
+    _recordId;
+    _connected = false;
+
+    /**
+     * On a record page Lightning can reuse this component for another batch. Reload when the record changes, so
+     * Export and Mark paid never act on the batch that was shown before.
+     */
+    @api
+    get recordId() {
+        return this._recordId;
+    }
+    set recordId(value) {
+        const changed = value !== this._recordId;
+        this._recordId = value;
+        if (changed && this._connected) {
+            this.message = null;
+            this.errorMessage = null;
+            this.load();
+        }
+    }
 
     connectedCallback() {
+        this._connected = true;
         this.load();
+    }
+
+    disconnectedCallback() {
+        this._connected = false;
+    }
+
+    /** Tells sibling components (the record detail panel) that the batch changed on the server. */
+    async refreshRecord(batchId) {
+        if (!batchId) return;
+        try {
+            await notifyRecordUpdateAvailable([{ recordId: batchId }]);
+        } catch (e) {
+            // A stale detail panel is cosmetic; never fail the payout action over it.
+        }
     }
 
     async load() {
@@ -111,6 +146,8 @@ export default class PrPayoutConsole extends LightningElement {
         try {
             await fn();
             await this.load();
+            // On a Payout Batch record page, refresh the detail panel (status, paid date) next to this console.
+            await this.refreshRecord(this.recordId);
         } catch (err) {
             this.errorMessage = this.msg(err);
         } finally {
