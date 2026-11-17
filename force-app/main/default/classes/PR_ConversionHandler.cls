@@ -27,6 +27,28 @@ public without sharing class PR_ConversionHandler {
             priceByProduct.put(pbe.Product2.Name, pbe.UnitPrice);
         }
 
+        // One product per requested utility (KAN-48): a missing price book entry would silently drop a service
+        // and understate the commission, so the conversion fails with the utility named instead.
+        Map<Id, Lead> blocked = new Map<Id, Lead>();
+        for (Id oppId : leadByOpp.keySet()) {
+            Lead l = leadByOpp.get(oppId);
+            List<String> missing = new List<String>();
+            for (String utility : String.isBlank(l.Utilities__c) ? new List<String>() : l.Utilities__c.split(';')) {
+                if (!entryByProduct.containsKey(utility)) missing.add(utility);
+            }
+            if (!missing.isEmpty()) {
+                l.addError(
+                    'Cannot convert: the "' + PR_Settings.get().Price_Book_Name__c + '" price book has no active ' + cur +
+                    ' entry for ' + String.join(missing, ', ') + '. Ask an administrator to add it.'
+                );
+                blocked.put(oppId, l);
+            }
+        }
+        for (Id oppId : blocked.keySet()) leadByOpp.remove(oppId);
+        if (leadByOpp.isEmpty()) {
+            return;
+        }
+
         Id rt = PR_Settings.opportunityRecordTypeId();
         List<Opportunity> opps = new List<Opportunity>();
         for (Opportunity o : [SELECT Id, Pricebook2Id, (SELECT Id FROM OpportunityLineItems) FROM Opportunity WHERE Id IN :leadByOpp.keySet()]) {

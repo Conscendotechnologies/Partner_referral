@@ -27,6 +27,60 @@ private class PR_LeadLifecycleTest {
     }
 
     @IsTest
+    static void blankRouteRecordsAreSkipped() {
+        PR_Settings.routesOverride = new List<PR_State_Route__mdt>{
+            new PR_State_Route__mdt(State_Codes__c = null, Queue_Developer_Name__c = 'PR_QLD'),
+            new PR_State_Route__mdt(State_Codes__c = 'VIC,TAS', Queue_Developer_Name__c = 'PR_VIC_TAS')
+        };
+        Assert.areEqual([SELECT Id FROM Group WHERE DeveloperName = 'PR_Unassigned'].Id, PR_Settings.routeQueueId('ZZ'), 'no NullPointerException; falls back');
+        Assert.areEqual([SELECT Id FROM Group WHERE DeveloperName = 'PR_VIC_TAS'].Id, PR_Settings.routeQueueId('TAS'));
+    }
+
+    @IsTest
+    static void settingsReturnTheFullConsentText() {
+        Partner_Referral_Setting__mdt s = PR_Settings.get();
+        Assert.areEqual(
+            [SELECT Consent_Text__c FROM Partner_Referral_Setting__mdt WHERE DeveloperName = 'Default'].Consent_Text__c,
+            s.Consent_Text__c
+        );
+    }
+
+    @IsTest
+    static void slaMonitorCapsEachRun() {
+        Test.startTest();
+        Referral__c a = submit('0411000011', 'NSW', 5, new List<String>{ 'Gas' });
+        Referral__c b = submit('0411000012', 'NSW', 6, new List<String>{ 'Gas' });
+        Test.stopTest();
+        Set<Id> leadIds = new Set<Id>{ a.Lead__c, b.Lead__c };
+        Assert.areEqual(0, [SELECT COUNT() FROM Lead WHERE Id IN :leadIds AND Is_Urgent__c = TRUE]);
+        // Widen the urgent window so both leads become due for the sweep, then cap the run at one lead.
+        PR_Settings.get().Urgent_Window_Hours__c = 240;
+        PR_SlaMonitorJob.MAX_PER_RUN = 1;
+        Assert.areEqual(1, PR_SlaMonitorJob.run(), 'one run never touches more than the cap');
+        Assert.areEqual(a.Lead__c, [SELECT Id FROM Lead WHERE Id IN :leadIds AND Is_Urgent__c = TRUE].Id, 'soonest move-in goes first');
+        Assert.areEqual(1, PR_SlaMonitorJob.run(), 'the next run picks up the rest');
+    }
+
+    @IsTest
+    static void conversionFailsWhenAUtilityHasNoPriceBookEntry() {
+        Test.startTest();
+        Referral__c r = submit('0411000013', 'NSW', 20, new List<String>{ 'Electricity', 'Water' });
+        delete [SELECT Id FROM PricebookEntry WHERE Pricebook2.Name = 'Partner Referral Utilities' AND Product2.Name = 'Water'];
+        User mgr = PR_TestFactory.user('prmgr');
+        System.runAs(mgr) {
+            update new Lead(Id = r.Lead__c, OwnerId = mgr.Id, Status = 'Working');
+            Database.LeadConvert lc = new Database.LeadConvert();
+            lc.setLeadId(r.Lead__c);
+            lc.setConvertedStatus('Converted');
+            Database.LeadConvertResult res = Database.convertLead(lc, false);
+            Assert.isFalse(res.isSuccess(), 'conversion must not complete without every utility');
+            Assert.isTrue(res.getErrors()[0].getMessage().contains('Water'), res.getErrors()[0].getMessage());
+        }
+        Test.stopTest();
+        Assert.isFalse([SELECT IsConverted FROM Lead WHERE Id = :r.Lead__c].IsConverted);
+    }
+
+    @IsTest
     static void unknownStateGoesToUnassigned() {
         Assert.areEqual([SELECT Id FROM Group WHERE DeveloperName = 'PR_Unassigned'].Id, PR_Settings.routeQueueId(null));
         Assert.areEqual([SELECT Id FROM Group WHERE DeveloperName = 'PR_SA_WA_NT'].Id, PR_Settings.routeQueueId('wa'));

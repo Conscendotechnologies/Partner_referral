@@ -122,8 +122,8 @@ public class PR_TestFactory {
         insert custom;
     }
 
-    public static PR_ReferralService.ReferralInput input(String mobile, String state, Integer moveInDays, List<String> utilities) {
-        PR_ReferralService.ReferralInput i = new PR_ReferralService.ReferralInput();
+    public static PR_ReferralInput input(String mobile, String state, Integer moveInDays, List<String> utilities) {
+        PR_ReferralInput i = new PR_ReferralInput();
         i.firstName = 'Jordan';
         i.lastName = 'Mover';
         i.mobile = mobile;
@@ -140,8 +140,8 @@ public class PR_TestFactory {
     }
 
     /** Submits as the given portal user and returns the saved referral with its Lead. */
-    public static Referral__c submitAs(String alias, PR_ReferralService.ReferralInput i) {
-        PR_ReferralService.SubmitResult r;
+    public static Referral__c submitAs(String alias, PR_ReferralInput i) {
+        PR_SubmitResult r;
         System.runAs(user(alias)) {
             r = PR_ReferralService.submit(i);
         }

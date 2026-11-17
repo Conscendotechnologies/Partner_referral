@@ -40,16 +40,31 @@ public without sharing class PR_UserTriggerHandler {
             ps.put(p.Name, p.Id);
         }
         List<PermissionSetAssignment> psas = new List<PermissionSetAssignment>();
+        List<User> assignees = new List<User>();
         Set<Id> principalAgencies = new Set<Id>();
         for (User u : newList) {
             Contact c = contacts.get(u.ContactId);
             if (c == null) continue;
             Boolean principal = c.Portal_Role__c == 'Principal';
             String name = principal ? PS_PRINCIPAL : PS_AGENT;
-            if (ps.containsKey(name)) psas.add(new PermissionSetAssignment(AssigneeId = u.Id, PermissionSetId = ps.get(name)));
+            if (!ps.containsKey(name)) {
+                u.addError('Permission set ' + name + ' is missing, so this partner user could not be set up.');
+                continue;
+            }
+            psas.add(new PermissionSetAssignment(AssigneeId = u.Id, PermissionSetId = ps.get(name)));
+            assignees.add(u);
             if (principal) principalAgencies.add(c.AccountId);
         }
-        Database.insert(psas, false);
+        // A partner user without the permission set cannot use the portal: fail that user's creation
+        // with the reason rather than leave a login that does nothing.
+        List<Database.SaveResult> results = Database.insert(psas, false);
+        for (Integer i = 0; i < results.size(); i++) {
+            if (!results[i].isSuccess()) {
+                assignees[i].addError(
+                    'Could not assign the partner permission set: ' + results[i].getErrors()[0].getMessage()
+                );
+            }
+        }
         if (!principalAgencies.isEmpty() && !System.isFuture() && !System.isBatch()) {
             PR_CommissionSharing.shareForAgencies(principalAgencies);
         }

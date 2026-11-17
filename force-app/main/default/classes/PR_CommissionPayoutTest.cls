@@ -46,6 +46,78 @@ private class PR_CommissionPayoutTest {
     }
 
     @IsTest
+    static void opportunityKeyIsLocked() {
+        Partner_Commission__c c = commissions(PR_TestFactory.AGENCY_A, 1, 'Approved')[0];
+        PR_CommissionService.withBypass(new List<Partner_Commission__c>{ new Partner_Commission__c(Id = c.Id, Opportunity_Key__c = 'KEY-1') }, false);
+        System.runAs(PR_TestFactory.user('prmgr')) {
+            Database.SaveResult cleared = Database.update(new Partner_Commission__c(Id = c.Id, Opportunity_Key__c = null), false);
+            Assert.isFalse(cleared.isSuccess(), 'key cannot be cleared outside a cancellation');
+            update new Partner_Commission__c(Id = c.Id, Status__c = 'Pending');
+            update new Partner_Commission__c(Id = c.Id, Status__c = 'Cancelled', Cancellation_Reason__c = 'Wrong agency');
+            Assert.isNull([SELECT Opportunity_Key__c FROM Partner_Commission__c WHERE Id = :c.Id].Opportunity_Key__c, 'cancel frees the key');
+            Database.SaveResult reset = Database.update(new Partner_Commission__c(Id = c.Id, Opportunity_Key__c = 'KEY-2'), false);
+            Assert.isFalse(reset.isSuccess(), 'a cancelled commission cannot take a key back');
+        }
+    }
+
+    @IsTest
+    static void commissionsMustBeInAud() {
+        Account a = PR_TestFactory.agencyByName(PR_TestFactory.AGENCY_A);
+        Partner_Commission__c aed = new Partner_Commission__c(Agency__c = a.Id, Amount__c = 100, Status__c = 'Approved');
+        aed.put('CurrencyIsoCode', 'AED');
+        try {
+            PR_CommissionService.withBypass(new List<Partner_Commission__c>{ aed }, true);
+            Assert.fail('a non-AUD commission must be rejected, even through the service bypass');
+        } catch (DmlException e) {
+            Assert.isTrue(e.getMessage().contains('AUD'), e.getMessage());
+        }
+        Partner_Commission__c aud = commissions(PR_TestFactory.AGENCY_A, 1, 'Pending')[0];
+        Partner_Commission__c change = new Partner_Commission__c(Id = aud.Id);
+        change.put('CurrencyIsoCode', 'AED');
+        Assert.isFalse(Database.update(change, false).isSuccess(), 'currency cannot be changed away from AUD');
+    }
+
+    @IsTest
+    static void exportAndRerunBlockedWhileAPayoutIsRunning() {
+        commissions(PR_TestFactory.AGENCY_A, 2, 'Approved');
+        User mgr = PR_TestFactory.user('prmgr');
+        Test.startTest();
+        System.runAs(mgr) {
+            Id batchId = PR_PayoutController.runPayout('2026-12');
+            Assert.isTrue(PR_PayoutService.runInProgress(), 'the batch job is queued until stopTest');
+            try {
+                PR_PayoutController.exportCsv(batchId);
+                Assert.fail('export must wait for the run');
+            } catch (AuraHandledException e) {
+                Assert.isTrue(e.getMessage().contains('still processing'), e.getMessage());
+            }
+            try {
+                PR_PayoutController.runPayout('2026-12');
+                Assert.fail('a second run must wait');
+            } catch (AuraHandledException e) {
+                Assert.isTrue(e.getMessage().contains('already in progress'), e.getMessage());
+            }
+        }
+        Test.stopTest();
+        Assert.isFalse(PR_PayoutService.runInProgress());
+    }
+
+    @IsTest
+    static void historicalSharingIsPagedPerAgency() {
+        List<Partner_Commission__c> cs = commissions(PR_TestFactory.AGENCY_A, 3, 'Pending');
+        Set<Id> ids = new Map<Id, Partner_Commission__c>(cs).keySet();
+        delete [SELECT Id FROM Partner_Commission__Share WHERE ParentId IN :ids AND RowCause = 'Agency_Principal__c'];
+        PR_CommissionSharing.PAGE = 1;
+        Test.startTest();
+        PR_CommissionSharing.shareForAgencies(new Set<Id>{
+            PR_TestFactory.agencyByName(PR_TestFactory.AGENCY_A).Id,
+            PR_TestFactory.agencyByName(PR_TestFactory.AGENCY_B).Id
+        });
+        Test.stopTest();
+        Assert.areEqual(3, [SELECT COUNT() FROM Partner_Commission__Share WHERE ParentId IN :ids AND RowCause = 'Agency_Principal__c']);
+    }
+
+    @IsTest
     static void manualCreateOnlyForFinance() {
         Account a = PR_TestFactory.agencyByName(PR_TestFactory.AGENCY_A);
         System.runAs(PR_TestFactory.user('prrep')) {

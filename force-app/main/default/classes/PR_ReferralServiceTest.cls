@@ -7,7 +7,7 @@ private class PR_ReferralServiceTest {
 
     @IsTest
     static void validateCatchesEveryRule() {
-        PR_ReferralService.ReferralInput i = new PR_ReferralService.ReferralInput();
+        PR_ReferralInput i = new PR_ReferralInput();
         i.mobile = '0298765432';
         i.email = 'not-an-email';
         i.state = 'XX';
@@ -18,7 +18,7 @@ private class PR_ReferralServiceTest {
         Assert.isTrue(errors.size() >= 9, String.join(errors, ' | '));
         Assert.isTrue(PR_ReferralService.validate(null).size() == 1);
 
-        PR_ReferralService.ReferralInput ok = PR_TestFactory.input('0412 345 678', 'NSW', 10, new List<String>{ 'Gas' });
+        PR_ReferralInput ok = PR_TestFactory.input('0412 345 678', 'NSW', 10, new List<String>{ 'Gas' });
         Assert.areEqual(0, PR_ReferralService.validate(ok).size());
         ok.mobile = '+61412345678';
         Assert.areEqual(0, PR_ReferralService.validate(ok).size());
@@ -74,7 +74,7 @@ private class PR_ReferralServiceTest {
 
     @IsTest
     static void invalidInputIsRejectedServerSide() {
-        PR_ReferralService.ReferralInput i = PR_TestFactory.input('12345', 'NSW', 5, new List<String>{ 'Gas' });
+        PR_ReferralInput i = PR_TestFactory.input('12345', 'NSW', 5, new List<String>{ 'Gas' });
         i.consent = false;
         Test.startTest();
         try {
@@ -88,10 +88,10 @@ private class PR_ReferralServiceTest {
 
     @IsTest
     static void duplicatesWarnSameAgencyAndFlagOtherAgency() {
-        PR_ReferralService.ReferralInput i = PR_TestFactory.input('0433333333', 'NSW', 20, new List<String>{ 'Gas' });
+        PR_ReferralInput i = PR_TestFactory.input('0433333333', 'NSW', 20, new List<String>{ 'Gas' });
         Test.startTest();
         PR_TestFactory.submitAs('pa_ag1', i);
-        PR_ReferralService.SubmitResult warn;
+        PR_SubmitResult warn;
         System.runAs(PR_TestFactory.user('pa_ag2')) {
             warn = PR_ReferralService.submit(i);
             Assert.isTrue(warn.duplicateWarning);
@@ -119,7 +119,7 @@ private class PR_ReferralServiceTest {
             Assert.areEqual(0, PR_PortalController.getReferrals(null).size(), 'other agent in same agency sees nothing');
         }
         System.runAs(PR_TestFactory.user('pa_prin')) {
-            List<PR_PortalController.ReferralRow> rows = PR_PortalController.getReferrals(null);
+            List<PR_ReferralRow> rows = PR_PortalController.getReferrals(null);
             Assert.areEqual(1, rows.size(), 'principal sees whole agency');
             Assert.areEqual('Alex Tester', rows[0].submittedBy);
         }
@@ -136,7 +136,7 @@ private class PR_ReferralServiceTest {
             Map<String, Object> cfg = PR_PortalController.getFormConfig();
             Assert.areEqual(true, cfg.get('agencyActive'));
             Assert.areEqual(PR_TestFactory.AGENCY_A, cfg.get('agencyName'));
-            PR_ReferralService.SubmitResult res = PR_PortalController.submitReferral(PR_TestFactory.input('0455555555', 'SA', 1, new List<String>{ 'Water' }));
+            PR_SubmitResult res = PR_PortalController.submitReferral(PR_TestFactory.input('0455555555', 'SA', 1, new List<String>{ 'Water' }));
             Assert.isTrue(res.saved);
             Assert.isNotNull(res.referralNumber);
             try {

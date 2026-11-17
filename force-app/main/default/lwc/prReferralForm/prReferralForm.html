@@ -93,8 +93,8 @@
                     </ul>
                     <p>Send it anyway only if this is a different move.</p>
                     <div class="pr-actions">
-                        <lightning-button label="Cancel" onclick={handleCancelDuplicate}></lightning-button>
-                        <lightning-button variant="brand" label="Send anyway" onclick={handleSubmitAnyway}></lightning-button>
+                        <lightning-button label="Cancel" onclick={handleCancelDuplicate} disabled={loading}></lightning-button>
+                        <lightning-button variant="brand" label="Send anyway" onclick={handleSubmitAnyway} disabled={loading}></lightning-button>
                     </div>
                 </div>
             </template>

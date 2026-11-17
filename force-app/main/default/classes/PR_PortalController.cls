@@ -3,20 +3,6 @@
  * what they submitted and a principal sees their whole agency (partner role hierarchy). No agency sees another.
  */
 public with sharing class PR_PortalController {
-    public class ReferralRow {
-        @AuraEnabled public Id id;
-        @AuraEnabled public String referralNumber;
-        @AuraEnabled public String moverName;
-        @AuraEnabled public String suburb;
-        @AuraEnabled public Date moveInDate;
-        @AuraEnabled public String utilities;
-        @AuraEnabled public String status;
-        @AuraEnabled public String repFirstName;
-        @AuraEnabled public String submittedBy;
-        @AuraEnabled public Datetime submittedAt;
-        @AuraEnabled public Boolean urgent;
-    }
-
     @AuraEnabled(cacheable=true)
     public static Map<String, Object> getFormConfig() {
         PR_SystemData.PortalContext ctx = PR_SystemData.currentContext();
@@ -35,7 +21,7 @@ public with sharing class PR_PortalController {
     }
 
     @AuraEnabled
-    public static PR_ReferralService.SubmitResult submitReferral(PR_ReferralService.ReferralInput input) {
+    public static PR_SubmitResult submitReferral(PR_ReferralInput input) {
         try {
             return PR_ReferralService.submit(input);
         } catch (Exception e) {
@@ -46,15 +32,15 @@ public with sharing class PR_PortalController {
     }
 
     @AuraEnabled(cacheable=false)
-    public static List<ReferralRow> getReferrals(String statusFilter) {
+    public static List<PR_ReferralRow> getReferrals(String statusFilter) {
         String soql =
             'SELECT Id, Name, First_Name__c, Last_Name__c, New_Suburb__c, New_State__c, Move_In_Date__c, Utilities__c, ' +
             'Partner_Status__c, Rep_First_Name__c, Referring_Agent__r.Name, CreatedDate, Is_Urgent__c ' +
             'FROM Referral__c ' + (String.isBlank(statusFilter) ? '' : 'WHERE Partner_Status__c = :statusFilter ') +
             'ORDER BY CreatedDate DESC LIMIT 200';
-        List<ReferralRow> rows = new List<ReferralRow>();
+        List<PR_ReferralRow> rows = new List<PR_ReferralRow>();
         for (Referral__c r : (List<Referral__c>) Database.queryWithBinds(soql, new Map<String, Object>{ 'statusFilter' => statusFilter }, AccessLevel.USER_MODE)) {
-            ReferralRow row = new ReferralRow();
+            PR_ReferralRow row = new PR_ReferralRow();
             row.id = r.Id;
             row.referralNumber = r.Name;
             row.moverName = r.First_Name__c + ' ' + r.Last_Name__c;

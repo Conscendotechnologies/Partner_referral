@@ -1,5 +1,6 @@
 # Runs when a pull request is merged into main (any push to main):
-#   1. deploys the metadata that changed in the merge, with every Apex test class specified
+#   1. deploys the metadata changed since the last successful deploy (tag deployed/sdo), with every Apex
+#      test class specified, then moves the tag to this commit
 #   2. runs every Apex test class against the org, now holding the merged code
 # Uses the "production" environment: add required reviewers there to make deploys wait for approval.
 # Needs the secret SFDX_AUTH_URL (repository or production environment; see .github/README.md).
@@ -15,7 +16,10 @@ concurrency:
   cancel-in-progress: false
 
 permissions:
-  contents: read
+  contents: write # moves the deployed/sdo tag after a successful deploy
+
+env:
+  DEPLOY_TAG: deployed/sdo
 
 jobs:
   deploy:
@@ -53,17 +57,48 @@ jobs:
           printf %s "$SFDX_AUTH_URL" > "$auth_file"
           sf org login sfdx-url --sfdx-url-file "$auth_file" --alias target --set-default --json | node -e "let s='';process.stdin.on('data',d=>s+=d).on('end',()=>{const j=JSON.parse(s);if(j.status){console.log('::error::Org login failed: '+j.name+': '+j.message);process.exit(1)}console.log('Logged in as '+j.result.username+' ('+j.result.instanceUrl+')')})"
 
-      - name: Work out what the merge changed
+      - name: Work out what changed since the last successful deploy
         env:
           BEFORE: ${{ github.event.before }}
         run: |
-          if [ -z "$BEFORE" ] || [ "$BEFORE" = "0000000000000000000000000000000000000000" ] || ! git cat-file -e "$BEFORE^{commit}" 2>/dev/null; then
-            BEFORE="$(git rev-parse HEAD~1)"
+          # The delta starts at the tag deployed/sdo (the last commit that deployed successfully), so a failed
+          # deploy's changes are carried into the next run instead of being skipped.
+          git fetch --force origin "refs/tags/${DEPLOY_TAG}:refs/tags/${DEPLOY_TAG}" 2>/dev/null || true
+          if git rev-parse -q --verify "refs/tags/${DEPLOY_TAG}" >/dev/null; then
+            FROM="$(git rev-parse "refs/tags/${DEPLOY_TAG}^{commit}")"
+            if ! git merge-base --is-ancestor "$FROM" HEAD; then
+              echo "::error::${DEPLOY_TAG} (${FROM}) is not an ancestor of ${GITHUB_SHA}: this run is stale or history was rewritten. Not deploying."
+              exit 1
+            fi
+            if [ "$FROM" = "$(git rev-parse HEAD)" ]; then
+              echo "Already deployed: ${DEPLOY_TAG} is at this commit."
+            fi
+            echo "Delta from ${DEPLOY_TAG} (${FROM})"
+          else
+            # First run: no tag yet, so fall back to the commit before this push.
+            FROM="$BEFORE"
+            if [ -z "$FROM" ] || [ "$FROM" = "0000000000000000000000000000000000000000" ] || ! git cat-file -e "$FROM^{commit}" 2>/dev/null; then
+              FROM="$(git rev-parse HEAD~1)"
+            fi
+            echo "No ${DEPLOY_TAG} tag yet: delta from ${FROM}"
           fi
-          bash .github/scripts/sf-steps.sh delta "$BEFORE" HEAD
+          bash .github/scripts/sf-steps.sh delta "$FROM" HEAD
 
       - name: Deploy
         run: bash .github/scripts/sf-steps.sh deploy deploy
+
+      - name: Mark this commit as deployed
+        run: |
+          # Move the tag only forwards: re-read it and refuse if another run has already moved it past this commit.
+          git fetch --force origin "refs/tags/${DEPLOY_TAG}:refs/tags/${DEPLOY_TAG}" 2>/dev/null || true
+          if git rev-parse -q --verify "refs/tags/${DEPLOY_TAG}" >/dev/null &&
+             ! git merge-base --is-ancestor "refs/tags/${DEPLOY_TAG}^{commit}" HEAD; then
+            echo "::warning::${DEPLOY_TAG} is already ahead of ${GITHUB_SHA}; leaving it where it is."
+            exit 0
+          fi
+          git tag --force "${DEPLOY_TAG}" HEAD
+          git push --force origin "refs/tags/${DEPLOY_TAG}"
+          echo "${DEPLOY_TAG} -> ${GITHUB_SHA}" >> "$GITHUB_STEP_SUMMARY"
 
       - name: Run all Apex test classes
         run: bash .github/scripts/sf-steps.sh tests

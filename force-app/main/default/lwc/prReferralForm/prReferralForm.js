@@ -102,6 +102,8 @@ export default class PrReferralForm extends LightningElement {
     }
 
     async send(acknowledgeDuplicate) {
+        // "Send anyway" skips the duplicate check, so a second tap while pending would create a second referral.
+        if (this.loading) return;
         this.loading = true;
         this.errorMessage = null;
         try {

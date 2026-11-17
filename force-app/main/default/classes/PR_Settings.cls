@@ -48,7 +48,16 @@ public inherited sharing class PR_Settings {
 
     public static Partner_Referral_Setting__mdt get() {
         if (cached == null) {
-            cached = Partner_Referral_Setting__mdt.getInstance('Default');
+            // SOQL, not getInstance(): getInstance returns only the first 255 characters of a long text area,
+            // and the consent wording the customer agrees to must never be cut off.
+            List<Partner_Referral_Setting__mdt> rows = [
+                SELECT Consent_Version__c, Consent_Text__c, Urgent_Window_Hours__c, SLA_Hours__c,
+                    Business_Hours_Name__c, Fallback_Queue__c, Currency_Code__c, Price_Book_Name__c
+                FROM Partner_Referral_Setting__mdt
+                WHERE DeveloperName = 'Default'
+                LIMIT 1
+            ];
+            cached = rows.isEmpty() ? null : rows[0];
             if (cached == null) {
                 cached = new Partner_Referral_Setting__mdt(
                     Consent_Version__c = '1',
@@ -117,11 +126,16 @@ public inherited sharing class PR_Settings {
         return queueIds;
     }
 
+    /** Custom metadata cannot be inserted in tests; this lets a test supply route records. */
+    @TestVisible
+    private static List<PR_State_Route__mdt> routesOverride;
+
     /** State code -> queue Id, from PR_State_Route__mdt; falls back to the Unassigned queue. */
     public static Id routeQueueId(String stateCode) {
         Map<String, Id> queues = queueIdsByDeveloperName();
         if (String.isNotBlank(stateCode)) {
-            for (PR_State_Route__mdt route : PR_State_Route__mdt.getAll().values()) {
+            for (PR_State_Route__mdt route : routesOverride != null ? routesOverride : PR_State_Route__mdt.getAll().values()) {
+                if (String.isBlank(route.State_Codes__c)) continue;
                 for (String code : route.State_Codes__c.split(',')) {
                     if (code.trim().equalsIgnoreCase(stateCode.trim()) && queues.containsKey(route.Queue_Developer_Name__c)) {
                         return queues.get(route.Queue_Developer_Name__c);

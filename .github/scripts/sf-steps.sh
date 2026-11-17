@@ -8,8 +8,11 @@ set -euo pipefail
 TESTS="$(node .github/scripts/apex-test-classes.js force-app)"
 summary() { echo "$*" >> "${GITHUB_STEP_SUMMARY:-/dev/null}"; }
 
+# A change set counts when either manifest has types: a deletion-only change has an empty package.xml and
+# everything in destructiveChanges.xml, and must still be deployed.
 has_changes() {
-  grep -q '<types>' delta/package/package.xml 2>/dev/null
+  grep -q '<types>' delta/package/package.xml 2>/dev/null ||
+    grep -q '<types>' delta/destructiveChanges/destructiveChanges.xml 2>/dev/null
 }
 
 case "${1:-}" in

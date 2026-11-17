@@ -41,8 +41,21 @@ public without sharing class PR_PayoutService {
         return b;
     }
 
+    /** True while a payout batch job is queued or still processing chunks. */
+    public static Boolean runInProgress() {
+        return [
+            SELECT COUNT()
+            FROM AsyncApexJob
+            WHERE ApexClass.Name = 'PR_PayoutBatchJob' AND JobType = 'BatchApex'
+                AND Status IN ('Holding', 'Queued', 'Preparing', 'Processing')
+        ] > 0;
+    }
+
     /** Starts (or re-runs) the payout for a month. Returns the batch Id. */
     public static Id startRun(String period) {
+        if (runInProgress()) {
+            throw new PR_Exception('A payout run is already in progress. Wait for it to finish, then try again.');
+        }
         Payout_Batch__c b = getOrCreateBatch(period);
         if (b.Status__c != PR_Settings.BATCH_DRAFT) {
             throw new PR_Exception('The ' + period + ' payout is already ' + b.Status__c + '. New approvals go into next month.');
@@ -62,7 +75,9 @@ public without sharing class PR_PayoutService {
 
     /** Adds one chunk of approved commissions to the batch, accumulating per-agency lines. */
     public static void addToBatch(Id batchId, List<Partner_Commission__c> scope) {
-        Payout_Batch__c b = [SELECT Id, Period_Month__c, Status__c FROM Payout_Batch__c WHERE Id = :batchId];
+        // Row lock: overlapping chunks or runs for the same batch, and export, wait for each other, so line
+        // totals are never computed from a stale snapshot and nothing is added after the CSV is built.
+        Payout_Batch__c b = [SELECT Id, Period_Month__c, Status__c FROM Payout_Batch__c WHERE Id = :batchId FOR UPDATE];
         if (b.Status__c != PR_Settings.BATCH_DRAFT) {
             return;
         }
@@ -151,8 +166,13 @@ public without sharing class PR_PayoutService {
 
     public static String export(Id batchId) {
         requireFinance();
+        // Server-side guard (the console can be stale): a run that is still processing would add lines after
+        // the file is built. Lock the batch row before reading lines, so no chunk can commit mid-export.
+        if (runInProgress()) {
+            throw new PR_Exception('The payout run is still processing. Download the CSV when it has finished.');
+        }
+        Payout_Batch__c b = [SELECT Id, Status__c FROM Payout_Batch__c WHERE Id = :batchId FOR UPDATE];
         String body = buildCsv(batchId);
-        Payout_Batch__c b = [SELECT Id, Status__c FROM Payout_Batch__c WHERE Id = :batchId];
         if (b.Status__c == PR_Settings.BATCH_DRAFT) {
             update new Payout_Batch__c(Id = batchId, Status__c = PR_Settings.BATCH_EXPORTED);
         }

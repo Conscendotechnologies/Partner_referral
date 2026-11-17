@@ -4,31 +4,6 @@
  * from the client.
  */
 public with sharing class PR_ReferralService {
-    public class ReferralInput {
-        @AuraEnabled public String firstName { get; set; }
-        @AuraEnabled public String lastName { get; set; }
-        @AuraEnabled public String mobile { get; set; }
-        @AuraEnabled public String email { get; set; }
-        @AuraEnabled public String street { get; set; }
-        @AuraEnabled public String suburb { get; set; }
-        @AuraEnabled public String state { get; set; }
-        @AuraEnabled public String postcode { get; set; }
-        @AuraEnabled public String previousAddress { get; set; }
-        @AuraEnabled public Date moveInDate { get; set; }
-        @AuraEnabled public List<String> utilities { get; set; }
-        @AuraEnabled public String notes { get; set; }
-        @AuraEnabled public Boolean consent { get; set; }
-        @AuraEnabled public Boolean acknowledgeDuplicate { get; set; }
-    }
-
-    public class SubmitResult {
-        @AuraEnabled public Boolean saved = false;
-        @AuraEnabled public Id referralId;
-        @AuraEnabled public String referralNumber;
-        @AuraEnabled public Boolean duplicateWarning = false;
-        @AuraEnabled public List<String> duplicates = new List<String>();
-    }
-
     private static final Pattern MOBILE_PATTERN = Pattern.compile('^(04\\d{8}|\\+614\\d{8})$');
     private static final Pattern EMAIL_PATTERN = Pattern.compile('^[^@\\s]+@[^@\\s]+\\.[^@\\s]+$');
     private static final Pattern POSTCODE_PATTERN = Pattern.compile('^\\d{4}$');
@@ -38,7 +13,7 @@ public with sharing class PR_ReferralService {
     }
 
     /** Returns every rule the input breaks (empty list = valid). */
-    public static List<String> validate(ReferralInput i) {
+    public static List<String> validate(PR_ReferralInput i) {
         List<String> errors = new List<String>();
         if (i == null) {
             return new List<String>{ 'Referral details are missing.' };
@@ -74,7 +49,7 @@ public with sharing class PR_ReferralService {
         return errors;
     }
 
-    public static SubmitResult submit(ReferralInput i) {
+    public static PR_SubmitResult submit(PR_ReferralInput i) {
         PR_SystemData.PortalContext ctx = PR_SystemData.currentContext();
         if (ctx.contactId == null || ctx.accountId == null) {
             throw new PR_Exception('Only partner agents can submit referrals.');
@@ -92,7 +67,7 @@ public with sharing class PR_ReferralService {
         String mobile = normaliseMobile(i.mobile);
         String email = String.isBlank(i.email) ? null : i.email.trim().toLowerCase();
 
-        SubmitResult result = new SubmitResult();
+        PR_SubmitResult result = new PR_SubmitResult();
         result.duplicates = PR_SystemData.sameAgencyDuplicates(ctx.accountId, mobile, email);
         if (!result.duplicates.isEmpty() && i.acknowledgeDuplicate != true) {
             result.duplicateWarning = true;

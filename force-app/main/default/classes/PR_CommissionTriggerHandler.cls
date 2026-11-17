@@ -20,7 +20,24 @@ public without sharing class PR_CommissionTriggerHandler {
         return FeatureManagement.checkPermission(permission);
     }
 
+    /**
+     * Decision F1: every commission is in the settings currency (AUD). Runs before the bypass check, because the
+     * services write through the bypass and the payout sums amounts without converting them.
+     */
+    private static void requireCurrency(List<Partner_Commission__c> records) {
+        String cur = PR_Settings.currencyCode();
+        for (Partner_Commission__c c : records) {
+            Object code = c.get('CurrencyIsoCode');
+            if (code == null) {
+                c.put('CurrencyIsoCode', cur);
+            } else if ((String) code != cur) {
+                c.addError('Partner commissions must be in ' + cur + '.');
+            }
+        }
+    }
+
     public static void beforeInsert(List<Partner_Commission__c> newList) {
+        requireCurrency(newList);
         if (PR_CommissionService.bypassLocks) return;
         Boolean finance = can(PR_Settings.PERM_MANAGE_PAYOUTS);
         for (Partner_Commission__c c : newList) {
@@ -36,6 +53,7 @@ public without sharing class PR_CommissionTriggerHandler {
     }
 
     public static void beforeUpdate(List<Partner_Commission__c> newList, Map<Id, Partner_Commission__c> oldMap) {
+        requireCurrency(newList);
         if (PR_CommissionService.bypassLocks) return;
         Boolean approver = can(PR_Settings.PERM_APPROVE_COMMISSION);
         Boolean finance = can(PR_Settings.PERM_MANAGE_PAYOUTS);
@@ -46,6 +64,12 @@ public without sharing class PR_CommissionTriggerHandler {
                     c.addError('Amount, rate, services, Opportunity and agency cannot be changed. Cancel this commission and create a new one.');
                     break;
                 }
+            }
+            // The key stops a second live commission for the same Opportunity. Only a valid cancellation
+            // (below) or the commission service may clear it.
+            Boolean cancelling = c.Status__c == PR_Settings.COM_CANCELLED && old.Status__c != PR_Settings.COM_CANCELLED;
+            if (c.Opportunity_Key__c != old.Opportunity_Key__c && !(cancelling && c.Opportunity_Key__c == null)) {
+                c.Opportunity_Key__c.addError('The Opportunity key is managed automatically and cannot be changed.');
             }
             if (c.Payout_Line__c != old.Payout_Line__c) {
                 c.addError('Payout lines are set by the monthly payout run.');

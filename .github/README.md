@@ -3,9 +3,11 @@
 | Workflow | When | What it does |
 | --- | --- | --- |
 | `pr-validate.yml` (PR validation) | A pull request into `main` is opened, updated or reopened | Check-only deploy (dry run) of the metadata the PR changes, with every Apex test class specified, then runs every Apex test class explicitly. |
-| `deploy-on-merge.yml` (Deploy on merge) | A pull request is merged into `main` (any push to `main`) | Deploys the metadata the merge changed, then runs every Apex test class against the org. |
+| `deploy-on-merge.yml` (Deploy on merge) | A pull request is merged into `main` (any push to `main`) | Deploys the metadata changed since the last successful deploy, moves the `deployed/sdo` tag to this commit, then runs every Apex test class against the org. |
 
-Both use [sfdx-git-delta](https://github.com/scolladon/sfdx-git-delta), so only changed metadata is deployed. Deletions are deployed as post-destructive changes.
+Both use [sfdx-git-delta](https://github.com/scolladon/sfdx-git-delta), so only changed metadata is deployed. Deletions are deployed as post-destructive changes, including deletion-only changes.
+
+The merge deploy diffs from the `deployed/sdo` tag, not from the previous push, so a failed deploy's changes are carried into the next run. The tag only moves after a successful deploy and only forwards. A run whose commit is behind the tag stops without deploying. On the first merge there is no tag yet, so the delta starts at the commit before the push.
 "Every Apex test class" means every class under `force-app` that has test methods (`.github/scripts/apex-test-classes.js`).
 
 Why the explicit test run: the salesOrgSDO org runs no Apex tests during deploys, even with `RunSpecifiedTests` or
