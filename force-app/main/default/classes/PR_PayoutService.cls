@@ -189,24 +189,88 @@ public without sharing class PR_PayoutService {
     }
 
     /** Marks the batch Paid and every commission in it Paid. */
-    public static void markPaid(Id batchId) {
+    public static final String MARK_PAID_DONE = 'Paid';
+    public static final String MARK_PAID_PROCESSING = 'Processing';
+
+    /**
+     * Up to this many commissions are marked Paid in the same transaction (well inside the 10,000-row DML
+     * limit). A larger batch, for example after several missed monthly runs, goes to PR_MarkPaidBatchJob.
+     */
+    @TestVisible
+    private static Integer SYNC_LIMIT = 9000;
+    /** Commissions per PR_MarkPaidBatchJob chunk. */
+    public static final Integer MARK_PAID_SCOPE = 2000;
+
+    /** True while a mark-paid batch job is queued or still processing chunks. */
+    public static Boolean markPaidInProgress() {
+        return [
+            SELECT COUNT()
+            FROM AsyncApexJob
+            WHERE ApexClass.Name = 'PR_MarkPaidBatchJob' AND JobType = 'BatchApex'
+                AND Status IN ('Holding', 'Queued', 'Preparing', 'Processing')
+        ] > 0;
+    }
+
+    /**
+     * Marks every commission in the batch Paid, then the batch (AC-11.1). Small batches are done at once and
+     * return MARK_PAID_DONE. Larger ones are handed to PR_MarkPaidBatchJob and return MARK_PAID_PROCESSING: the
+     * batch stays Exported until the job has marked every commission, and only then becomes Paid.
+     */
+    public static String markPaid(Id batchId) {
         requireFinance();
-        Payout_Batch__c b = [SELECT Id, Status__c FROM Payout_Batch__c WHERE Id = :batchId];
+        // Lock the batch row first, then check for a running job. A second request for the same batch waits here
+        // until the first commits, then sees its queued job and is refused, so the same batch is never queued twice.
+        Payout_Batch__c b = [SELECT Id, Status__c FROM Payout_Batch__c WHERE Id = :batchId FOR UPDATE];
+        if (markPaidInProgress()) {
+            throw new PR_Exception('A batch is already being marked Paid. Wait for it to finish, then try again.');
+        }
         if (b.Status__c == PR_Settings.BATCH_PAID) {
-            return;
+            return MARK_PAID_DONE;
         }
         if (b.Status__c != PR_Settings.BATCH_EXPORTED) {
             throw new PR_Exception('Download the Xero CSV before marking the batch Paid.');
         }
-        List<Partner_Commission__c> updates = new List<Partner_Commission__c>();
-        for (Partner_Commission__c c : [
+        // Read at most SYNC_LIMIT + 1 rows: enough to decide the path without loading a huge batch.
+        Integer limitPlusOne = SYNC_LIMIT + 1;
+        List<Partner_Commission__c> toPay = [
             SELECT Id
             FROM Partner_Commission__c
             WHERE Payout_Line__r.Payout_Batch__c = :batchId AND Status__c = :PR_Settings.COM_IN_PAYOUT
-        ]) {
+            LIMIT :limitPlusOne
+        ];
+        if (toPay.size() > SYNC_LIMIT) {
+            Database.executeBatch(new PR_MarkPaidBatchJob(batchId), MARK_PAID_SCOPE);
+            return MARK_PAID_PROCESSING;
+        }
+        payCommissions(toPay);
+        finishMarkPaid(batchId);
+        return MARK_PAID_DONE;
+    }
+
+    /** Marks the given commissions Paid (one chunk). */
+    public static void payCommissions(List<Partner_Commission__c> commissions) {
+        List<Partner_Commission__c> updates = new List<Partner_Commission__c>();
+        for (Partner_Commission__c c : commissions) {
             updates.add(new Partner_Commission__c(Id = c.Id, Status__c = PR_Settings.COM_PAID));
         }
         PR_CommissionService.withBypass(updates, false);
+    }
+
+    /**
+     * Marks the batch Paid only when no commission in it is still Included in Payout. If any are left (a chunk
+     * failed), the batch stays Exported and Finance can mark it Paid again, which picks up the rest.
+     */
+    public static Boolean finishMarkPaid(Id batchId) {
+        Integer remaining = [
+            SELECT COUNT()
+            FROM Partner_Commission__c
+            WHERE Payout_Line__r.Payout_Batch__c = :batchId AND Status__c = :PR_Settings.COM_IN_PAYOUT
+            LIMIT 1
+        ];
+        if (remaining > 0) {
+            return false;
+        }
         update new Payout_Batch__c(Id = batchId, Status__c = PR_Settings.BATCH_PAID, Paid_On__c = Date.today());
+        return true;
     }
 }
