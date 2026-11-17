@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomNotificationType xmlns="http://soap.sforce.com/2006/04/metadata">
+    <customNotifTypeName>Partner commission reopened</customNotifTypeName>
+    <description>A won partner referral Opportunity was reopened after its commission was approved (clawback review).</description>
+    <desktop>true</desktop>
+    <masterLabel>Partner commission reopened</masterLabel>
+    <mobile>true</mobile>
+</CustomNotificationType>

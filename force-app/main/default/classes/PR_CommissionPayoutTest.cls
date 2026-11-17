@@ -277,6 +277,9 @@ private class PR_CommissionPayoutTest {
         Partner_Commission__c after = [SELECT Status__c, Reopened_After_Approval__c FROM Partner_Commission__c WHERE Id = :c.Id];
         Assert.areEqual('Approved', after.Status__c);
         Assert.isTrue(after.Reopened_After_Approval__c);
+        Assert.areEqual(1, PR_CommissionService.financeNotifications, 'AC-06.4: Finance is notified');
+        PR_CommissionService.handleReopen(new Set<Id>{ o.Id });
+        Assert.areEqual(1, PR_CommissionService.financeNotifications, 'only once per commission');
         PR_CommissionService.createFor(new Set<Id>());
         PR_CommissionService.handleReopen(null);
     }

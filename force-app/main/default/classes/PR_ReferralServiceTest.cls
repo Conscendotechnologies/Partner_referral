@@ -146,6 +146,7 @@ private class PR_ReferralServiceTest {
         Referral__c other = PR_TestFactory.submitAs('pb_ag1', i);
         Test.stopTest();
         Assert.isTrue(other.Possible_Duplicate__c, 'cross-agency match flagged internally');
+        Assert.areEqual(3, [SELECT COUNT() FROM Referral__c WHERE Possible_Duplicate__c = TRUE], 'AC-02.9: the earlier agency A referrals are flagged too, not only the new one');
         Assert.areEqual(3, [SELECT COUNT() FROM Referral__c]);
     }
 

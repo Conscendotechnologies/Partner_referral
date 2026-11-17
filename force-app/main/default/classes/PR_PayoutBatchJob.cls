@@ -18,7 +18,7 @@ public without sharing class PR_PayoutBatchJob implements Database.Batchable<SOb
         if (!PR_PayoutService.isFirstBusinessDay(today) || PR_PayoutService.runInProgress()) {
             return;
         }
-        Payout_Batch__c b = PR_PayoutService.getOrCreateBatch(PR_Settings.periodFor(today));
+        Payout_Batch__c b = PR_PayoutService.getOrCreateBatch(PR_PayoutService.defaultPeriod());
         if (b.Status__c == PR_Settings.BATCH_DRAFT) {
             Database.executeBatch(new PR_PayoutBatchJob(b.Id), 200);
         }

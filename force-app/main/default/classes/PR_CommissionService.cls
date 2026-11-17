@@ -49,8 +49,9 @@ public without sharing class PR_CommissionService {
             return;
         }
         List<Partner_Commission__c> updates = new List<Partner_Commission__c>();
+        List<Partner_Commission__c> flagged = new List<Partner_Commission__c>();
         for (Partner_Commission__c c : [
-            SELECT Id, Status__c
+            SELECT Id, Name, Status__c, Reopened_After_Approval__c
             FROM Partner_Commission__c
             WHERE Opportunity__c IN :oppIds AND Status__c != :PR_Settings.COM_CANCELLED
         ]) {
@@ -58,14 +59,57 @@ public without sharing class PR_CommissionService {
                 updates.add(new Partner_Commission__c(
                     Id = c.Id,
                     Status__c = PR_Settings.COM_CANCELLED,
-                    Cancellation_Reason__c = 'Opportunity reopened before approval',
+                    Cancellation_Reason__c = REOPENED_REASON,
                     Opportunity_Key__c = null
                 ));
             } else {
                 updates.add(new Partner_Commission__c(Id = c.Id, Reopened_After_Approval__c = true));
+                if (!c.Reopened_After_Approval__c) flagged.add(c);
             }
         }
         withBypass(updates, false);
+        notifyFinance(flagged);
+    }
+
+    /** AC-06.4: cancellation reason for a Pending commission whose Opportunity is reopened. */
+    public static final String REOPENED_REASON = 'Opportunity reopened';
+
+    @TestVisible
+    private static Integer financeNotifications = 0;
+
+    /**
+     * AC-06.4: tells Finance (everyone with PR_Finance) that approved commissions were reopened, so they can review a
+     * clawback. One notification per transaction, so a bulk update never floods anyone. Never blocks the save.
+     */
+    private static void notifyFinance(List<Partner_Commission__c> flagged) {
+        if (flagged.isEmpty()) {
+            return;
+        }
+        Set<String> recipients = new Set<String>();
+        for (PermissionSetAssignment psa : [
+            SELECT AssigneeId
+            FROM PermissionSetAssignment
+            WHERE PermissionSet.Name = 'PR_Finance' AND Assignee.IsActive = TRUE
+        ]) {
+            recipients.add(psa.AssigneeId);
+        }
+        List<CustomNotificationType> types = [SELECT Id FROM CustomNotificationType WHERE DeveloperName = 'Partner_Commission_Reopened' LIMIT 1];
+        if (recipients.isEmpty() || types.isEmpty()) {
+            return;
+        }
+        try {
+            Messaging.CustomNotification n = new Messaging.CustomNotification();
+            n.setNotificationTypeId(types[0].Id);
+            n.setTargetId(flagged[0].Id);
+            n.setTitle(flagged.size() == 1
+                ? 'Approved commission ' + flagged[0].Name + ' was reopened'
+                : flagged.size() + ' approved commissions were reopened');
+            n.setBody('The won Opportunity was reopened after the commission was approved. Review it for a clawback; the commission is flagged "Reopened After Approval".');
+            n.send(recipients);
+            financeNotifications++;
+        } catch (Exception e) {
+            System.debug(LoggingLevel.WARN, 'PR finance notification not sent: ' + e.getMessage());
+        }
     }
 
     public static void withBypass(List<Partner_Commission__c> records, Boolean isInsert) {
