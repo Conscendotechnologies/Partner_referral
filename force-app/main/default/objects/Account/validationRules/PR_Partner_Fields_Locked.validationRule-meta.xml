@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ValidationRule xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>PR_Partner_Fields_Locked</fullName>
+    <active>true</active>
+    <description>002 Partner referral</description>
+    <errorConditionFormula>AND(OR(ISCHANGED(Partner_Status__c), ISCHANGED(Commission_Rate__c)), NOT($Permission.Manage_Partner_Agencies))</errorConditionFormula>
+    <errorMessage>Only Partner Managers can change an agency's partner status or commission rate.</errorMessage>
+</ValidationRule>

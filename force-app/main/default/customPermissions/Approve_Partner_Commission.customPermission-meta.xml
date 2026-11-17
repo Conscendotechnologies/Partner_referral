@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomPermission xmlns="http://soap.sforce.com/2006/04/metadata">
+    <description>Approve Pending partner commissions.</description>
+    <isLicensed>false</isLicensed>
+    <label>Approve Partner Commission</label>
+</CustomPermission>

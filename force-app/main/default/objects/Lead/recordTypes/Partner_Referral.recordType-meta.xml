@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<RecordType xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Partner_Referral</fullName>
+    <active>true</active>
+    <businessProcess>Partner_Referral_Lead_Process</businessProcess>
+    <description>Leads created from the Connectnow partner portal.</description>
+    <label>Partner Referral</label>
+</RecordType>

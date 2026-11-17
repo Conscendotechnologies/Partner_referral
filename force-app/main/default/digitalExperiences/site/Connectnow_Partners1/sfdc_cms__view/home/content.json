@@ -1,0 +1,78 @@
+{
+  "type": "sfdc_cms__view",
+  "title": "Home",
+  "contentBody": {
+    "component": {
+      "children": [
+        {
+          "children": [
+            {
+              "attributes": {
+                "backgroundImageConfig": "",
+                "backgroundImageOverlay": "rgba(0,0,0,0)",
+                "componentSpacerSize": "",
+                "layoutDirectionDesktop": "row",
+                "layoutDirectionMobile": "column",
+                "layoutDirectionTablet": "column",
+                "maxContentWidth": "",
+                "sectionColumnGutterWidth": "",
+                "sectionConfig": "{\"UUID\":\"888d5949-0913-4fb0-86e1-609d351efdfc\",\"columns\":[{\"UUID\":\"39c9d3e7-8ab0-4386-b97f-05df61bd0caf\",\"columnName\":\"Column 1\",\"columnKey\":\"col1\",\"columnWidth\":\"12\",\"seedComponents\":null}]}",
+                "sectionMinHeight": "",
+                "sectionVerticalAlign": "flex-start"
+              },
+              "children": [
+                {
+                  "children": [
+                    {
+                      "attributes": {},
+                      "definition": "c:prPortalHome",
+                      "id": "5b0e6c1e-6d1a-4f7e-9a51-2a7c1b9d0001",
+                      "type": "component"
+                    }
+                  ],
+                  "id": "39c9d3e7-8ab0-4386-b97f-05df61bd0caf",
+                  "name": "col1",
+                  "title": "Column 1",
+                  "type": "region"
+                }
+              ],
+              "definition": "community_layout:section",
+              "id": "888d5949-0913-4fb0-86e1-609d351efdfc",
+              "type": "component"
+            }
+          ],
+          "id": "4ed323bd-218a-412b-b418-2fa15ca3710d",
+          "name": "content",
+          "title": "Content",
+          "type": "region"
+        },
+        {
+          "children": [
+            {
+              "attributes": {
+                "customHeadTags": "",
+                "description": "",
+                "pageTitle": "Connectnow Partners",
+                "recordId": "{!recordId}"
+              },
+              "definition": "community_builder:seoAssistant",
+              "id": "6f042dc6-e383-4ed4-b567-ebd9f980d1b6",
+              "type": "component"
+            }
+          ],
+          "id": "3b0832d2-12b4-4829-acbe-9209956f5509",
+          "name": "sfdcHiddenRegion",
+          "title": "sfdcHiddenRegion",
+          "type": "region"
+        }
+      ],
+      "definition": "community_layout:sldsFlexibleLayout",
+      "id": "984c43a1-a8cf-4add-919d-6a3224756c87",
+      "type": "component"
+    },
+    "dataProviders": [],
+    "themeLayoutType": "Inner",
+    "viewType": "home"
+  },
+  "urlName": "home"
+}

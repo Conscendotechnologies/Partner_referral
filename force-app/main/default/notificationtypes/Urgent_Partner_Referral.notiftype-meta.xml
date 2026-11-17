@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomNotificationType xmlns="http://soap.sforce.com/2006/04/metadata">
+    <customNotifTypeName>Urgent partner referral</customNotifTypeName>
+    <description>A partner referral moves in within 48 hours.</description>
+    <desktop>true</desktop>
+    <masterLabel>Urgent partner referral</masterLabel>
+    <mobile>true</mobile>
+</CustomNotificationType>

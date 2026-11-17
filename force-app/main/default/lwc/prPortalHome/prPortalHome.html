@@ -1,0 +1,53 @@
+<template>
+    <div class="pr-home">
+        <header class="pr-hero">
+            <p class="pr-hero__eyebrow">Connectnow Partners</p>
+            <h1 class="pr-hero__title">{greeting}</h1>
+        </header>
+
+        <template lwc:if={errorMessage}>
+            <div class="pr-error" role="alert">{errorMessage}</div>
+        </template>
+
+        <section class="pr-tiles" aria-label="This month">
+            <div class="pr-tile pr-tile_total">
+                <span class="pr-tile__label">Referrals this month</span>
+                <span class="pr-tile__value">{total}</span>
+            </div>
+            <template for:each={statusTiles} for:item="t">
+                <div key={t.label} class={t.cls}>
+                    <span class="pr-tile__label">{t.label}</span>
+                    <span class="pr-tile__value">{t.value}</span>
+                </div>
+            </template>
+            <template lwc:if={isPrincipal}>
+                <div class="pr-tile pr-tile_money">
+                    <span class="pr-tile__label">Commission this month</span>
+                    <span class="pr-tile__value">
+                        <lightning-formatted-number value={commissionThisMonth} format-style="currency" currency-code="AUD" currency-display-as="symbol"></lightning-formatted-number>
+                    </span>
+                    <span class="pr-tile__hint">ex GST</span>
+                </div>
+                <div class="pr-tile pr-tile_money">
+                    <span class="pr-tile__label">Commission last month</span>
+                    <span class="pr-tile__value">
+                        <lightning-formatted-number value={commissionLastMonth} format-style="currency" currency-code="AUD" currency-display-as="symbol"></lightning-formatted-number>
+                    </span>
+                    <span class="pr-tile__hint">ex GST</span>
+                </div>
+            </template>
+        </section>
+
+        <div class="pr-switch" role="tablist" aria-label="Partner portal">
+            <button role="tab" class={referTabClass} aria-selected={isRefer} data-tab="refer" onclick={handleTab}>Refer a mover</button>
+            <button role="tab" class={listTabClass} aria-selected={isList} data-tab="list" onclick={handleTab}>{listLabel}</button>
+        </div>
+
+        <div class="pr-panel" lwc:if={isRefer}>
+            <c-pr-referral-form onreferralsent={handleSent}></c-pr-referral-form>
+        </div>
+        <div class="pr-panel" lwc:else>
+            <c-pr-my-referrals title={listLabel} show-submitter={isPrincipal}></c-pr-my-referrals>
+        </div>
+    </div>
+</template>

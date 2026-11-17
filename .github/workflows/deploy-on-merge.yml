@@ -1,0 +1,122 @@
+# Runs when a pull request is merged into main (any push to main):
+#   1. deploys the metadata changed since the last successful deploy (tag deployed/sdo), with every Apex
+#      test class specified, then moves the tag to this commit
+#   2. runs every Apex test class against the org, now holding the merged code
+# Uses the "production" environment: add required reviewers there to make deploys wait for approval.
+# Needs the secret SFDX_AUTH_URL (repository or production environment; see .github/README.md).
+name: Deploy on merge
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+concurrency:
+  group: deploy-main
+  cancel-in-progress: false
+
+permissions:
+  contents: write # moves the deployed/sdo tag after a successful deploy
+
+env:
+  DEPLOY_TAG: deployed/sdo
+
+jobs:
+  deploy:
+    name: Deploy and run Apex tests
+    runs-on: ubuntu-24.04
+    timeout-minutes: 90
+    environment: production
+    steps:
+      - name: Check out
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Install Salesforce CLI and sfdx-git-delta
+        run: |
+          npm install --global @salesforce/cli
+          echo y | sf plugins install sfdx-git-delta
+          sf version
+
+      - name: Log in to the org
+        env:
+          SFDX_AUTH_URL: ${{ secrets.SFDX_AUTH_URL }}
+        run: |
+          if [ -z "$SFDX_AUTH_URL" ]; then
+            echo "::error::Secret SFDX_AUTH_URL is not set. See .github/README.md."
+            exit 1
+          fi
+          auth_file="$(mktemp)"
+          trap 'rm -f "$auth_file"' EXIT
+          printf %s "$SFDX_AUTH_URL" > "$auth_file"
+          sf org login sfdx-url --sfdx-url-file "$auth_file" --alias target --set-default --json | node -e "let s='';process.stdin.on('data',d=>s+=d).on('end',()=>{const j=JSON.parse(s);if(j.status){console.log('::error::Org login failed: '+j.name+': '+j.message);process.exit(1)}console.log('Logged in as '+j.result.username+' ('+j.result.instanceUrl+')')})"
+
+      - name: Work out what changed since the last successful deploy
+        env:
+          DEPLOY_BASELINE_SHA: ${{ vars.DEPLOY_BASELINE_SHA }}
+        run: |
+          # The delta starts at the tag deployed/sdo (the last commit that deployed successfully), so a failed
+          # deploy's changes are carried into the next run instead of being skipped.
+          git fetch --force origin "refs/tags/${DEPLOY_TAG}:refs/tags/${DEPLOY_TAG}" 2>/dev/null || true
+          if git rev-parse -q --verify "refs/tags/${DEPLOY_TAG}" >/dev/null; then
+            FROM="$(git rev-parse "refs/tags/${DEPLOY_TAG}^{commit}")"
+            if ! git merge-base --is-ancestor "$FROM" HEAD; then
+              echo "::error::${DEPLOY_TAG} (${FROM}) is not an ancestor of ${GITHUB_SHA}: this run is stale or history was rewritten. Not deploying."
+              exit 1
+            fi
+            if [ "$FROM" = "$(git rev-parse HEAD)" ]; then
+              echo "Already deployed: ${DEPLOY_TAG} is at this commit."
+            fi
+            echo "Delta from ${DEPLOY_TAG} (${FROM})"
+          else
+            # No tag yet (first deploy, or the first deploy failed): start from the fixed, verified baseline that
+            # matches the org, never from the previous push. Otherwise a failed first deploy would be skipped.
+            FROM="$DEPLOY_BASELINE_SHA"
+            if [ -z "$FROM" ]; then
+              echo "::error::No ${DEPLOY_TAG} tag and no DEPLOY_BASELINE_SHA repository variable. Set it to the commit the org matches (see .github/README.md)."
+              exit 1
+            fi
+            if ! git cat-file -e "${FROM}^{commit}" 2>/dev/null || ! git merge-base --is-ancestor "$FROM" HEAD; then
+              echo "::error::DEPLOY_BASELINE_SHA (${FROM}) is not a commit in the history of ${GITHUB_SHA}."
+              exit 1
+            fi
+            echo "No ${DEPLOY_TAG} tag yet: delta from the verified baseline ${FROM}"
+          fi
+          bash .github/scripts/sf-steps.sh delta "$FROM" HEAD
+
+      - name: Deploy
+        run: bash .github/scripts/sf-steps.sh deploy deploy
+
+      - name: Mark this commit as deployed
+        run: |
+          # Move the tag only forwards: re-read it and refuse if another run has already moved it past this commit.
+          git fetch --force origin "refs/tags/${DEPLOY_TAG}:refs/tags/${DEPLOY_TAG}" 2>/dev/null || true
+          if git rev-parse -q --verify "refs/tags/${DEPLOY_TAG}" >/dev/null &&
+             ! git merge-base --is-ancestor "refs/tags/${DEPLOY_TAG}^{commit}" HEAD; then
+            echo "::warning::${DEPLOY_TAG} is already ahead of ${GITHUB_SHA}; leaving it where it is."
+            exit 0
+          fi
+          git tag --force "${DEPLOY_TAG}" HEAD
+          git push --force origin "refs/tags/${DEPLOY_TAG}"
+          echo "${DEPLOY_TAG} -> ${GITHUB_SHA}" >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Run all Apex test classes
+        run: bash .github/scripts/sf-steps.sh tests
+
+      - name: Keep results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: deploy-results
+          path: |
+            delta/package
+            delta/destructiveChanges
+            deploy-result.json
+            test-results
+          if-no-files-found: ignore

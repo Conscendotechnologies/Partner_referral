@@ -1,0 +1,51 @@
+<template>
+    <div class="pr-list">
+        <div class="pr-head">
+            <h2 class="pr-title">{title}</h2>
+            <lightning-button-icon icon-name="utility:refresh" alternative-text="Refresh" onclick={refresh}></lightning-button-icon>
+        </div>
+        <div class="pr-filters" role="group" aria-label="Filter by status">
+            <template for:each={filters} for:item="f">
+                <button key={f.value} class={f.cls} data-value={f.value} aria-pressed={f.pressed} onclick={handleFilter}>{f.label}</button>
+            </template>
+        </div>
+
+        <template lwc:if={loading}>
+            <lightning-spinner alternative-text="Loading" size="small"></lightning-spinner>
+        </template>
+        <template lwc:if={errorMessage}>
+            <div class="pr-error" role="alert">{errorMessage}</div>
+        </template>
+
+        <template lwc:if={isEmpty}>
+            <p class="pr-empty">No referrals yet{emptySuffix}.</p>
+        </template>
+
+        <ul class="pr-cards">
+            <template for:each={rows} for:item="r">
+                <li key={r.id} class="pr-card">
+                    <div class="pr-card__top">
+                        <div class="pr-card__name">
+                            {r.moverName}
+                            <template lwc:if={r.urgent}><span class="pr-urgent">Moving soon</span></template>
+                        </div>
+                        <span class={r.badgeClass}>{r.status}</span>
+                    </div>
+                    <div class="pr-card__meta">{r.referralNumber} · {r.suburb}</div>
+                    <dl class="pr-card__grid">
+                        <dt>Move-in</dt>
+                        <dd><lightning-formatted-date-time value={r.moveInDate} time-zone="UTC"></lightning-formatted-date-time></dd>
+                        <dt>Services</dt>
+                        <dd>{r.utilities}</dd>
+                        <dt>Connectnow rep</dt>
+                        <dd>{r.repLabel}</dd>
+                        <template lwc:if={showSubmitter}>
+                            <dt>Sent by</dt>
+                            <dd>{r.submittedBy}</dd>
+                        </template>
+                    </dl>
+                </li>
+            </template>
+        </ul>
+    </div>
+</template>

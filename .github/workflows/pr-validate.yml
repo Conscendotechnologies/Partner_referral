@@ -1,0 +1,78 @@
+# Runs on every pull request into main:
+#   1. check-only deploy (dry run) of the metadata the PR changes, with every Apex test class specified
+#   2. every Apex test class in the repo, run explicitly (this SDO runs no tests during deploys)
+# Needs the repository secret SFDX_AUTH_URL (see .github/README.md).
+name: PR validation
+
+on:
+  pull_request:
+    branches: [main]
+    types: [opened, synchronize, reopened, ready_for_review]
+  workflow_dispatch:
+
+concurrency:
+  group: pr-validate-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    name: Dry-run deploy and Apex tests
+    runs-on: ubuntu-24.04
+    timeout-minutes: 60
+    steps:
+      - name: Check out
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Install Salesforce CLI and sfdx-git-delta
+        run: |
+          npm install --global @salesforce/cli
+          echo y | sf plugins install sfdx-git-delta
+          sf version
+
+      - name: Log in to the org
+        env:
+          SFDX_AUTH_URL: ${{ secrets.SFDX_AUTH_URL }}
+        run: |
+          if [ -z "$SFDX_AUTH_URL" ]; then
+            echo "::error::Repository secret SFDX_AUTH_URL is not set. See .github/README.md."
+            exit 1
+          fi
+          auth_file="$(mktemp)"
+          trap 'rm -f "$auth_file"' EXIT
+          printf %s "$SFDX_AUTH_URL" > "$auth_file"
+          sf org login sfdx-url --sfdx-url-file "$auth_file" --alias target --set-default --json | node -e "let s='';process.stdin.on('data',d=>s+=d).on('end',()=>{const j=JSON.parse(s);if(j.status){console.log('::error::Org login failed: '+j.name+': '+j.message);process.exit(1)}console.log('Logged in as '+j.result.username+' ('+j.result.instanceUrl+')')})"
+
+      - name: Work out what the PR changes
+        env:
+          # The base SHA this PR event was built against. origin/main can move on after the event, and diffing
+          # against it would show main's newer commits as reversions in this PR. Manual runs use origin/main.
+          BASE_SHA: ${{ github.event.pull_request.base.sha }}
+        run: bash .github/scripts/sf-steps.sh delta "${BASE_SHA:-origin/main}" HEAD
+
+      - name: Check-only deploy (dry run)
+        run: bash .github/scripts/sf-steps.sh deploy validate
+
+      - name: Run all Apex test classes
+        run: bash .github/scripts/sf-steps.sh tests
+
+      - name: Keep results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: pr-validation-results
+          path: |
+            delta/package
+            delta/destructiveChanges
+            deploy-result.json
+            test-results
+          if-no-files-found: ignore
