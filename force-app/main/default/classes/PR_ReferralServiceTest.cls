@@ -202,6 +202,55 @@ private class PR_ReferralServiceTest {
     }
 
     @IsTest
+    static void duplicatesWithinOneSubmissionAreCaught() {
+        PR_ReferralInput first = PR_TestFactory.input('0477777777', 'NSW', 20, new List<String>{ 'Gas' });
+        PR_ReferralInput second = PR_TestFactory.input('0477777777', 'NSW', 20, new List<String>{ 'Gas' });
+        PR_ReferralInput different = PR_TestFactory.input('0466000001', 'VIC', 20, new List<String>{ 'Water' });
+        Test.startTest();
+        System.runAs(PR_TestFactory.user('pa_ag1')) {
+            List<PR_SubmitResult> results = PR_ReferralService.submitAll(new List<PR_ReferralInput>{ first, second, different });
+            Assert.isTrue(results[0].saved, 'first copy saved');
+            Assert.isTrue(results[1].duplicateWarning, 'second copy in the same call is a duplicate of the first');
+            Assert.isFalse(results[1].saved);
+            Assert.isTrue(results[1].duplicates[0].contains('earlier in this submission'), results[1].duplicates[0]);
+            Assert.isTrue(results[2].saved, 'a different mover in the same call is still saved');
+
+            // Acknowledged: both copies are saved.
+            PR_ReferralInput third = PR_TestFactory.input('0455500000', 'QLD', 20, new List<String>{ 'Gas' });
+            PR_ReferralInput fourth = PR_TestFactory.input('0455500000', 'QLD', 20, new List<String>{ 'Gas' });
+            fourth.acknowledgeDuplicate = true;
+            List<PR_SubmitResult> acked = PR_ReferralService.submitAll(new List<PR_ReferralInput>{ third, fourth });
+            Assert.isTrue(acked[0].saved && acked[1].saved);
+        }
+        Test.stopTest();
+        Assert.areEqual(4, [SELECT COUNT() FROM Referral__c]);
+    }
+
+    @IsTest
+    static void duplicateCandidatesAreNeverTruncated() {
+        Account a = PR_TestFactory.agencyByName(PR_TestFactory.AGENCY_B);
+        List<Referral__c> existing = new List<Referral__c>();
+        for (Integer n = 0; n < 2; n++) {
+            Referral__c r = new Referral__c(First_Name__c = 'Old' + n, Last_Name__c = 'Mover', Mobile__c = '0488888888', Referring_Agency__c = a.Id, Partner_Status__c = 'Received');
+            r.put('CurrencyIsoCode', 'AUD');
+            existing.add(r);
+        }
+        insert existing;
+        PR_SystemData.DUPLICATE_CANDIDATE_CAP = 1;
+        Test.startTest();
+        System.runAs(PR_TestFactory.user('pa_ag1')) {
+            try {
+                PR_ReferralService.submit(PR_TestFactory.input('0488888888', 'NSW', 20, new List<String>{ 'Gas' }));
+                Assert.fail('more candidates than the cap must be an explicit error, not a silent cut');
+            } catch (PR_Exception e) {
+                Assert.isTrue(e.getMessage().contains('Too many open referrals'), e.getMessage());
+            }
+        }
+        Test.stopTest();
+        Assert.areEqual(2, [SELECT COUNT() FROM Referral__c], 'nothing saved');
+    }
+
+    @IsTest
     static void portalUsersGetRoleAndPermissionSet() {
         User prin = PR_TestFactory.user('pa_prin');
         User ag = PR_TestFactory.user('pa_ag1');

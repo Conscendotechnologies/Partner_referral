@@ -38,15 +38,29 @@ public without sharing class PR_SystemData {
         if (mobiles == null || mobiles.isEmpty()) {
             return new List<Referral__c>();
         }
-        return [
+        // Never truncate silently: a missing candidate would let a duplicate through without its warning or flag.
+        // Read one more than the cap; if the cap is exceeded, refuse the submission with a clear error instead.
+        Integer limitPlusOne = DUPLICATE_CANDIDATE_CAP + 1;
+        List<Referral__c> rows = [
             SELECT Id, Name, First_Name__c, Last_Name__c, Mobile__c, Email__c, Referring_Agency__c
             FROM Referral__c
             WHERE Mobile__c IN :mobiles
                 AND Partner_Status__c NOT IN (:PR_Settings.REF_CONNECTED, :PR_Settings.REF_CLOSED_LOST)
             ORDER BY CreatedDate DESC
-            LIMIT 2000
+            LIMIT :limitPlusOne
         ];
+        if (rows.size() > DUPLICATE_CANDIDATE_CAP) {
+            throw new PR_Exception(
+                'Too many open referrals share these mobile numbers to check for duplicates (more than ' +
+                DUPLICATE_CANDIDATE_CAP + '). Submit fewer referrals at a time.'
+            );
+        }
+        return rows;
     }
+
+    /** Most open referrals the duplicate check reads in one submission (well inside the 50,000-row query limit). */
+    @TestVisible
+    private static Integer DUPLICATE_CANDIDATE_CAP = 10000;
 
     /** AC-02.9: marks existing referrals (and their Leads) as possible duplicates of a referral from another agency. */
     public static void flagPossibleDuplicates(Set<Id> referralIds) {

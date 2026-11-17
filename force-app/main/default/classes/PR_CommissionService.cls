@@ -79,7 +79,8 @@ public without sharing class PR_CommissionService {
 
     /**
      * AC-06.4: tells Finance (everyone with PR_Finance) that approved commissions were reopened, so they can review a
-     * clawback. One notification per transaction, so a bulk update never floods anyone. Never blocks the save.
+     * clawback. One notification per call: the Opportunity trigger calls this once per 200-record chunk, so a single
+     * notification covers up to 200 reopened commissions and a bulk update never floods anyone. Never blocks the save.
      */
     private static void notifyFinance(List<Partner_Commission__c> flagged) {
         if (flagged.isEmpty()) {

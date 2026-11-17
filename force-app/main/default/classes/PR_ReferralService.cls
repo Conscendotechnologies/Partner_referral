@@ -129,6 +129,13 @@ public with sharing class PR_ReferralService {
                     others.add(r.Id);
                 }
             }
+            // Earlier inputs accepted in this same call are not in the database yet; they come from this agency, so a
+            // match is a same-agency duplicate and needs the same acknowledgement.
+            for (Referral__c accepted : toCreate) {
+                if (isSameMover(accepted, mobile, email)) {
+                    result.duplicates.add('earlier in this submission (' + accepted.First_Name__c + ' ' + accepted.Last_Name__c + ')');
+                }
+            }
             if (!result.duplicates.isEmpty() && i.acknowledgeDuplicate != true) {
                 result.duplicateWarning = true;
                 continue;
