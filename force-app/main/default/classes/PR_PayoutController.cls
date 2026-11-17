@@ -70,10 +70,11 @@ public with sharing class PR_PayoutController {
         }
     }
 
+    /** Returns 'Paid' when done, or 'Processing' when a large batch is being marked Paid in the background. */
     @AuraEnabled
-    public static void markPaid(Id batchId) {
+    public static String markPaid(Id batchId) {
         try {
-            PR_PayoutService.markPaid(batchId);
+            return PR_PayoutService.markPaid(batchId);
         } catch (Exception e) {
             throw auraError(e);
         }

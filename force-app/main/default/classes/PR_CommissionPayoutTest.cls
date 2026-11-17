@@ -352,6 +352,68 @@ private class PR_CommissionPayoutTest {
         }
     }
 
+    /** An exported payout batch holding the given number of commissions per agency. */
+    private static Payout_Batch__c exportedBatch(Integer forA, Integer forB) {
+        List<Partner_Commission__c> all = new List<Partner_Commission__c>();
+        all.addAll(commissions(PR_TestFactory.AGENCY_A, forA, 'Approved'));
+        all.addAll(commissions(PR_TestFactory.AGENCY_B, forB, 'Approved'));
+        Payout_Batch__c b = PR_PayoutService.getOrCreateBatch('2026-12');
+        PR_PayoutService.addToBatch(b.Id, all);
+        System.runAs(PR_TestFactory.user('prmgr')) {
+            PR_PayoutService.export(b.Id);
+        }
+        return [SELECT Id, Status__c FROM Payout_Batch__c WHERE Id = :b.Id];
+    }
+
+    @IsTest
+    static void largeBatchIsMarkedPaidInTheBackground() {
+        Payout_Batch__c b = exportedBatch(5, 2);
+        Assert.areEqual('Exported', b.Status__c);
+        Assert.areEqual(7, [SELECT COUNT() FROM Partner_Commission__c WHERE Status__c = 'Included in Payout']);
+        // Lower the limit so 7 commissions count as "more than one transaction can update".
+        PR_PayoutService.SYNC_LIMIT = 3;
+        User mgr = PR_TestFactory.user('prmgr');
+        Test.startTest();
+        System.runAs(mgr) {
+            Assert.areEqual('Processing', PR_PayoutController.markPaid(b.Id), 'large batch goes to the background job');
+            Assert.isTrue(PR_PayoutService.markPaidInProgress());
+            // Until the job has run, nothing is Paid and the batch is not marked Paid.
+            Assert.areEqual('Exported', [SELECT Status__c FROM Payout_Batch__c WHERE Id = :b.Id].Status__c, 'batch not Paid before every commission is');
+            Assert.areEqual(0, [SELECT COUNT() FROM Partner_Commission__c WHERE Status__c = 'Paid']);
+            try {
+                PR_PayoutController.markPaid(b.Id);
+                Assert.fail('a second mark-paid must wait for the running one');
+            } catch (AuraHandledException e) {
+                Assert.isTrue(e.getMessage().contains('already being marked Paid'), e.getMessage());
+            }
+        }
+        Test.stopTest();
+        Assert.areEqual(7, [SELECT COUNT() FROM Partner_Commission__c WHERE Status__c = 'Paid'], 'every commission is Paid');
+        Assert.areEqual(0, [SELECT COUNT() FROM Partner_Commission__c WHERE Status__c = 'Included in Payout']);
+        Payout_Batch__c after = [SELECT Status__c, Paid_On__c FROM Payout_Batch__c WHERE Id = :b.Id];
+        Assert.areEqual('Paid', after.Status__c, 'batch Paid once all commissions are');
+        // The job runs as the Finance user (Sydney time), so "today" can be a day ahead of the test runner's.
+        Assert.isNotNull(after.Paid_On__c);
+        Assert.isTrue(Math.abs(after.Paid_On__c.daysBetween(Date.today())) <= 1, String.valueOf(after.Paid_On__c));
+        Assert.isFalse(PR_PayoutService.markPaidInProgress());
+    }
+
+    @IsTest
+    static void batchStaysExportedUntilEveryCommissionIsPaid() {
+        Payout_Batch__c b = exportedBatch(3, 0);
+        List<Partner_Commission__c> inBatch = [SELECT Id FROM Partner_Commission__c WHERE Status__c = 'Included in Payout'];
+        // Only part of the batch paid (as if a chunk failed): the batch must not be marked Paid.
+        PR_PayoutService.payCommissions(new List<Partner_Commission__c>{ inBatch[0] });
+        Assert.isFalse(PR_PayoutService.finishMarkPaid(b.Id));
+        Assert.areEqual('Exported', [SELECT Status__c FROM Payout_Batch__c WHERE Id = :b.Id].Status__c);
+        // Finance retries: the rest are paid and the batch becomes Paid.
+        System.runAs(PR_TestFactory.user('prmgr')) {
+            Assert.areEqual('Paid', PR_PayoutController.markPaid(b.Id), 'small remainder is paid straight away');
+        }
+        Assert.areEqual(3, [SELECT COUNT() FROM Partner_Commission__c WHERE Status__c = 'Paid']);
+        Assert.areEqual('Paid', [SELECT Status__c FROM Payout_Batch__c WHERE Id = :b.Id].Status__c);
+    }
+
     @IsTest
     static void schedulerOnlyRunsOnFirstBusinessDay() {
         Assert.isTrue(PR_PayoutService.isFirstBusinessDay(Date.newInstance(2026, 12, 1)), 'Tue 1 Dec 2026');
