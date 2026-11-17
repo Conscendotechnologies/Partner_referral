@@ -146,6 +146,7 @@ private class PR_ReferralServiceTest {
         Referral__c other = PR_TestFactory.submitAs('pb_ag1', i);
         Test.stopTest();
         Assert.isTrue(other.Possible_Duplicate__c, 'cross-agency match flagged internally');
+        Assert.areEqual(3, [SELECT COUNT() FROM Referral__c WHERE Possible_Duplicate__c = TRUE], 'AC-02.9: the earlier agency A referrals are flagged too, not only the new one');
         Assert.areEqual(3, [SELECT COUNT() FROM Referral__c]);
     }
 
@@ -198,6 +199,176 @@ private class PR_ReferralServiceTest {
             Assert.areEqual(0, (Decimal) home.get('commissionThisMonth'));
         }
         Test.stopTest();
+    }
+
+    @IsTest
+    static void duplicatesWithinOneSubmissionAreCaught() {
+        PR_ReferralInput first = PR_TestFactory.input('0477777777', 'NSW', 20, new List<String>{ 'Gas' });
+        PR_ReferralInput second = PR_TestFactory.input('0477777777', 'NSW', 20, new List<String>{ 'Gas' });
+        PR_ReferralInput different = PR_TestFactory.input('0466000001', 'VIC', 20, new List<String>{ 'Water' });
+        Test.startTest();
+        System.runAs(PR_TestFactory.user('pa_ag1')) {
+            List<PR_SubmitResult> results = PR_ReferralService.submitAll(new List<PR_ReferralInput>{ first, second, different });
+            Assert.isTrue(results[0].saved, 'first copy saved');
+            Assert.isTrue(results[1].duplicateWarning, 'second copy in the same call is a duplicate of the first');
+            Assert.isFalse(results[1].saved);
+            Assert.isTrue(results[1].duplicates[0].contains('earlier in this submission'), results[1].duplicates[0]);
+            Assert.isTrue(results[2].saved, 'a different mover in the same call is still saved');
+
+            // Acknowledged: both copies are saved.
+            PR_ReferralInput third = PR_TestFactory.input('0455500000', 'QLD', 20, new List<String>{ 'Gas' });
+            PR_ReferralInput fourth = PR_TestFactory.input('0455500000', 'QLD', 20, new List<String>{ 'Gas' });
+            fourth.acknowledgeDuplicate = true;
+            List<PR_SubmitResult> acked = PR_ReferralService.submitAll(new List<PR_ReferralInput>{ third, fourth });
+            Assert.isTrue(acked[0].saved && acked[1].saved);
+        }
+        Test.stopTest();
+        Assert.areEqual(4, [SELECT COUNT() FROM Referral__c]);
+    }
+
+    @IsTest
+    static void duplicateCandidatesAreNeverTruncated() {
+        Account a = PR_TestFactory.agencyByName(PR_TestFactory.AGENCY_B);
+        List<Referral__c> existing = new List<Referral__c>();
+        for (Integer n = 0; n < 2; n++) {
+            Referral__c r = new Referral__c(First_Name__c = 'Old' + n, Last_Name__c = 'Mover', Mobile__c = '0488888888', Referring_Agency__c = a.Id, Partner_Status__c = 'Received');
+            r.put('CurrencyIsoCode', 'AUD');
+            existing.add(r);
+        }
+        insert existing;
+        PR_SystemData.DUPLICATE_CANDIDATE_CAP = 1;
+        Test.startTest();
+        System.runAs(PR_TestFactory.user('pa_ag1')) {
+            try {
+                PR_ReferralService.submit(PR_TestFactory.input('0488888888', 'NSW', 20, new List<String>{ 'Gas' }));
+                Assert.fail('more candidates than the cap must be an explicit error, not a silent cut');
+            } catch (PR_Exception e) {
+                Assert.isTrue(e.getMessage().contains('Too many open referrals'), e.getMessage());
+            }
+        }
+        Test.stopTest();
+        Assert.areEqual(2, [SELECT COUNT() FROM Referral__c], 'nothing saved');
+    }
+
+    /** An open referral at another agency with the given mobile; with an unconverted Lead when asked. */
+    private static Referral__c otherAgencyReferral(String mobile, Boolean flagged, Boolean withOpenLead) {
+        Account other = PR_TestFactory.agencyByName(PR_TestFactory.AGENCY_B);
+        Referral__c r = new Referral__c(First_Name__c = 'Elsewhere', Last_Name__c = 'Mover', Mobile__c = mobile, Referring_Agency__c = other.Id, Partner_Status__c = 'Received', Possible_Duplicate__c = flagged);
+        r.put('CurrencyIsoCode', 'AUD');
+        insert r;
+        if (withOpenLead) {
+            Lead l = new Lead(RecordTypeId = PR_Settings.leadRecordTypeId(), LastName = 'Mover', State = 'NSW', LeadSource = 'Partner Referral', Referral__c = r.Id, Possible_Duplicate__c = flagged);
+            l.put('CurrencyIsoCode', 'AUD');
+            insert l;
+            update new Referral__c(Id = r.Id, Lead__c = l.Id);
+        }
+        return r;
+    }
+
+    private static PR_ReferralInput inputFor(String mobile) {
+        PR_ReferralInput i = PR_TestFactory.input(mobile, 'NSW', 20, new List<String>{ 'Gas' });
+        i.email = null;
+        return i;
+    }
+
+    @IsTest
+    static void dmlBudgetCountsAMatchWithAnOpenLeadAsTwoRows() {
+        // 1 new referral routed to a queue (3 rows) + 1 unflagged match with an unconverted Lead (Referral + Lead = 2) = 5.
+        Referral__c existing = otherAgencyReferral('0499999999', false, true);
+        Test.startTest();
+        System.runAs(PR_TestFactory.user('pa_ag1')) {
+            PR_ReferralService.dmlRowsAvailableOverride = 4;
+            try {
+                PR_ReferralService.submit(inputFor('0499999999'));
+                Assert.fail('over budget must be refused before any write');
+            } catch (PR_Exception e) {
+                Assert.isTrue(e.getMessage().contains('5 rows, 4 available'), e.getMessage());
+            }
+        }
+        // Counted as the test runner: the agent can't see the other agency's referral.
+        Assert.areEqual(1, [SELECT COUNT() FROM Referral__c], 'nothing was written');
+        System.runAs(PR_TestFactory.user('pa_ag1')) {
+            PR_ReferralService.dmlRowsAvailableOverride = 5;
+            Assert.isTrue(PR_ReferralService.submit(inputFor('0499999999')).saved, 'exactly on budget is accepted');
+        }
+        Test.stopTest();
+        Referral__c after = [SELECT Possible_Duplicate__c, Lead__r.Possible_Duplicate__c FROM Referral__c WHERE Id = :existing.Id];
+        Assert.isTrue(after.Possible_Duplicate__c, 'the existing referral is flagged');
+        Assert.isTrue(after.Lead__r.Possible_Duplicate__c, 'and its open Lead');
+    }
+
+    @IsTest
+    static void dmlBudgetIgnoresMatchesThatAreAlreadyFlagged() {
+        // Three matches already flagged need no writes: only the new referral's 3 rows count.
+        for (Integer n = 0; n < 3; n++) otherAgencyReferral('0499999998', true, true);
+        Test.startTest();
+        System.runAs(PR_TestFactory.user('pa_ag1')) {
+            PR_ReferralService.dmlRowsAvailableOverride = 3;
+            PR_SubmitResult r = PR_ReferralService.submit(inputFor('0499999998'));
+            Assert.isTrue(r.saved, 'already-flagged matches must not use up the budget');
+        }
+        Test.stopTest();
+        Assert.areEqual(4, [SELECT COUNT() FROM Referral__c WHERE Possible_Duplicate__c = TRUE], 'the new referral is flagged too');
+    }
+
+    @IsTest
+    static void overBudgetWithAMatchWithoutALeadIsRefused() {
+        Referral__c existing = otherAgencyReferral('0499999997', false, false);
+        Test.startTest();
+        System.runAs(PR_TestFactory.user('pa_ag1')) {
+            PR_ReferralService.dmlRowsAvailableOverride = 3; // new referral 3 + unflagged match without a Lead 1 = 4
+            try {
+                PR_ReferralService.submit(inputFor('0499999997'));
+                Assert.fail();
+            } catch (PR_Exception e) {
+                Assert.isTrue(e.getMessage().contains('4 rows, 3 available'), e.getMessage());
+            }
+        }
+        Test.stopTest();
+        Assert.isFalse([SELECT Possible_Duplicate__c FROM Referral__c WHERE Id = :existing.Id].Possible_Duplicate__c, 'nothing was flagged');
+    }
+
+    @IsTest
+    static void aSubmissionWithNoMatchesNeedsExactlyThreeRows() {
+        // Routed to a queue, the new Lead's status sync writes nothing: Referral insert, Lead insert, link update.
+        Test.startTest();
+        System.runAs(PR_TestFactory.user('pa_ag1')) {
+            PR_ReferralService.dmlRowsAvailableOverride = 2;
+            try {
+                PR_ReferralService.submit(inputFor('0466111111'));
+                Assert.fail('2 rows are not enough');
+            } catch (PR_Exception e) {
+                Assert.isTrue(e.getMessage().contains('3 rows, 2 available'), e.getMessage());
+            }
+            PR_ReferralService.dmlRowsAvailableOverride = 3;
+            Assert.isTrue(PR_ReferralService.submit(inputFor('0466111111')).saved, 'exactly 3 rows fit');
+        }
+        Test.stopTest();
+        Assert.areEqual(3, PR_ReferralService.createRows([SELECT New_State__c FROM Referral__c]), 'one routed referral = 3 rows');
+        Referral__c unrouted = new Referral__c(New_State__c = null);
+        PR_Settings.routesOverride = new List<PR_State_Route__mdt>();
+        Assert.isNotNull(PR_Settings.routeQueueId(null), 'the Unassigned fallback queue still routes a blank state');
+        Assert.areEqual(3, PR_ReferralService.createRows(new List<Referral__c>{ unrouted }));
+    }
+
+    @IsTest
+    static void theGuardUsesTheRealRemainingDmlLimit() {
+        // No override: the guard reads Limits. Exactly the remaining rows is accepted; one more is refused.
+        Integer remaining = Limits.getLimitDmlRows() - Limits.getDmlRows();
+        PR_ReferralService.requireDmlBudget(remaining);
+        try {
+            PR_ReferralService.requireDmlBudget(remaining + 1);
+            Assert.fail('one row over the real remaining limit must be refused');
+        } catch (PR_Exception e) {
+            Assert.isTrue(e.getMessage().contains((remaining + 1) + ' rows, ' + remaining + ' available'), e.getMessage());
+        }
+        insert new Account(Name = 'Uses a row');
+        try {
+            PR_ReferralService.requireDmlBudget(remaining);
+            Assert.fail('after a write, the same number of rows no longer fits');
+        } catch (PR_Exception e) {
+            Assert.isTrue(e.getMessage().contains((remaining - 1) + ' available'), e.getMessage());
+        }
     }
 
     @IsTest

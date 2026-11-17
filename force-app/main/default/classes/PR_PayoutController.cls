@@ -14,7 +14,7 @@ public with sharing class PR_PayoutController {
     public static Map<String, Object> getConsole(Id batchId) {
         Map<String, Object> out = new Map<String, Object>();
         out.put('canManage', FeatureManagement.checkPermission(PR_Settings.PERM_MANAGE_PAYOUTS));
-        out.put('currentPeriod', PR_Settings.periodFor(Date.today()));
+        out.put('currentPeriod', PR_PayoutService.defaultPeriod());
         // Summed in Apex: SUM() on a currency field returns the corporate currency (AED), not AUD.
         Integer readyCount = 0;
         Decimal readyTotal = 0;
@@ -53,7 +53,7 @@ public with sharing class PR_PayoutController {
     public static Id runPayout(String period) {
         try {
             PR_PayoutService.requireFinance();
-            return PR_PayoutService.startRun(String.isBlank(period) ? PR_Settings.periodFor(Date.today()) : period);
+            return PR_PayoutService.startRun(String.isBlank(period) ? PR_PayoutService.defaultPeriod() : period);
         } catch (Exception e) {
             throw auraError(e);
         }

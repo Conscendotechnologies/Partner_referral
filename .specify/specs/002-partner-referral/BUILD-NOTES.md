@@ -10,7 +10,11 @@ decided by the builder, as listed below.
 | --- | --- | --- |
 | F1 currency | Undecided (KAN-52) | **AUD added** as an active currency (rate to AED 0.4167). Every partner record (Referral, Lead, Opportunity, Commission, Payout) is stamped AUD. Amounts are totalled in Apex, because `SUM()` on a currency field returns the corporate currency (AED). |
 | F10 State/Country picklists | Enable org-wide | **Not enabled**: too risky in a shared SDO. `Referral__c.New_State__c` is a restricted picklist, Lead `State` is set to the code (NSW, VIC...). Routing uses that code. |
-| Routing | Lead assignment rules | **Apex + custom metadata** (`PR_State_Route__mdt`), with `PR_Unassigned` as the fallback. This avoids overwriting the org's existing Lead assignment rules, and routes are editable without a deploy. |
+| Routing | Lead assignment rules | **Apex + custom metadata** (`PR_State_Route__mdt`), with `PR_Unassigned` as the fallback. Done in the Lead trigger (before insert), so a Partner Referral Lead is routed however it is created (portal, API, data load, by hand), as an assignment rule would. A Lead already owned by a PR queue keeps it. This avoids overwriting the org's existing Lead assignment rules, and routes are editable without a deploy. |
+| Queue list views (AC-03.7) | Sorted urgent first, then move-in | One Lead list view per PR queue (`PR - <state> queue`) plus `PR - Urgent movers`, with Urgent and Move-in Date as the first columns. **List view metadata can't store a sort order**, so each rep sets it once: on a PR queue list view, open **Column sort**, add Urgent (`Is_Urgent__c`) descending, then Move-in Date (`Move_In_Date__c`) ascending, and click **Apply**. Salesforce keeps that two-column sort per user until it is changed or reset. The `PR - Urgent movers` view shows only urgent leads. |
+| Duplicates (AC-02.8, AC-02.9) | Same mobile and email, open referrals | Same mobile (either 04 or +614 form) and, when both referrals have an email, the same email; only referrals that are not Connected or Closed Lost. A cross-agency match flags **both** referrals (and the existing referral's open Lead) as Possible Duplicate. |
+| Payout period (AC-07.1) | Previous month | The run on the first business day creates the batch for the **previous** month (run on 1 Dec 2026 → batch 2026-11, reference 202611-<ABN>). The console's Payout month defaults to the previous month too. |
+| Reopened approved commission (AC-06.4) | Finance notified | Pending → Cancelled with reason "Opportunity reopened". Approved or later → flagged Reopened After Approval, and everyone with `PR_Finance` gets one "Partner commission reopened" bell notification per 200-record trigger chunk (one notification covers up to 200 reopened commissions). |
 | Address on Referral | Compound Address field | Street, Suburb, State, Postcode fields (custom compound address fields need F10). |
 | Partner profile | Partner Community profile | **Custom profile `Connectnow Partner User`** (Partner Community licence). Salesforce no longer allows creating users on standard external profiles. All access comes from permission sets. |
 | Enable Partner User | Manual role + permission set | `PR_UserTrigger` sets the partner role (Principal = Executive, Agent = Worker) and assigns `PR_Partner_Principal` / `PR_Partner_Agent` from the contact's Portal Role. |
@@ -121,6 +125,19 @@ Run in order with `sf apex run -f scripts/apex/pr-demo/<file>`:
 4. `4-sample-referrals.apex`: 8 referrals across every status, 2 commissions (1 approved)
 5. `5-schedule-jobs.apex`: SLA monitor and payout schedules
 6. `6-site-passwords.apex`: after the site exists; sets one demo password for all partner users (debug log)
+
+## Bulk acceptance tests
+
+`PR_BulkTest` covers the bulk ACs, each in one transaction:
+
+| Test | AC | Volume |
+| --- | --- | --- |
+| `twoHundredSubmissionsAndStatusChanges` | AC-02.12, AC-04.8 | 200 referrals through `PR_ReferralService.submitAll`, then 200 Leads to Working |
+| `twoHundredLeadsInserted` | AC-03.8 | 200 Partner Referral Leads inserted directly: routing, urgency, SLA due |
+| `twoHundredConversions` | AC-05.5 | 200 Leads converted in two `convertLead` calls of 100 (the platform maximum per call) |
+| `twoHundredCommissions` | AC-06.10 | 200 Opportunities to Utilities Connected: 200 commissions and principal shares |
+| `threeThousandCommissionsAcrossFortyAgencies` | AC-07.7 | 3,000 approved commissions, 40 agencies: 40 lines with exact totals |
+| `partnerUsersEnabledTogether` | AC-01.7 | **50**, not 200, partner users: the SDO has 60 Partner Community licences and test users count against them |
 
 ## Tests
 

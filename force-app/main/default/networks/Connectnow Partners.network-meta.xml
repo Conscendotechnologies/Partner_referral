@@ -47,7 +47,7 @@
     </networkPageOverrides>
     <picassoSite>Connectnow_Partners1</picassoSite>
     <selfRegistration>false</selfRegistration>
-    <sendWelcomeEmail>false</sendWelcomeEmail>
+    <sendWelcomeEmail>true</sendWelcomeEmail>
     <site>Connectnow_Partners</site>
     <siteArchiveStatus>NotArchived</siteArchiveStatus>
     <status>Live</status>

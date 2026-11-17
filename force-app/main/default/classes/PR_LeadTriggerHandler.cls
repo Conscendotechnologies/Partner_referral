@@ -17,7 +17,14 @@ public without sharing class PR_LeadTriggerHandler {
 
     public static void beforeInsert(List<Lead> newList) {
         Datetime now = System.now();
+        // AC-03.1: every new Partner Referral Lead is routed by state, however it is created (portal, API, data
+        // load or by hand), as the assignment rule in the design would. A Lead already owned by a PR queue keeps it.
+        Set<Id> prQueues = new Set<Id>(PR_Settings.queueIdsByDeveloperName().values());
         for (Lead l : partnerLeads(newList)) {
+            if (!prQueues.contains(l.OwnerId)) {
+                Id queueId = PR_Settings.routeQueueId(l.State);
+                if (queueId != null) l.OwnerId = queueId;
+            }
             l.Is_Urgent__c = PR_Settings.isUrgent(l.Move_In_Date__c);
             if (l.SLA_Due_At__c == null) {
                 l.SLA_Due_At__c = PR_Settings.slaDueFrom(now);
