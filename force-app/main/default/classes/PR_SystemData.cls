@@ -42,7 +42,8 @@ public without sharing class PR_SystemData {
         // Read one more than the cap; if the cap is exceeded, refuse the submission with a clear error instead.
         Integer limitPlusOne = DUPLICATE_CANDIDATE_CAP + 1;
         List<Referral__c> rows = [
-            SELECT Id, Name, First_Name__c, Last_Name__c, Mobile__c, Email__c, Referring_Agency__c
+            SELECT Id, Name, First_Name__c, Last_Name__c, Mobile__c, Email__c, Referring_Agency__c,
+                Possible_Duplicate__c, Lead__c, Lead__r.IsConverted
             FROM Referral__c
             WHERE Mobile__c IN :mobiles
                 AND Partner_Status__c NOT IN (:PR_Settings.REF_CONNECTED, :PR_Settings.REF_CLOSED_LOST)

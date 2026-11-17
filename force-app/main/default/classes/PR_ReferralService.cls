@@ -174,7 +174,17 @@ public with sharing class PR_ReferralService {
             otherAgencyMatches.addAll(others);
         }
 
-        requireDmlBudget(toCreate.size(), otherAgencyMatches.size());
+        // Only the writes flagging will really make: an already-flagged match costs nothing; an unflagged one costs
+        // its Referral, plus its Lead when that Lead is still open (PR_SystemData.flagPossibleDuplicates).
+        Map<Id, Referral__c> openById = new Map<Id, Referral__c>(open);
+        Integer flagRows = 0;
+        for (Id matchId : otherAgencyMatches) {
+            Referral__c m = openById.get(matchId);
+            if (m == null || m.Possible_Duplicate__c) continue;
+            flagRows += 1;
+            if (m.Lead__c != null && !m.Lead__r.IsConverted) flagRows += 1;
+        }
+        requireDmlBudget(toCreate.size(), flagRows);
         PR_SystemData.createReferralsAndLeads(toCreate);
         // AC-02.9: a cross-agency match is flagged on both referrals (internal only, never shown to partners).
         PR_SystemData.flagPossibleDuplicates(otherAgencyMatches);
@@ -195,11 +205,11 @@ public with sharing class PR_ReferralService {
      * Refuses a submission whose writes would exceed the transaction's DML-row limit (10,000), which would otherwise
      * fail with an uncatchable governor exception part-way through. Checked before any write, so nothing is saved.
      * Rows per new referral: Referral insert, Lead insert, Referral link update, and the status sync the Lead
-     * trigger performs (4). Rows per flagged cross-agency match: the Referral and its open Lead (2).
+     * trigger performs (4). Plus the rows flagging cross-agency matches will update (counted by the caller).
      */
     @TestVisible
-    private static void requireDmlBudget(Integer newReferrals, Integer flaggedMatches) {
-        Integer needed = newReferrals * 4 + flaggedMatches * 2;
+    private static void requireDmlBudget(Integer newReferrals, Integer flagRows) {
+        Integer needed = newReferrals * 4 + flagRows;
         Integer available = dmlRowsAvailableOverride != null
             ? dmlRowsAvailableOverride
             : Limits.getLimitDmlRows() - Limits.getDmlRows();
