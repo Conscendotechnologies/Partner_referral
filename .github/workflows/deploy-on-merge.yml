@@ -1,0 +1,78 @@
+# Runs when a pull request is merged into main (any push to main):
+#   1. deploys the metadata that changed in the merge, with every Apex test class specified
+#   2. runs every Apex test class against the org, now holding the merged code
+# Uses the "production" environment: add required reviewers there to make deploys wait for approval.
+# Needs the secret SFDX_AUTH_URL (repository or production environment; see .github/README.md).
+name: Deploy on merge
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+concurrency:
+  group: deploy-main
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+
+jobs:
+  deploy:
+    name: Deploy and run Apex tests
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    environment: production
+    steps:
+      - name: Check out
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Install Salesforce CLI and sfdx-git-delta
+        run: |
+          npm install --global @salesforce/cli
+          echo y | sf plugins install sfdx-git-delta
+          sf version
+
+      - name: Log in to the org
+        env:
+          SFDX_AUTH_URL: ${{ secrets.SFDX_AUTH_URL }}
+        run: |
+          if [ -z "$SFDX_AUTH_URL" ]; then
+            echo "::error::Secret SFDX_AUTH_URL is not set. See .github/README.md."
+            exit 1
+          fi
+          echo "$SFDX_AUTH_URL" | sf org login sfdx-url --sfdx-url-stdin --alias target --set-default
+
+      - name: Work out what the merge changed
+        env:
+          BEFORE: ${{ github.event.before }}
+        run: |
+          if [ -z "$BEFORE" ] || [ "$BEFORE" = "0000000000000000000000000000000000000000" ] || ! git cat-file -e "$BEFORE^{commit}" 2>/dev/null; then
+            BEFORE="$(git rev-parse HEAD~1)"
+          fi
+          bash .github/scripts/sf-steps.sh delta "$BEFORE" HEAD
+
+      - name: Deploy
+        run: bash .github/scripts/sf-steps.sh deploy deploy
+
+      - name: Run all Apex test classes
+        run: bash .github/scripts/sf-steps.sh tests
+
+      - name: Keep results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: deploy-results
+          path: |
+            delta/package
+            delta/destructiveChanges
+            deploy-result.json
+            test-results
+          if-no-files-found: ignore
