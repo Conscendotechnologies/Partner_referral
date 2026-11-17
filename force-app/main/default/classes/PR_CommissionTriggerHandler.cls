@@ -23,16 +23,15 @@ public without sharing class PR_CommissionTriggerHandler {
     /**
      * Decision F1: every commission is in the settings currency (AUD). Runs before the bypass check, because the
      * services write through the bypass and the payout sums amounts without converting them.
+     * Only a null currency is stamped; any other non-AUD value is rejected, never relabelled. Note that on insert
+     * the platform fills a blank currency with the creator's default before this runs, so a creator whose default
+     * is not AUD must set CurrencyIsoCode = AUD explicitly.
      */
-    private static void requireCurrency(List<Partner_Commission__c> records, Boolean isInsert) {
+    private static void requireCurrency(List<Partner_Commission__c> records) {
         String cur = PR_Settings.currencyCode();
-        // On insert the platform fills a blank currency with the creator's default before this trigger runs,
-        // so a value equal to that default is treated as "not chosen" and stamped with the configured currency.
-        // (An explicit choice of the creator's own default currency cannot be told apart and is stamped too.)
-        String userDefault = UserInfo.getDefaultCurrency();
         for (Partner_Commission__c c : records) {
             Object code = c.get('CurrencyIsoCode');
-            if (code == null || (isInsert && (String) code == userDefault)) {
+            if (code == null) {
                 c.put('CurrencyIsoCode', cur);
             } else if ((String) code != cur) {
                 c.addError('Partner commissions must be in ' + cur + '.');
@@ -41,7 +40,7 @@ public without sharing class PR_CommissionTriggerHandler {
     }
 
     public static void beforeInsert(List<Partner_Commission__c> newList) {
-        requireCurrency(newList, true);
+        requireCurrency(newList);
         if (PR_CommissionService.bypassLocks) return;
         Boolean finance = can(PR_Settings.PERM_MANAGE_PAYOUTS);
         for (Partner_Commission__c c : newList) {
@@ -57,7 +56,7 @@ public without sharing class PR_CommissionTriggerHandler {
     }
 
     public static void beforeUpdate(List<Partner_Commission__c> newList, Map<Id, Partner_Commission__c> oldMap) {
-        requireCurrency(newList, false);
+        requireCurrency(newList);
         if (PR_CommissionService.bypassLocks) return;
         Boolean approver = can(PR_Settings.PERM_APPROVE_COMMISSION);
         Boolean finance = can(PR_Settings.PERM_MANAGE_PAYOUTS);

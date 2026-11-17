@@ -98,37 +98,42 @@ private class PR_CommissionPayoutTest {
         }
     }
 
+    /** A manual commission with the currency set explicitly, as every manual insert must now do. */
+    private static Partner_Commission__c manual(Id agencyId, Decimal amount, String status, String currencyCode) {
+        Partner_Commission__c c = new Partner_Commission__c(Agency__c = agencyId, Amount__c = amount, Status__c = status);
+        c.put('CurrencyIsoCode', currencyCode);
+        return c;
+    }
+
     @IsTest
     static void commissionsMustBeInAud() {
         String cur = PR_Settings.currencyCode();
         Account a = PR_TestFactory.agencyByName(PR_TestFactory.AGENCY_A);
-        // A Finance user whose own default currency is AED: the case the rule exists for.
+        // A Finance user whose own default currency is AED: every manual insert sets AUD explicitly.
         User aedFinance = PR_TestFactory.internalUserWithCurrency('praed', 'AED', new List<String>{ 'PR_Finance', 'PR_Partner_Manager' });
 
         System.runAs(aedFinance) {
-            // Normal path, insert, no currency given: stamped with the configured currency.
-            Partner_Commission__c blank = new Partner_Commission__c(Agency__c = a.Id, Amount__c = 50);
-            insert blank;
-            Assert.areEqual(cur, [SELECT CurrencyIsoCode FROM Partner_Commission__c WHERE Id = :blank.Id].CurrencyIsoCode, 'normal insert, blank currency');
+            // Normal path, insert with AUD set explicitly: saved as AUD.
+            Partner_Commission__c normal = manual(a.Id, 50, null, cur);
+            insert normal;
+            Assert.areEqual(cur, [SELECT CurrencyIsoCode FROM Partner_Commission__c WHERE Id = :normal.Id].CurrencyIsoCode, 'normal insert, AUD');
 
-            // Normal path, update to non-AUD: rejected; update with the currency cleared: set back to AUD.
-            Partner_Commission__c toAed = new Partner_Commission__c(Id = blank.Id);
+            // Normal path, update to non-AUD: rejected. Update with the currency cleared (null): stamped AUD.
+            Partner_Commission__c toAed = new Partner_Commission__c(Id = normal.Id);
             toAed.put('CurrencyIsoCode', 'AED');
             Assert.isFalse(Database.update(toAed, false).isSuccess(), 'normal update to AED');
-            Partner_Commission__c cleared = new Partner_Commission__c(Id = blank.Id);
+            Partner_Commission__c cleared = new Partner_Commission__c(Id = normal.Id);
             cleared.put('CurrencyIsoCode', null);
             update cleared;
-            Assert.areEqual(cur, [SELECT CurrencyIsoCode FROM Partner_Commission__c WHERE Id = :blank.Id].CurrencyIsoCode, 'normal update, blank currency');
-        }
+            Assert.areEqual(cur, [SELECT CurrencyIsoCode FROM Partner_Commission__c WHERE Id = :normal.Id].CurrencyIsoCode, 'normal update, null currency');
 
-        System.runAs(aedFinance) {
-            // Bypass path (the services), insert, no currency: stamped.
-            Partner_Commission__c bypassBlank = new Partner_Commission__c(Agency__c = a.Id, Amount__c = 100, Status__c = 'Approved');
-            PR_CommissionService.withBypass(new List<Partner_Commission__c>{ bypassBlank }, true);
-            Assert.areEqual(cur, [SELECT CurrencyIsoCode FROM Partner_Commission__c WHERE Id = :bypassBlank.Id].CurrencyIsoCode, 'bypass insert, blank currency');
+            // Bypass path (the services), insert with AUD: saved.
+            Partner_Commission__c bypassed = manual(a.Id, 100, 'Approved', cur);
+            PR_CommissionService.withBypass(new List<Partner_Commission__c>{ bypassed }, true);
+            Assert.areEqual(cur, [SELECT CurrencyIsoCode FROM Partner_Commission__c WHERE Id = :bypassed.Id].CurrencyIsoCode, 'bypass insert, AUD');
 
-            // Bypass path, update to non-AUD: rejected; update with the currency cleared: set back to AUD.
-            Partner_Commission__c bypassToAed = new Partner_Commission__c(Id = bypassBlank.Id);
+            // Bypass path, update to non-AUD: rejected. Update with the currency cleared (null): stamped AUD.
+            Partner_Commission__c bypassToAed = new Partner_Commission__c(Id = bypassed.Id);
             bypassToAed.put('CurrencyIsoCode', 'AED');
             try {
                 PR_CommissionService.withBypass(new List<Partner_Commission__c>{ bypassToAed }, false);
@@ -136,32 +141,53 @@ private class PR_CommissionPayoutTest {
             } catch (DmlException e) {
                 Assert.isTrue(e.getMessage().contains(cur), e.getMessage());
             }
-            Partner_Commission__c bypassCleared = new Partner_Commission__c(Id = bypassBlank.Id);
+            Partner_Commission__c bypassCleared = new Partner_Commission__c(Id = bypassed.Id);
             bypassCleared.put('CurrencyIsoCode', null);
             PR_CommissionService.withBypass(new List<Partner_Commission__c>{ bypassCleared }, false);
-            Assert.areEqual(cur, [SELECT CurrencyIsoCode FROM Partner_Commission__c WHERE Id = :bypassBlank.Id].CurrencyIsoCode, 'bypass update, blank currency');
+            Assert.areEqual(cur, [SELECT CurrencyIsoCode FROM Partner_Commission__c WHERE Id = :bypassed.Id].CurrencyIsoCode, 'bypass update, null currency');
         }
-        // Explicit non-AUD from a user whose default is AUD (so it cannot be a platform default): rejected on both paths.
+
+        // Explicit non-AUD from a user whose default is AUD: rejected on both paths.
         System.runAs(PR_TestFactory.user('prmgr')) {
-            // Normal path, insert, non-AUD: rejected.
-            Partner_Commission__c aedNormal = new Partner_Commission__c(Agency__c = a.Id, Amount__c = 50);
-            aedNormal.put('CurrencyIsoCode', 'AED');
-            Database.SaveResult sr = Database.insert(aedNormal, false);
+            Database.SaveResult sr = Database.insert(manual(a.Id, 50, null, 'AED'), false);
             Assert.isFalse(sr.isSuccess(), 'normal insert, AED');
             Assert.isTrue(sr.getErrors()[0].getMessage().contains(cur));
-
-            Partner_Commission__c bypassAed = new Partner_Commission__c(Agency__c = a.Id, Amount__c = 100, Status__c = 'Approved');
-            bypassAed.put('CurrencyIsoCode', 'AED');
             try {
-                PR_CommissionService.withBypass(new List<Partner_Commission__c>{ bypassAed }, true);
+                PR_CommissionService.withBypass(new List<Partner_Commission__c>{ manual(a.Id, 100, 'Approved', 'AED') }, true);
                 Assert.fail('bypass insert, AED: the bypass must not skip the currency rule');
             } catch (DmlException e) {
                 Assert.isTrue(e.getMessage().contains(cur), e.getMessage());
             }
-
         }
-
         Assert.areEqual(0, [SELECT COUNT() FROM Partner_Commission__c WHERE CurrencyIsoCode != :cur], 'no non-AUD commission was saved');
+    }
+
+    @IsTest
+    static void aedDefaultUserCannotSaveAnAedCommission() {
+        String cur = PR_Settings.currencyCode();
+        Account a = PR_TestFactory.agencyByName(PR_TestFactory.AGENCY_A);
+        User aedFinance = PR_TestFactory.internalUserWithCurrency('praed2', 'AED', new List<String>{ 'PR_Finance', 'PR_Partner_Manager' });
+        System.runAs(aedFinance) {
+            Assert.areEqual('AED', UserInfo.getDefaultCurrency());
+
+            // AED chosen explicitly by a user whose own default is AED: rejected, never relabelled as AUD.
+            Database.SaveResult explicitAed = Database.insert(manual(a.Id, 50, null, 'AED'), false);
+            Assert.isFalse(explicitAed.isSuccess(), 'explicit AED from an AED-default user is rejected');
+            Assert.isTrue(explicitAed.getErrors()[0].getMessage().contains(cur), explicitAed.getErrors()[0].getMessage());
+
+            try {
+                PR_CommissionService.withBypass(new List<Partner_Commission__c>{ manual(a.Id, 50, 'Approved', 'AED') }, true);
+                Assert.fail('bypass insert of AED from an AED-default user is rejected too');
+            } catch (DmlException e) {
+                Assert.isTrue(e.getMessage().contains(cur), e.getMessage());
+            }
+
+            // Currency left blank: the platform fills in the user's AED before the trigger, so it is rejected too.
+            // That is why every manual insert must set CurrencyIsoCode = AUD.
+            Database.SaveResult blank = Database.insert(new Partner_Commission__c(Agency__c = a.Id, Amount__c = 50), false);
+            Assert.isFalse(blank.isSuccess(), 'blank currency from an AED-default user becomes AED and is rejected');
+        }
+        Assert.areEqual(0, [SELECT COUNT() FROM Partner_Commission__c WHERE CurrencyIsoCode = 'AED']);
     }
 
     @IsTest
@@ -228,11 +254,12 @@ private class PR_CommissionPayoutTest {
     static void manualCreateOnlyForFinance() {
         Account a = PR_TestFactory.agencyByName(PR_TestFactory.AGENCY_A);
         System.runAs(PR_TestFactory.user('prrep')) {
-            Database.SaveResult sr = Database.insert(new Partner_Commission__c(Agency__c = a.Id, Amount__c = 50), false);
+            Database.SaveResult sr = Database.insert(manual(a.Id, 50, null, PR_Settings.currencyCode()), false);
             Assert.isFalse(sr.isSuccess());
+            Assert.isTrue(sr.getErrors()[0].getMessage().contains('created automatically'), 'refused for permission, not currency');
         }
         System.runAs(PR_TestFactory.user('prmgr')) {
-            Partner_Commission__c c = new Partner_Commission__c(Agency__c = a.Id, Amount__c = 50, Status__c = 'Approved');
+            Partner_Commission__c c = manual(a.Id, 50, 'Approved', PR_Settings.currencyCode());
             insert c;
             Assert.areEqual('Pending', [SELECT Status__c FROM Partner_Commission__c WHERE Id = :c.Id].Status__c, 'always starts Pending');
         }

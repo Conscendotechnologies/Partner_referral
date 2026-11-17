@@ -58,10 +58,17 @@ for a demo, not for real routing.
 
 ## Currency rule for commissions
 
-Every commission must be in the configured currency (AUD), on both the normal path and the services' bypass path.
-On insert, Salesforce fills a blank currency with the creator's default currency before the trigger runs, so a
-value equal to the creator's own default is treated as "not chosen" and stamped AUD. Any other non-AUD currency is
-rejected, and an update to a non-AUD currency is always rejected.
+Every commission must be in the configured currency (AUD), on both the normal path and the services' bypass path
+(`PR_CommissionTriggerHandler.requireCurrency`, which runs before the bypass check):
+
+- A **null** `CurrencyIsoCode` is stamped with the configured currency.
+- **Any other non-AUD value is rejected**, on insert and on update. It is never relabelled as AUD, because that would
+  silently change what the amount means.
+
+On insert, Salesforce fills a blank currency with the creator's default currency before the trigger runs. A user whose
+default currency is not AUD (for example AED, the corporate currency) therefore gets an error if the field is left
+blank. **Every manual insert must set `CurrencyIsoCode = 'AUD'` explicitly**: Finance picks AUD in the Currency field
+when creating a commission by hand. The services (commission creation, payout) always set it.
 
 ## Demo data (S10)
 
