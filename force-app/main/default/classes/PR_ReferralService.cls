@@ -109,6 +109,9 @@ public with sharing class PR_ReferralService {
         Set<String> variants = new Set<String>();
         for (PR_ReferralInput i : inputs) variants.addAll(mobileVariants(canonicalMobile(i.mobile)));
         List<Referral__c> open = PR_SystemData.openReferralsForMobiles(variants);
+        // Group candidates by canonical mobile once, so each input is compared only with referrals for the same mobile.
+        Map<String, List<Referral__c>> openByMobile = byMobile(open);
+        Map<String, List<Referral__c>> acceptedByMobile = new Map<String, List<Referral__c>>();
 
         Partner_Referral_Setting__mdt s = PR_Settings.get();
         List<PR_SubmitResult> results = new List<PR_SubmitResult>();
@@ -121,7 +124,7 @@ public with sharing class PR_ReferralService {
             PR_SubmitResult result = new PR_SubmitResult();
             results.add(result);
             Set<Id> others = new Set<Id>();
-            for (Referral__c r : open) {
+            for (Referral__c r : candidates(openByMobile, mobile)) {
                 if (!isSameMover(r, mobile, email)) continue;
                 if (r.Referring_Agency__c == ctx.accountId) {
                     result.duplicates.add(r.Name + ' (' + r.First_Name__c + ' ' + r.Last_Name__c + ')');
@@ -131,7 +134,7 @@ public with sharing class PR_ReferralService {
             }
             // Earlier inputs accepted in this same call are not in the database yet; they come from this agency, so a
             // match is a same-agency duplicate and needs the same acknowledgement.
-            for (Referral__c accepted : toCreate) {
+            for (Referral__c accepted : candidates(acceptedByMobile, mobile)) {
                 if (isSameMover(accepted, mobile, email)) {
                     result.duplicates.add('earlier in this submission (' + accepted.First_Name__c + ' ' + accepted.Last_Name__c + ')');
                 }
@@ -170,6 +173,7 @@ public with sharing class PR_ReferralService {
             );
             r.put('CurrencyIsoCode', PR_Settings.currencyCode());
             toCreate.add(r);
+            candidatesFor(acceptedByMobile, mobile).add(r);
             createdResults.add(result);
             otherAgencyMatches.addAll(others);
         }
@@ -185,9 +189,17 @@ public with sharing class PR_ReferralService {
             if (m.Lead__c != null && !m.Lead__r.IsConverted) flagRows += 1;
         }
         requireDmlBudget(createRows(toCreate) + flagRows);
-        PR_SystemData.createReferralsAndLeads(toCreate);
-        // AC-02.9: a cross-agency match is flagged on both referrals (internal only, never shown to partners).
-        PR_SystemData.flagPossibleDuplicates(otherAgencyMatches);
+        // One unit of work: if any write fails (for example a matching Lead cannot be flagged), nothing is saved and the
+        // agent gets a clear error, instead of new referrals saved next to a match that was only half flagged.
+        Savepoint sp = Database.setSavepoint();
+        try {
+            PR_SystemData.createReferralsAndLeads(toCreate);
+            // AC-02.9: a cross-agency match is flagged on both referrals (internal only, never shown to partners).
+            PR_SystemData.flagPossibleDuplicates(otherAgencyMatches);
+        } catch (DmlException e) {
+            Database.rollback(sp);
+            throw new PR_Exception('The referral could not be saved because a related record could not be updated (' + e.getDmlMessage(0) + '). Nothing was saved. Please try again.');
+        }
         Map<Id, String> numbers = PR_SystemData.referralNumbers(new Map<Id, Referral__c>(toCreate).keySet());
         for (Integer n = 0; n < toCreate.size(); n++) {
             createdResults[n].saved = true;
@@ -233,6 +245,22 @@ public with sharing class PR_ReferralService {
                 'Submit fewer referrals at a time.'
             );
         }
+    }
+
+    private static Map<String, List<Referral__c>> byMobile(List<Referral__c> refs) {
+        Map<String, List<Referral__c>> result = new Map<String, List<Referral__c>>();
+        for (Referral__c r : refs) candidatesFor(result, canonicalMobile(r.Mobile__c)).add(r);
+        return result;
+    }
+
+    private static List<Referral__c> candidatesFor(Map<String, List<Referral__c>> index, String mobile) {
+        if (!index.containsKey(mobile)) index.put(mobile, new List<Referral__c>());
+        return index.get(mobile);
+    }
+
+    private static List<Referral__c> candidates(Map<String, List<Referral__c>> index, String mobile) {
+        List<Referral__c> found = index.get(mobile);
+        return found == null ? new List<Referral__c>() : found;
     }
 
     /** AC-02.8: same mover = same mobile (either format) and, when both referrals have an email, the same email. */

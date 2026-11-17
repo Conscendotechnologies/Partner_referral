@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Finance_Notified__c</fullName>
+    <label>Finance Notified</label>
+    <inlineHelpText>Finance has been sent the reopened-after-approval notification for this commission. Stays unticked until a notification is actually sent, so a failed send is retried.</inlineHelpText>
+    <defaultValue>false</defaultValue>
+    <type>Checkbox</type>
+</CustomField>

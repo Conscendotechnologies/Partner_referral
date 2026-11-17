@@ -80,6 +80,11 @@
     </fieldPermissions>
     <fieldPermissions>
         <editable>false</editable>
+        <field>Partner_Commission__c.Finance_Notified__c</field>
+        <readable>true</readable>
+    </fieldPermissions>
+    <fieldPermissions>
+        <editable>false</editable>
         <field>Partner_Commission__c.Reopened_After_Approval__c</field>
         <readable>true</readable>
     </fieldPermissions>

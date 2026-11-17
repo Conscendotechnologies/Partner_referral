@@ -278,10 +278,37 @@ private class PR_CommissionPayoutTest {
         Assert.areEqual('Approved', after.Status__c);
         Assert.isTrue(after.Reopened_After_Approval__c);
         Assert.areEqual(1, PR_CommissionService.financeNotifications, 'AC-06.4: Finance is notified');
+        Assert.isTrue([SELECT Finance_Notified__c FROM Partner_Commission__c WHERE Id = :c.Id].Finance_Notified__c);
         PR_CommissionService.handleReopen(new Set<Id>{ o.Id });
         Assert.areEqual(1, PR_CommissionService.financeNotifications, 'only once per commission');
         PR_CommissionService.createFor(new Set<Id>());
         PR_CommissionService.handleReopen(null);
+    }
+
+    @IsTest
+    static void aFailedFinanceNotificationIsRetriedOnTheNextReopen() {
+        Partner_Commission__c c = commissions(PR_TestFactory.AGENCY_A, 1, 'Approved')[0];
+        Account acc = new Account(Name = 'Mover');
+        insert acc;
+        Opportunity o = new Opportunity(Name = 'x', AccountId = acc.Id, StageName = 'Qualification', CloseDate = Date.today());
+        insert o;
+        PR_CommissionService.withBypass(new List<Partner_Commission__c>{ new Partner_Commission__c(Id = c.Id, Opportunity__c = o.Id) }, false);
+
+        // The send fails (for example the user who reopened lacks Send Custom Notifications).
+        PR_CommissionService.simulateSendFailure = true;
+        PR_CommissionService.handleReopen(new Set<Id>{ o.Id });
+        Partner_Commission__c after = [SELECT Reopened_After_Approval__c, Finance_Notified__c FROM Partner_Commission__c WHERE Id = :c.Id];
+        Assert.isTrue(after.Reopened_After_Approval__c, 'the reopen is still recorded');
+        Assert.isFalse(after.Finance_Notified__c, 'a failed send is not recorded as sent');
+        Assert.areEqual(0, PR_CommissionService.financeNotifications);
+
+        // The next reopen tries again and succeeds; after that, no repeat.
+        PR_CommissionService.simulateSendFailure = false;
+        PR_CommissionService.handleReopen(new Set<Id>{ o.Id });
+        Assert.areEqual(1, PR_CommissionService.financeNotifications, 'the failed notification is retried');
+        Assert.isTrue([SELECT Finance_Notified__c FROM Partner_Commission__c WHERE Id = :c.Id].Finance_Notified__c);
+        PR_CommissionService.handleReopen(new Set<Id>{ o.Id });
+        Assert.areEqual(1, PR_CommissionService.financeNotifications, 'once sent, never repeated');
     }
 
     @IsTest

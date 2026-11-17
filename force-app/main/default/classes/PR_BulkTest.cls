@@ -179,14 +179,14 @@ private class PR_BulkTest {
     }
 
     /**
-     * AC-01.7: partner users enabled together get their role and permission set. 50 users, not 200: the SDO has 60
-     * Partner Community licences and test users count against them.
+     * AC-01.7: partner users enabled together get their role and permission set, for a full 200-user bulk insert
+     * (created under System.runAs, which ignores user licence limits).
      */
     @IsTest
     static void partnerUsersEnabledTogether() {
         Account a = PR_TestFactory.agencyByName(PR_TestFactory.AGENCY_B);
         List<Contact> contacts = new List<Contact>();
-        for (Integer n = 0; n < 50; n++) {
+        for (Integer n = 0; n < 200; n++) {
             contacts.add(new Contact(AccountId = a.Id, FirstName = 'Agent' + n, LastName = 'Bulk', Portal_Role__c = Math.mod(n, 10) == 0 ? 'Principal' : 'Agent'));
         }
         System.runAs(PR_TestFactory.user('prmgr')) {
@@ -198,7 +198,7 @@ private class PR_BulkTest {
         }
         Test.stopTest();
         Map<Id, User> users = new Map<Id, User>([SELECT Id, ContactId, UserRole.PortalRole FROM User WHERE ContactId IN :contacts]);
-        Assert.areEqual(50, users.size());
+        Assert.areEqual(200, users.size());
         Map<Id, String> psByUser = new Map<Id, String>();
         for (PermissionSetAssignment p : [SELECT AssigneeId, PermissionSet.Name FROM PermissionSetAssignment WHERE AssigneeId IN :users.keySet() AND PermissionSet.Name LIKE 'PR_Partner%']) {
             psByUser.put(p.AssigneeId, p.PermissionSet.Name);
