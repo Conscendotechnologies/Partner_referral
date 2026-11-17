@@ -23,8 +23,7 @@ decided by the builder, as listed below.
 - **Portal**: Experience Cloud LWR site "Connectnow Partners", `https://co1778135180529.my.site.com/partners`, login only.
   Home = `c:prPortalHome` (this month's tiles, commission tiles for principals, `prReferralForm`, `prMyReferrals`).
 - **Internal app**: "Connectnow Partner Referrals" (Leads, Opportunities, Referrals, Commissions, Payout Batches, Payouts console, Reports).
-- **Reports**: folder "Partner Referral Reports" (referrals by agency this month and by week, commission this month by agency,
-  first-contact SLA breaches, moved in but not connected).
+- **Reports and dashboards (KAN-51)**: see "Reports, dashboards and access" below.
 - **Schedules**: `PR SLA monitor` (hourly at :05) and `PR monthly payout` (daily 06:00, acts on the first business day only).
 
 ## Deploy
@@ -39,6 +38,34 @@ sf project deploy start -o <org> --test-level RunSpecifiedTests \
 For a fresh org, check the prerequisites in `.github/README.md` ("Org prerequisites") first: Lead statuses (New,
 Working, Qualified, Unqualified, and Converted marked as converted), AUD, merged value sets and business hours, a
 verified site sender address, and queue staff.
+
+## Reports, dashboards and access (KAN-51)
+
+Four dashboards in the dashboard folder **Partner Referrals**, all run as the **logged-in user** (dynamic, no hard-coded
+running user), built on reports in the report folder **Partner Referral Reports**:
+
+| Dashboard | AC | Components | Reports |
+| --- | --- | --- | --- |
+| Partner Referrals – Volume | AC-08.1 | Referrals per agency per week (stacked column); this month per agency by status (stacked bar) | `PR_Referrals_by_Agency_by_Week`, `PR_Referrals_by_Agency_This_Month` |
+| Partner Referrals – Conversion | AC-08.2 | Overall conversion rate and Connected count (metrics); rate by agency (bar); referrals in, Connected and rate per agency (Lightning table) | `PR_Referral_Conversion_by_Agency` (last 90 days) |
+| Partner Commission – This Month | AC-08.3 | Pending + Approved total (metric); per agency by status (stacked bar), AUD ex GST | `PR_Commission_This_Month_by_Agency` (report currency AUD) |
+| Partner Referrals – SLA | AC-08.4 | Three Lightning tables: past due with no first contact; first contacted late; moved in and not Connected or Closed Lost | `PR_SLA_No_First_Contact`, `PR_SLA_Contacted_Late`, `PR_Moved_In_Not_Connected` |
+
+- **Conversion without a schema change.** `PR_Referral_Conversion_by_Agency` uses a report row-level formula
+  (`CDF1 = IF(ISPICKVAL(Partner_Status__c, "Connected"), 1, 0)`) and a summary formula
+  (`FORMULA1 = CDF1:SUM / RowCount`). No formula field was added, so nothing needs the Architect.
+- **SLA split.** The old `PR_First_Contact_SLA_Breaches` report is replaced by two reports on breached, open (not converted,
+  not Unqualified) partner referral leads: `PR_SLA_No_First_Contact` (First Contacted At blank) and
+  `PR_SLA_Contacted_Late` (First Contacted At set). The merge deploy deletes the old report.
+
+**Access (AC-08.5).** Both folders are **not Public**. Each is shared with View access only to the public group
+**PR_Report_Viewers** (`groups/PR_Report_Viewers.group-meta.xml`). Partner users are never in that group, so they cannot
+see the reports or dashboards. Admins keep access as folder managers.
+
+The group deploys with no members. Add the people who should see the reports: **Setup → Public Groups →
+PR Report Viewers → Edit**, then add the sales team leads, the Partner Managers and Finance (users, or a role if they
+share one). Because the dashboards run as the logged-in user, each viewer sees only the records their own access
+allows. The demo script `1-setup-internal.apex` adds the running admin.
 
 ## Queue staff
 

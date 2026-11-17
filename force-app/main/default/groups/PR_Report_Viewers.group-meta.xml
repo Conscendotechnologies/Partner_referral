@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Group xmlns="http://soap.sforce.com/2006/04/metadata">
+    <description>002 Partner referral: sales team leads, Partner Managers and Finance. The only audience of the Partner Referral reports and dashboards.</description>
+    <doesIncludeBosses>false</doesIncludeBosses>
+    <name>PR Report Viewers</name>
+</Group>

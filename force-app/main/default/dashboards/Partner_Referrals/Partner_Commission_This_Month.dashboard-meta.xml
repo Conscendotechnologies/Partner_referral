@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Dashboard xmlns="http://soap.sforce.com/2006/04/metadata">
+    <backgroundEndColor>#FFFFFF</backgroundEndColor>
+    <backgroundFadeDirection>Diagonal</backgroundFadeDirection>
+    <backgroundStartColor>#FFFFFF</backgroundStartColor>
+    <chartTheme>light</chartTheme>
+    <colorPalette>unity</colorPalette>
+    <dashboardChartTheme>light</dashboardChartTheme>
+    <dashboardColorPalette>unity</dashboardColorPalette>
+    <dashboardGridLayout>
+        <dashboardGridComponents>
+            <colSpan>4</colSpan>
+            <columnIndex>0</columnIndex>
+            <dashboardComponent>
+                <autoselectColumnsFromReport>false</autoselectColumnsFromReport>
+                <chartSummary>
+                    <aggregate>Sum</aggregate>
+                    <axisBinding>y</axisBinding>
+                    <column>Partner_Commission__c.Amount__c</column>
+                </chartSummary>
+                <componentType>Metric</componentType>
+                <displayUnits>Auto</displayUnits>
+                <header>Pending + Approved this month (AUD)</header>
+                <indicatorHighColor>#54C254</indicatorHighColor>
+                <indicatorLowColor>#C25454</indicatorLowColor>
+                <indicatorMiddleColor>#C2C254</indicatorMiddleColor>
+                <report>Partner_Referral_Reports/PR_Commission_This_Month_by_Agency</report>
+                <useReportChart>false</useReportChart>
+            </dashboardComponent>
+            <rowIndex>0</rowIndex>
+            <rowSpan>6</rowSpan>
+        </dashboardGridComponents>
+        <dashboardGridComponents>
+            <colSpan>8</colSpan>
+            <columnIndex>4</columnIndex>
+            <dashboardComponent>
+                <autoselectColumnsFromReport>false</autoselectColumnsFromReport>
+                <chartAxisRange>Auto</chartAxisRange>
+                <chartSummary>
+                    <aggregate>Sum</aggregate>
+                    <axisBinding>y</axisBinding>
+                    <column>Partner_Commission__c.Amount__c</column>
+                </chartSummary>
+                <componentType>BarStacked</componentType>
+                <displayUnits>Auto</displayUnits>
+                <groupingColumn>Partner_Commission__c.Agency__c</groupingColumn>
+                <groupingColumn>Partner_Commission__c.Status__c</groupingColumn>
+                <header>Commission per agency by status (AUD ex GST)</header>
+                <legendPosition>Bottom</legendPosition>
+                <report>Partner_Referral_Reports/PR_Commission_This_Month_by_Agency</report>
+                <showPercentage>false</showPercentage>
+                <showValues>true</showValues>
+                <sortBy>RowValueDescending</sortBy>
+                <useReportChart>false</useReportChart>
+            </dashboardComponent>
+            <rowIndex>0</rowIndex>
+            <rowSpan>10</rowSpan>
+        </dashboardGridComponents>
+        <numberOfColumns>12</numberOfColumns>
+        <rowHeight>36</rowHeight>
+    </dashboardGridLayout>
+    <dashboardType>LoggedInUser</dashboardType>
+    <description>AC-08.3: this month's Pending and Approved commission per agency, AUD ex GST.</description>
+    <isGridLayout>true</isGridLayout>
+    <textColor>#000000</textColor>
+    <title>Partner Commission – This Month</title>
+    <titleColor>#000000</titleColor>
+    <titleSize>12</titleSize>
+</Dashboard>
