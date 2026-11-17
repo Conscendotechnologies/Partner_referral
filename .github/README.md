@@ -53,8 +53,8 @@ than salesOrgSDO:
   Plans Selected, Connection Requested, Utilities Connected; Partner Referral) before deploying.
 - **Currency.** Multi-currency on, with **AUD** active.
 - **Business hours.** `settings/BusinessHours` replaces all business hours: merge with the org's own first.
-- **Site sender.** Set `emailSenderAddress` in `networks/Connectnow Partners.network-meta.xml` to a verified address
-  (the repo has a placeholder).
+- **Site sender.** `emailSenderAddress` in `networks/Connectnow Partners.network-meta.xml` is the address the
+  salesOrgSDO site already uses. For another org, change it to an address verified there.
 - **Queue staff.** The five queues (PR_NSW_ACT, PR_VIC_TAS, PR_QLD, PR_SA_WA_NT, PR_Unassigned) deploy with **no
   members**. Add the sales reps as described under "Queue staff" in `.specify/specs/002-partner-referral/BUILD-NOTES.md`
   before referrals arrive.
