@@ -75,6 +75,21 @@ public class PR_TestFactory {
         return u;
     }
 
+    /** Enables partner logins for many agency contacts in one insert (bulk). Call inside System.runAs. */
+    public static List<User> portalUsers(List<Contact> contacts) {
+        Id profileId = [SELECT Id FROM Profile WHERE Name = 'Connectnow Partner User' LIMIT 1].Id;
+        List<User> users = new List<User>();
+        Integer n = 0;
+        for (Contact c : contacts) {
+            User u = baseUser('pb' + String.valueOf(n++).leftPad(4, '0'), profileId);
+            u.ContactId = c.Id;
+            u.FirstName = c.FirstName;
+            users.add(u);
+        }
+        insert users;
+        return users;
+    }
+
     public static Account agencyByName(String name) {
         return [SELECT Id, Commission_Rate__c FROM Account WHERE Name = :name LIMIT 1];
     }
