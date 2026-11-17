@@ -48,7 +48,10 @@ jobs:
             echo "::error::Secret SFDX_AUTH_URL is not set. See .github/README.md."
             exit 1
           fi
-          echo "$SFDX_AUTH_URL" | sf org login sfdx-url --sfdx-url-stdin --alias target --set-default
+          auth_file="$(mktemp)"
+          printf %s "$SFDX_AUTH_URL" > "$auth_file"
+          sf org login sfdx-url --sfdx-url-file "$auth_file" --alias target --set-default
+          rm -f "$auth_file"
 
       - name: Work out what the merge changed
         env:
