@@ -13,6 +13,14 @@ public without sharing class PR_PayoutService {
         }
     }
 
+    /**
+     * AC-07.1: the run on the first business day pays the previous month, so its batch is named after that month
+     * (for example the run on 1 December 2026 creates batch 2026-11, payment reference 202611-<ABN>).
+     */
+    public static String defaultPeriod() {
+        return PR_Settings.periodFor(Date.today().toStartOfMonth().addMonths(-1));
+    }
+
     /** First Monday-to-Friday of the month. */
     public static Boolean isFirstBusinessDay(Date d) {
         Date x = d.toStartOfMonth();
