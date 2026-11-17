@@ -218,10 +218,12 @@ public without sharing class PR_PayoutService {
      */
     public static String markPaid(Id batchId) {
         requireFinance();
+        // Lock the batch row first, then check for a running job. A second request for the same batch waits here
+        // until the first commits, then sees its queued job and is refused, so the same batch is never queued twice.
+        Payout_Batch__c b = [SELECT Id, Status__c FROM Payout_Batch__c WHERE Id = :batchId FOR UPDATE];
         if (markPaidInProgress()) {
             throw new PR_Exception('A batch is already being marked Paid. Wait for it to finish, then try again.');
         }
-        Payout_Batch__c b = [SELECT Id, Status__c FROM Payout_Batch__c WHERE Id = :batchId FOR UPDATE];
         if (b.Status__c == PR_Settings.BATCH_PAID) {
             return MARK_PAID_DONE;
         }
