@@ -71,8 +71,20 @@ case "${1:-}" in
     echo "Running: $TESTS"
     mkdir -p test-results
     set +e
-    sf apex run test --class-names "$TESTS" --code-coverage --wait 60 --output-dir test-results --result-format json > test-results/run.json
-    code=$?
+    # The org runs only one test run for the same classes at a time. If another run (another PR's check, or a
+    # developer) is in progress, wait for it and try again instead of failing the check.
+    for attempt in 1 2 3 4 5 6 7 8; do
+      sf apex run test --class-names "$TESTS" --code-coverage --wait 60 --output-dir test-results --result-format json > test-results/run.json 2> test-results/run.err
+      code=$?
+      cat test-results/run.err >&2
+      # The CLI reports this on stderr (and may leave run.json empty), so check both.
+      if grep -qs 'ALREADY_IN_PROCESS' test-results/run.json test-results/run.err; then
+        echo "Another Apex test run is in progress in the org; waiting 60 s (attempt $attempt of 8)."
+        sleep 60
+        continue
+      fi
+      break
+    done
     set -e
     node -e '
       const j = JSON.parse(require("fs").readFileSync("test-results/run.json", "utf8"));
