@@ -3,6 +3,7 @@ import PrPayoutConsole from 'c/prPayoutConsole';
 import getConsole from '@salesforce/apex/PR_PayoutController.getConsole';
 import markPaid from '@salesforce/apex/PR_PayoutController.markPaid';
 import exportCsv from '@salesforce/apex/PR_PayoutController.exportCsv';
+import runPayout from '@salesforce/apex/PR_PayoutController.runPayout';
 import { notifyRecordUpdateAvailable } from 'lightning/uiRecordApi';
 
 jest.mock('@salesforce/apex/PR_PayoutController.getConsole', () => ({ default: jest.fn() }), { virtual: true });
@@ -66,6 +67,7 @@ describe('c-pr-payout-console on a Payout Batch record page', () => {
         getConsole.mockReset();
         markPaid.mockReset();
         exportCsv.mockReset();
+        runPayout.mockReset();
     });
 
     it('ignores an older response that arrives after the newer one (out-of-order loads)', async () => {
@@ -176,6 +178,55 @@ describe('c-pr-payout-console on a Payout Batch record page', () => {
         await flush();
         await flush();
         expect(text(element)).toContain('Only Finance can mark batches paid');
+    });
+
+    describe('on the Payouts app page (no record)', () => {
+        const settle = async () => {
+            for (let n = 0; n < 10; n++) await Promise.resolve();
+        };
+
+        afterEach(() => jest.useRealTimers());
+
+        it('does not reload after Run payout if the console was left before the run finished', async () => {
+            jest.useFakeTimers();
+            getConsole.mockResolvedValue({ canManage: true, currentPeriod: '2026-11', readyCount: 3, readyTotal: 300, batches: [] });
+            const running = deferred();
+            runPayout.mockReturnValueOnce(running.promise);
+            const element = createElement('c-pr-payout-console', { is: PrPayoutConsole });
+            document.body.appendChild(element);
+            await settle();
+            const loadsBefore = getConsole.mock.calls.length;
+
+            element.shadowRoot.querySelector('.pr-period').reportValidity = () => true; // stub has no validity API
+            button(element, 'Run payout').dispatchEvent(new CustomEvent('click'));
+            await settle();
+            document.body.removeChild(element); // the user leaves before the run returns
+            running.resolve('a0Bbatch');
+            await settle();
+            jest.advanceTimersByTime(5000); // the delayed refresh would fire here
+            await settle();
+
+            expect(runPayout).toHaveBeenCalledWith({ period: '2026-11' });
+            expect(getConsole.mock.calls.length).toBe(loadsBefore); // no load for a page that is gone
+        });
+
+        it('still refreshes after Run payout while the console stays open', async () => {
+            jest.useFakeTimers();
+            getConsole.mockResolvedValue({ canManage: true, currentPeriod: '2026-11', readyCount: 3, readyTotal: 300, batches: [] });
+            runPayout.mockResolvedValueOnce('a0Bbatch');
+            const element = createElement('c-pr-payout-console', { is: PrPayoutConsole });
+            document.body.appendChild(element);
+            await settle();
+
+            element.shadowRoot.querySelector('.pr-period').reportValidity = () => true; // stub has no validity API
+            button(element, 'Run payout').dispatchEvent(new CustomEvent('click'));
+            await settle();
+            const loadsAfterRun = getConsole.mock.calls.length;
+            jest.advanceTimersByTime(5000);
+            await settle();
+
+            expect(getConsole.mock.calls.length).toBe(loadsAfterRun + 1); // the delayed refresh ran once
+        });
     });
 
     describe('with a CSV export', () => {

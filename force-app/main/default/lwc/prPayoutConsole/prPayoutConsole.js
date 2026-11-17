@@ -41,6 +41,7 @@ export default class PrPayoutConsole extends LightningElement {
         // screen or behind the Export and Mark paid buttons (also after a reconnect), and retire results still
         // in flight for it.
         this._contextSeq++;
+        this._requestSeq++; // a load still in flight for the old record must not land, connected or not
         this.data = null;
         this.message = null;
         this.errorMessage = null;
@@ -124,11 +125,15 @@ export default class PrPayoutConsole extends LightningElement {
         const input = this.template.querySelector('.pr-period');
         if (input && !input.reportValidity()) return;
         const period = this.period;
+        const context = this._contextSeq;
         await this.act(async () => {
             await runPayout({ period });
-            // the batch job is asynchronous: refresh once it has had time to run
+            // The batch job is asynchronous: refresh once it has had time to run, but only if the console is still
+            // connected and showing the same thing. A refresh for a page the user has left must not run.
             // eslint-disable-next-line @lwc/lwc/no-async-operation
-            setTimeout(() => this.load(), 4000);
+            setTimeout(() => {
+                if (this._connected && context === this._contextSeq) this.load();
+            }, 4000);
             return `Payout for ${period} is running. Refresh in a few seconds to see the lines.`;
         });
     }
