@@ -184,7 +184,7 @@ public with sharing class PR_ReferralService {
             flagRows += 1;
             if (m.Lead__c != null && !m.Lead__r.IsConverted) flagRows += 1;
         }
-        requireDmlBudget(toCreate.size(), flagRows);
+        requireDmlBudget(createRows(toCreate) + flagRows);
         PR_SystemData.createReferralsAndLeads(toCreate);
         // AC-02.9: a cross-agency match is flagged on both referrals (internal only, never shown to partners).
         PR_SystemData.flagPossibleDuplicates(otherAgencyMatches);
@@ -202,14 +202,27 @@ public with sharing class PR_ReferralService {
     private static Integer dmlRowsAvailableOverride;
 
     /**
-     * Refuses a submission whose writes would exceed the transaction's DML-row limit (10,000), which would otherwise
-     * fail with an uncatchable governor exception part-way through. Checked before any write, so nothing is saved.
-     * Rows per new referral: Referral insert, Lead insert, Referral link update, and the status sync the Lead
-     * trigger performs (4). Plus the rows flagging cross-agency matches will update (counted by the caller).
+     * DML rows creating these referrals writes: the Referral insert, the Lead insert and the Referral link update (3).
+     * The Lead trigger's status sync writes nothing more when the Lead goes to a queue (status stays Received, no rep
+     * name), which is every state with a route. Only when no queue is found does the Lead stay with the submitting
+     * user, and the sync then writes the rep's first name on the Referral (a 4th row).
      */
     @TestVisible
-    private static void requireDmlBudget(Integer newReferrals, Integer flagRows) {
-        Integer needed = newReferrals * 4 + flagRows;
+    private static Integer createRows(List<Referral__c> refs) {
+        Integer rows = 0;
+        for (Referral__c r : refs) {
+            rows += PR_Settings.routeQueueId(r.New_State__c) != null ? 3 : 4;
+        }
+        return rows;
+    }
+
+    /**
+     * Refuses a submission whose writes would exceed what is left of the transaction's DML-row limit (10,000), which
+     * would otherwise fail with an uncatchable governor exception part-way through. Checked before any write, so
+     * nothing is saved.
+     */
+    @TestVisible
+    private static void requireDmlBudget(Integer needed) {
         Integer available = dmlRowsAvailableOverride != null
             ? dmlRowsAvailableOverride
             : Limits.getLimitDmlRows() - Limits.getDmlRows();
