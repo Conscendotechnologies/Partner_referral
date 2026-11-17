@@ -41,7 +41,7 @@
                 <field>Amount</field>
             </layoutItems>
             <layoutItems>
-                <behavior>Edit</behavior>
+                <behavior>Required</behavior>
                 <field>CurrencyIsoCode</field>
             </layoutItems>
             <layoutItems>
