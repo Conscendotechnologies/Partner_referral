@@ -10,6 +10,7 @@
     <columns>
         <field>Partner_Commission__c.Services_Count__c</field>
     </columns>
+    <currency>AUD</currency>
     <description>Pending and Approved commission created this month, by agency (AUD ex GST).</description>
     <filter>
         <criteriaItems>

@@ -16,6 +16,8 @@ public without sharing class PR_SlaMonitorJob implements Schedulable {
     public static Integer run() {
         Id rt = PR_Settings.leadRecordTypeId();
         Datetime now = System.now();
+        // Unqualified = Closed Lost for the partner: never alert on it or count it as an SLA breach.
+        String unqualified = PR_Settings.LEAD_UNQUALIFIED;
         Date urgentFrom = Date.today().addDays((Integer) Math.ceil((PR_Settings.get().Urgent_Window_Hours__c == null ? 48 : PR_Settings.get().Urgent_Window_Hours__c) / 24));
         // One cap for the whole run: 2,000 leads = 10 trigger chunks of 200, and PR_Notifier sends at most one
         // email batch per chunk, so a run stays within the 10 sendEmail calls per transaction. Newly urgent
@@ -25,7 +27,8 @@ public without sharing class PR_SlaMonitorJob implements Schedulable {
         for (Lead l : [
             SELECT Id
             FROM Lead
-            WHERE RecordTypeId = :rt AND IsConverted = FALSE AND Is_Urgent__c = FALSE AND Move_In_Date__c <= :urgentFrom
+            WHERE RecordTypeId = :rt AND IsConverted = FALSE AND Status != :unqualified
+                AND Is_Urgent__c = FALSE AND Move_In_Date__c <= :urgentFrom
             ORDER BY Move_In_Date__c ASC
             LIMIT :MAX_PER_RUN
         ]) {
@@ -36,7 +39,7 @@ public without sharing class PR_SlaMonitorJob implements Schedulable {
             for (Lead l : [
                 SELECT Id
                 FROM Lead
-                WHERE RecordTypeId = :rt AND IsConverted = FALSE AND SLA_Breached__c = FALSE
+                WHERE RecordTypeId = :rt AND IsConverted = FALSE AND Status != :unqualified AND SLA_Breached__c = FALSE
                     AND First_Contacted_At__c = NULL AND SLA_Due_At__c < :now AND Id NOT IN :touch.keySet()
                 ORDER BY SLA_Due_At__c ASC
                 LIMIT :room

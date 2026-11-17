@@ -37,12 +37,30 @@ private class PR_LeadLifecycleTest {
     }
 
     @IsTest
-    static void settingsReturnTheFullConsentText() {
+    static void consentTextOver255CharactersReachesTheFormInFull() {
+        String stored = [SELECT Consent_Text__c FROM Partner_Referral_Setting__mdt WHERE DeveloperName = 'Default'].Consent_Text__c;
+        Assert.isTrue(stored.length() > 255, 'the Default consent wording is longer than getInstance() would return: ' + stored.length());
+        System.runAs(PR_TestFactory.user('pa_ag1')) {
+            Map<String, Object> cfg = PR_PortalController.getFormConfig();
+            Assert.areEqual(stored, (String) cfg.get('consentText'), 'the form gets every character');
+            Assert.areEqual('1', cfg.get('consentVersion'));
+        }
+    }
+
+    @IsTest
+    static void settingsFallBackWhenThereIsNoDefaultRecord() {
+        PR_Settings.cached = null;
+        PR_Settings.settingsRecordName = 'No_Such_Record';
         Partner_Referral_Setting__mdt s = PR_Settings.get();
-        Assert.areEqual(
-            [SELECT Consent_Text__c FROM Partner_Referral_Setting__mdt WHERE DeveloperName = 'Default'].Consent_Text__c,
-            s.Consent_Text__c
-        );
+        Assert.areEqual('1', s.Consent_Version__c);
+        Assert.isFalse(String.isBlank(s.Consent_Text__c));
+        Assert.areEqual(48, s.Urgent_Window_Hours__c);
+        Assert.areEqual(2, s.SLA_Hours__c);
+        Assert.areEqual('PR_Unassigned', s.Fallback_Queue__c);
+        Assert.areEqual('AUD', PR_Settings.currencyCode());
+        System.runAs(PR_TestFactory.user('pa_ag1')) {
+            Assert.areEqual(s.Consent_Text__c, (String) PR_PortalController.getFormConfig().get('consentText'), 'the form uses the fallback wording');
+        }
     }
 
     @IsTest
@@ -59,6 +77,56 @@ private class PR_LeadLifecycleTest {
         Assert.areEqual(1, PR_SlaMonitorJob.run(), 'one run never touches more than the cap');
         Assert.areEqual(a.Lead__c, [SELECT Id FROM Lead WHERE Id IN :leadIds AND Is_Urgent__c = TRUE].Id, 'soonest move-in goes first');
         Assert.areEqual(1, PR_SlaMonitorJob.run(), 'the next run picks up the rest');
+    }
+
+    private static Lead partnerLead(String lastName, String status, Date moveIn, Datetime slaDue) {
+        Lead l = new Lead(
+            RecordTypeId = PR_Settings.leadRecordTypeId(),
+            LastName = lastName,
+            Status = status,
+            LeadSource = 'Partner Referral',
+            State = 'NSW',
+            Move_In_Date__c = moveIn,
+            SLA_Due_At__c = slaDue
+        );
+        l.put('CurrencyIsoCode', 'AUD');
+        return l;
+    }
+
+    @IsTest
+    static void slaMonitorMakesTheRealTransitions() {
+        // Inserted with a due time already passed: insert never sets the breach flag, so only the sweep can.
+        Lead overdue = partnerLead('Overdue', 'New', Date.today().addDays(60), System.now().addHours(-3));
+        // Moves in 5 days: outside the 48 h window now, inside once the window is widened below.
+        Lead soon = partnerLead('Soon', 'New', Date.today().addDays(5), System.now().addHours(5));
+        // Unqualified (Closed Lost for the partner) and both overdue and moving soon: must be left alone.
+        Lead lost = partnerLead('Lost', 'Unqualified', Date.today().addDays(5), System.now().addHours(-3));
+        // Nothing due: must not change.
+        Lead fine = partnerLead('Fine', 'New', Date.today().addDays(60), System.now().addHours(5));
+        System.runAs(PR_TestFactory.user('prmgr')) {
+            insert new List<Lead>{ overdue, soon, lost, fine };
+        }
+        Map<Id, Lead> before = new Map<Id, Lead>([SELECT Id, Is_Urgent__c, SLA_Breached__c FROM Lead WHERE Id IN :new List<Id>{ overdue.Id, soon.Id, lost.Id, fine.Id }]);
+        for (Lead l : before.values()) {
+            Assert.isFalse(l.Is_Urgent__c, 'nothing urgent before the sweep');
+            Assert.isFalse(l.SLA_Breached__c, 'nothing breached before the sweep');
+        }
+
+        PR_Settings.get().Urgent_Window_Hours__c = 240;
+        Test.startTest();
+        Integer touched = PR_SlaMonitorJob.run();
+        Test.stopTest();
+
+        Map<Id, Lead> after = new Map<Id, Lead>([SELECT Id, Is_Urgent__c, SLA_Breached__c FROM Lead WHERE Id IN :before.keySet()]);
+        Assert.areEqual(2, touched, 'only the overdue and the moving-soon leads are swept');
+        Assert.isTrue(after.get(overdue.Id).SLA_Breached__c, 'overdue lead is flagged as an SLA breach');
+        Assert.isFalse(after.get(overdue.Id).Is_Urgent__c);
+        Assert.isTrue(after.get(soon.Id).Is_Urgent__c, 'lead moving inside the window turns urgent');
+        Assert.isFalse(after.get(soon.Id).SLA_Breached__c);
+        Assert.isFalse(after.get(lost.Id).Is_Urgent__c, 'unqualified lead is never made urgent');
+        Assert.isFalse(after.get(lost.Id).SLA_Breached__c, 'unqualified lead is never counted as a breach');
+        Assert.isFalse(after.get(fine.Id).Is_Urgent__c);
+        Assert.isFalse(after.get(fine.Id).SLA_Breached__c);
     }
 
     @IsTest

@@ -49,11 +49,11 @@ public without sharing class PR_SystemData {
         String soql =
             'SELECT Id, Name, First_Name__c, Last_Name__c FROM Referral__c ' +
             'WHERE CreatedDate >= :since AND Referring_Agency__c ' + (sameAgency ? '=' : '!=') + ' :agencyId ' +
-            'AND (Mobile__c = :mobile' + (String.isBlank(email) ? '' : ' OR Email__c = :email') + ') ' +
+            'AND (Mobile__c IN :mobiles' + (String.isBlank(email) ? '' : ' OR Email__c = :email') + ') ' +
             'ORDER BY CreatedDate DESC LIMIT 5';
         return Database.queryWithBinds(
             soql,
-            new Map<String, Object>{ 'since' => since, 'agencyId' => agencyId, 'mobile' => mobile, 'email' => email },
+            new Map<String, Object>{ 'since' => since, 'agencyId' => agencyId, 'mobiles' => PR_ReferralService.mobileVariants(PR_ReferralService.canonicalMobile(mobile)), 'email' => email },
             AccessLevel.SYSTEM_MODE
         );
     }

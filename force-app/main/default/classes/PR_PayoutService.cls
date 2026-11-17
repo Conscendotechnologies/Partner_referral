@@ -20,9 +20,13 @@ public without sharing class PR_PayoutService {
         return x == d;
     }
 
+    /** Date arithmetic, not format('EEE'): the formatted day name follows the running user's locale. */
+    @TestVisible
     private static Boolean isWeekend(Date d) {
-        String day = Datetime.newInstance(d, Time.newInstance(12, 0, 0, 0)).format('EEE');
-        return day == 'Sat' || day == 'Sun';
+        // 7 January 1900 was a Sunday: 0 = Sunday ... 6 = Saturday.
+        Integer dow = Math.mod(Date.newInstance(1900, 1, 7).daysBetween(d), 7);
+        if (dow < 0) dow += 7;
+        return dow == 0 || dow == 6;
     }
 
     public static Payout_Batch__c getOrCreateBatch(String period) {
@@ -81,12 +85,17 @@ public without sharing class PR_PayoutService {
         if (b.Status__c != PR_Settings.BATCH_DRAFT) {
             return;
         }
+        // Lock the scope commissions too, then re-check them on the locked rows: a run for another Draft batch
+        // may have taken a commission between this job's start() query and now. Anything no longer Approved and
+        // unbatched is skipped, so a commission can never land on two payout lines.
         Map<Id, List<Partner_Commission__c>> byAgency = new Map<Id, List<Partner_Commission__c>>();
         for (Partner_Commission__c c : [
-            SELECT Id, Agency__c, Amount__c
+            SELECT Id, Agency__c, Amount__c, Status__c, Payout_Line__c
             FROM Partner_Commission__c
-            WHERE Id IN :scope AND Status__c = :PR_Settings.COM_APPROVED AND Payout_Line__c = NULL AND Agency__c != NULL
+            WHERE Id IN :scope
+            FOR UPDATE
         ]) {
+            if (c.Status__c != PR_Settings.COM_APPROVED || c.Payout_Line__c != null || c.Agency__c == null) continue;
             if (!byAgency.containsKey(c.Agency__c)) byAgency.put(c.Agency__c, new List<Partner_Commission__c>());
             byAgency.get(c.Agency__c).add(c);
         }

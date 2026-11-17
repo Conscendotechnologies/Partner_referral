@@ -55,6 +55,26 @@ public class PR_TestFactory {
         return [SELECT Id, FirstName, ContactId, Contact.AccountId, PortalRole, UserRole.PortalRole, UserRole.Name FROM User WHERE Alias = :alias AND Email LIKE '%@pr-test.example.com' LIMIT 1];
     }
 
+    /** Internal admin user with a given default currency and PR permission sets (setup DML in its own context). */
+    public static User internalUserWithCurrency(String alias, String currencyCode, List<String> permissionSets) {
+        User u = internalUser(alias, null);
+        u.put('DefaultCurrencyIsoCode', currencyCode);
+        System.runAs(new User(Id = UserInfo.getUserId())) {
+            insert u;
+            assign(u.Id, permissionSets);
+        }
+        return u;
+    }
+
+    /** Enables a partner login for an agency contact. Call inside System.runAs to keep setup DML separate. */
+    public static User portalUser(Contact c, String alias) {
+        User u = baseUser(alias, [SELECT Id FROM Profile WHERE Name = 'Connectnow Partner User' LIMIT 1].Id);
+        u.ContactId = c.Id;
+        u.FirstName = c.FirstName;
+        insert u;
+        return u;
+    }
+
     public static Account agencyByName(String name) {
         return [SELECT Id, Commission_Rate__c FROM Account WHERE Name = :name LIMIT 1];
     }

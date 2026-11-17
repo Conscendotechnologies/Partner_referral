@@ -43,6 +43,9 @@ public inherited sharing class PR_Settings {
 
     @TestVisible
     private static Partner_Referral_Setting__mdt cached;
+    /** The settings record to read; tests point it at a missing record to exercise the built-in fallback. */
+    @TestVisible
+    private static String settingsRecordName = 'Default';
     private static Map<String, Id> queueIds;
     private static Id bhId;
 
@@ -54,7 +57,7 @@ public inherited sharing class PR_Settings {
                 SELECT Consent_Version__c, Consent_Text__c, Urgent_Window_Hours__c, SLA_Hours__c,
                     Business_Hours_Name__c, Fallback_Queue__c, Currency_Code__c, Price_Book_Name__c
                 FROM Partner_Referral_Setting__mdt
-                WHERE DeveloperName = 'Default'
+                WHERE DeveloperName = :settingsRecordName
                 LIMIT 1
             ];
             cached = rows.isEmpty() ? null : rows[0];

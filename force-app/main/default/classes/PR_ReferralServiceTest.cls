@@ -27,6 +27,48 @@ private class PR_ReferralServiceTest {
     }
 
     @IsTest
+    static void firstNameAndSuburbFitTheLeadFields() {
+        PR_ReferralInput i = PR_TestFactory.input('0412345678', 'NSW', 10, new List<String>{ 'Gas' });
+        i.firstName = 'A'.repeat(40);
+        i.suburb = 'S'.repeat(40);
+        Assert.areEqual(0, PR_ReferralService.validate(i).size(), '40 characters is allowed');
+        i.firstName = 'A'.repeat(41);
+        i.suburb = 'S'.repeat(41);
+        List<String> errors = PR_ReferralService.validate(i);
+        Assert.areEqual(2, errors.size(), String.join(errors, ' | '));
+        Assert.isTrue(errors[0].contains('First name') && errors[1].contains('Suburb'));
+    }
+
+    @IsTest
+    static void mobileNumbersAreCanonicalForDuplicates() {
+        Assert.areEqual('0412345678', PR_ReferralService.canonicalMobile('+61 412 345 678'));
+        Assert.areEqual('0412345678', PR_ReferralService.canonicalMobile('0412 345 678'));
+        Assert.areEqual(new List<String>{ '0412345678', '+61412345678' }, PR_ReferralService.mobileVariants('0412345678'));
+
+        // An older referral stored in the +61 format, before canonicalisation.
+        Account a = PR_TestFactory.agencyByName(PR_TestFactory.AGENCY_A);
+        Referral__c legacy = new Referral__c(First_Name__c = 'Old', Last_Name__c = 'Format', Mobile__c = '+61466666666', Referring_Agency__c = a.Id);
+        legacy.put('CurrencyIsoCode', 'AUD');
+        insert legacy;
+
+        PR_ReferralInput i = PR_TestFactory.input('0466 666 666', 'NSW', 20, new List<String>{ 'Gas' });
+        i.email = null;
+        Test.startTest();
+        System.runAs(PR_TestFactory.user('pa_ag1')) {
+            PR_SubmitResult warn = PR_ReferralService.submit(i);
+            Assert.isTrue(warn.duplicateWarning, 'the 04 number matches the stored +61 number');
+            i.mobile = '+61466666666';
+            i.acknowledgeDuplicate = true;
+            Assert.isTrue(PR_ReferralService.submit(i).saved);
+        }
+        Referral__c other = PR_TestFactory.submitAs('pb_ag1', PR_TestFactory.input('+61 466 666 666', 'NSW', 20, new List<String>{ 'Gas' }));
+        Test.stopTest();
+        Assert.isTrue(other.Possible_Duplicate__c, 'cross-agency match across both formats');
+        Assert.areEqual(2, [SELECT COUNT() FROM Referral__c WHERE Mobile__c = '0412345678' OR Mobile__c = '0466666666'], 'new referrals are stored in the 04 format');
+        Assert.areEqual('0466666666', [SELECT MobilePhone FROM Lead WHERE Id = :other.Lead__c].MobilePhone);
+    }
+
+    @IsTest
     static void agentSubmitsAndEverythingIsStamped() {
         Test.startTest();
         Referral__c r = PR_TestFactory.submitAs('pa_ag1', PR_TestFactory.input('0411111111', 'VIC', 30, new List<String>{ 'Electricity', 'Internet' }));

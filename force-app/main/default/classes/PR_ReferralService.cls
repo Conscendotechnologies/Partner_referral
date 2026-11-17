@@ -8,8 +8,29 @@ public with sharing class PR_ReferralService {
     private static final Pattern EMAIL_PATTERN = Pattern.compile('^[^@\\s]+@[^@\\s]+\\.[^@\\s]+$');
     private static final Pattern POSTCODE_PATTERN = Pattern.compile('^\\d{4}$');
 
+    /** Lead.FirstName and Lead.City are 40 characters; longer values would fail the Lead insert. */
+    public static final Integer FIRST_NAME_MAX = 40;
+    public static final Integer SUBURB_MAX = 40;
+
     public static String normaliseMobile(String mobile) {
         return mobile == null ? null : mobile.replaceAll('[\\s\\-()]', '');
+    }
+
+    /** One stored format for both accepted inputs: +614XXXXXXXX becomes 04XXXXXXXX. */
+    public static String canonicalMobile(String mobile) {
+        String m = normaliseMobile(mobile);
+        if (m != null && m.startsWith('+614')) {
+            m = '0' + m.substring(3);
+        }
+        return m;
+    }
+
+    /** Both spellings of a canonical mobile, so records stored before canonicalisation still match. */
+    public static List<String> mobileVariants(String canonical) {
+        if (String.isBlank(canonical) || !canonical.startsWith('04')) {
+            return new List<String>{ canonical };
+        }
+        return new List<String>{ canonical, '+61' + canonical.substring(1) };
     }
 
     /** Returns every rule the input breaks (empty list = valid). */
@@ -18,7 +39,11 @@ public with sharing class PR_ReferralService {
         if (i == null) {
             return new List<String>{ 'Referral details are missing.' };
         }
-        if (String.isBlank(i.firstName)) errors.add('First name is required.');
+        if (String.isBlank(i.firstName)) {
+            errors.add('First name is required.');
+        } else if (i.firstName.trim().length() > FIRST_NAME_MAX) {
+            errors.add('First name must be ' + FIRST_NAME_MAX + ' characters or fewer.');
+        }
         if (String.isBlank(i.lastName)) errors.add('Last name is required.');
         String mobile = normaliseMobile(i.mobile);
         if (String.isBlank(mobile) || !MOBILE_PATTERN.matcher(mobile).matches()) {
@@ -28,7 +53,11 @@ public with sharing class PR_ReferralService {
             errors.add('Email is not valid.');
         }
         if (String.isBlank(i.street)) errors.add('Street is required.');
-        if (String.isBlank(i.suburb)) errors.add('Suburb is required.');
+        if (String.isBlank(i.suburb)) {
+            errors.add('Suburb is required.');
+        } else if (i.suburb.trim().length() > SUBURB_MAX) {
+            errors.add('Suburb must be ' + SUBURB_MAX + ' characters or fewer.');
+        }
         if (String.isBlank(i.state) || !PR_Settings.STATES.contains(i.state)) errors.add('State is required.');
         if (String.isBlank(i.postcode) || !POSTCODE_PATTERN.matcher(i.postcode.trim()).matches()) {
             errors.add('Postcode must be 4 digits.');
@@ -64,7 +93,7 @@ public with sharing class PR_ReferralService {
         if (!errors.isEmpty()) {
             throw new PR_Exception(String.join(errors, ' '));
         }
-        String mobile = normaliseMobile(i.mobile);
+        String mobile = canonicalMobile(i.mobile);
         String email = String.isBlank(i.email) ? null : i.email.trim().toLowerCase();
 
         PR_SubmitResult result = new PR_SubmitResult();

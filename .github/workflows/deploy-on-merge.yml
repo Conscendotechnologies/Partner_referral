@@ -59,7 +59,7 @@ jobs:
 
       - name: Work out what changed since the last successful deploy
         env:
-          BEFORE: ${{ github.event.before }}
+          DEPLOY_BASELINE_SHA: ${{ vars.DEPLOY_BASELINE_SHA }}
         run: |
           # The delta starts at the tag deployed/sdo (the last commit that deployed successfully), so a failed
           # deploy's changes are carried into the next run instead of being skipped.
@@ -75,12 +75,18 @@ jobs:
             fi
             echo "Delta from ${DEPLOY_TAG} (${FROM})"
           else
-            # First run: no tag yet, so fall back to the commit before this push.
-            FROM="$BEFORE"
-            if [ -z "$FROM" ] || [ "$FROM" = "0000000000000000000000000000000000000000" ] || ! git cat-file -e "$FROM^{commit}" 2>/dev/null; then
-              FROM="$(git rev-parse HEAD~1)"
+            # No tag yet (first deploy, or the first deploy failed): start from the fixed, verified baseline that
+            # matches the org, never from the previous push. Otherwise a failed first deploy would be skipped.
+            FROM="$DEPLOY_BASELINE_SHA"
+            if [ -z "$FROM" ]; then
+              echo "::error::No ${DEPLOY_TAG} tag and no DEPLOY_BASELINE_SHA repository variable. Set it to the commit the org matches (see .github/README.md)."
+              exit 1
             fi
-            echo "No ${DEPLOY_TAG} tag yet: delta from ${FROM}"
+            if ! git cat-file -e "${FROM}^{commit}" 2>/dev/null || ! git merge-base --is-ancestor "$FROM" HEAD; then
+              echo "::error::DEPLOY_BASELINE_SHA (${FROM}) is not a commit in the history of ${GITHUB_SHA}."
+              exit 1
+            fi
+            echo "No ${DEPLOY_TAG} tag yet: delta from the verified baseline ${FROM}"
           fi
           bash .github/scripts/sf-steps.sh delta "$FROM" HEAD
 

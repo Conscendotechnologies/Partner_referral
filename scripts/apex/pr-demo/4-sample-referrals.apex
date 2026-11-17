@@ -1,15 +1,12 @@
-// 002 Partner referral demo, step 4 of 5: sample referrals at every stage, as if agents sent them.
+// 002 Partner referral demo, step 4 of 6: sample referrals at every stage, as if agents sent them.
 // Uses the same service path as the portal (PR_SystemData.createReferralAndLead), then moves some along:
 // contacted, converted, connected (creates commissions), lost. Skips if demo referrals already exist.
 if ([SELECT COUNT() FROM Referral__c WHERE Mobile__c LIKE '04129%'] > 0) {
     System.debug('PR-DEMO step 4 skipped: sample referrals exist');
     return;
 }
-Map<String, User> agents = new Map<String, User>();
-for (User u : [SELECT Id, FirstName, LastName, ContactId, Contact.AccountId FROM User WHERE Username LIKE '%@connectnow-partners.demo']) {
-    agents.put(u.FirstName, u);
-}
-// agentFirstName, first, last, street, suburb, state, postcode, moveInDays, utilities
+
+// agentFirstName, mover first, last, street, suburb, state, postcode, moveInDays, utilities
 List<List<Object>> rows = new List<List<Object>>{
     new List<Object>{ 'Tom', 'Olivia', 'Harper', '12 Ocean Pde', 'Coogee', 'NSW', '2034', 1, 'Electricity;Gas;Internet' },
     new List<Object>{ 'Tom', 'Noah', 'Williams', '4/88 Crown St', 'Surry Hills', 'NSW', '2010', 9, 'Electricity;Internet' },
@@ -20,52 +17,75 @@ List<List<Object>> rows = new List<List<Object>>{
     new List<Object>{ 'Chloe', 'Zoe', 'Wright', '19 King St', 'Newtown', 'NSW', '2042', 45, 'Electricity;Gas;Water;Internet' },
     new List<Object>{ 'Marco', 'Ethan', 'Brown', '8 Rundle Mall', 'Adelaide', 'SA', '5000', 12, 'Electricity' }
 };
+// What happens to each sample after it is sent, by mover first name.
+Set<String> contacted = new Set<String>{ 'Noah', 'Mia', 'Jack', 'Leo', 'Zoe' };
+Set<String> lost = new Set<String>{ 'Zoe' };
+Map<String, String> convertTo = new Map<String, String>{
+    'Mia' => 'Plans Selected',
+    'Jack' => 'Utilities Connected',
+    'Leo' => 'Utilities Connected'
+};
+String approve = 'Jack';
+
+// Every demo agent must exist before anything is created, so a partial run can't leave half a demo behind.
+Map<String, User> agents = new Map<String, User>();
+for (User u : [SELECT Id, FirstName, LastName, ContactId, Contact.AccountId FROM User WHERE Username LIKE '%@connectnow-partners.demo' AND IsActive = TRUE]) {
+    agents.put(u.FirstName, u);
+}
+List<String> missing = new List<String>();
+for (List<Object> r : rows) {
+    String agent = (String) r[0];
+    if (!agents.containsKey(agent) && !missing.contains(agent)) missing.add(agent);
+}
+if (!missing.isEmpty()) {
+    throw new IllegalArgumentException('Demo agents missing, nothing created: ' + String.join(missing, ', ') + '. Run 3-portal-users.apex first.');
+}
+
 Partner_Referral_Setting__mdt s = PR_Settings.get();
-List<Referral__c> created = new List<Referral__c>();
+Map<String, Referral__c> byMover = new Map<String, Referral__c>();
 Integer n = 0;
 for (List<Object> r : rows) {
     User agent = agents.get((String) r[0]);
-    if (agent == null) continue;
     n++;
+    Date moveIn = Date.today().addDays((Integer) r[7]);
     Referral__c ref = new Referral__c(
         OwnerId = agent.Id, First_Name__c = (String) r[1], Last_Name__c = (String) r[2], Mobile__c = '04129' + String.valueOf(10000 + n).right(5),
         Email__c = ((String) r[1]).toLowerCase() + '@example.com', New_Street__c = (String) r[3], New_Suburb__c = (String) r[4],
-        New_State__c = (String) r[5], New_Postcode__c = (String) r[6], Move_In_Date__c = Date.today().addDays((Integer) r[7]),
+        New_State__c = (String) r[5], New_Postcode__c = (String) r[6], Move_In_Date__c = moveIn,
         Utilities__c = (String) r[8], Referring_Agent__c = agent.ContactId, Referring_Agency__c = agent.Contact.AccountId,
         Consent_Given__c = true, Consent_Given_At__c = System.now(), Consent_Version__c = s.Consent_Version__c,
-        Partner_Status__c = 'Received', Is_Urgent__c = PR_Settings.isUrgent(Date.today().addDays((Integer) r[7]))
+        Partner_Status__c = 'Received', Is_Urgent__c = PR_Settings.isUrgent(moveIn)
     );
     ref.put('CurrencyIsoCode', 'AUD');
     PR_SystemData.createReferralAndLead(ref);
-    created.add(ref);
+    byMover.put((String) r[1], ref);
 }
-Id me = UserInfo.getUserId();
-// 2 = Noah: contacted. 3 = Mia, 4 = Jack, 6 = Leo: converted (Jack and Leo then connected). 7 = Zoe: lost.
-List<Lead> working = new List<Lead>();
-for (Integer i : new List<Integer>{ 1, 2, 3, 5, 6 }) {
-    if (i < created.size()) working.add(new Lead(Id = created[i].Lead__c, OwnerId = me, Status = 'Working'));
-}
-update working;
-if (created.size() > 6) update new Lead(Id = created[6].Lead__c, Status = 'Unqualified');
 
+Id me = UserInfo.getUserId();
+List<Lead> working = new List<Lead>();
+for (String mover : contacted) working.add(new Lead(Id = byMover.get(mover).Lead__c, OwnerId = me, Status = 'Working'));
+update working;
+List<Lead> unqualified = new List<Lead>();
+for (String mover : lost) unqualified.add(new Lead(Id = byMover.get(mover).Lead__c, Status = 'Unqualified'));
+update unqualified;
+
+List<String> converting = new List<String>(convertTo.keySet());
 List<Database.LeadConvert> converts = new List<Database.LeadConvert>();
-for (Integer i : new List<Integer>{ 2, 3, 5 }) {
-    if (i >= created.size()) continue;
+for (String mover : converting) {
     Database.LeadConvert lc = new Database.LeadConvert();
-    lc.setLeadId(created[i].Lead__c);
+    lc.setLeadId(byMover.get(mover).Lead__c);
     lc.setConvertedStatus('Converted');
     converts.add(lc);
 }
-List<Id> opps = new List<Id>();
-for (Database.LeadConvertResult res : Database.convertLead(converts)) opps.add(res.getOpportunityId());
-if (opps.size() >= 3) {
-    update new List<Opportunity>{
-        new Opportunity(Id = opps[0], StageName = 'Plans Selected'),
-        new Opportunity(Id = opps[1], StageName = 'Utilities Connected'),
-        new Opportunity(Id = opps[2], StageName = 'Utilities Connected')
-    };
-    // Partner Manager approves one of the two new commissions.
-    List<Partner_Commission__c> pending = [SELECT Id FROM Partner_Commission__c WHERE Opportunity__c = :opps[1] AND Status__c = 'Pending'];
-    if (!pending.isEmpty()) update new Partner_Commission__c(Id = pending[0].Id, Status__c = 'Approved');
-}
-System.debug('PR-DEMO step 4 done: ' + created.size() + ' referrals, ' + opps.size() + ' converted');
+Map<String, Id> oppByMover = new Map<String, Id>();
+List<Database.LeadConvertResult> results = Database.convertLead(converts);
+for (Integer i = 0; i < results.size(); i++) oppByMover.put(converting[i], results[i].getOpportunityId());
+
+List<Opportunity> stages = new List<Opportunity>();
+for (String mover : converting) stages.add(new Opportunity(Id = oppByMover.get(mover), StageName = convertTo.get(mover)));
+update stages;
+
+// The Partner Manager approves one of the new commissions.
+List<Partner_Commission__c> pending = [SELECT Id FROM Partner_Commission__c WHERE Opportunity__c = :oppByMover.get(approve) AND Status__c = 'Pending'];
+if (!pending.isEmpty()) update new Partner_Commission__c(Id = pending[0].Id, Status__c = 'Approved');
+System.debug('PR-DEMO step 4 done: ' + byMover.size() + ' referrals, ' + oppByMover.size() + ' converted');

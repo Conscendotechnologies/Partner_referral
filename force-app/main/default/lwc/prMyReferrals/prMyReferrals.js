@@ -53,20 +53,26 @@ export default class PrMyReferrals extends LightningElement {
         this.load();
     }
 
+    /** Each load gets a number; only the latest one may update rows, errors or the loading state. */
+    requestSeq = 0;
+
     async load() {
+        const seq = ++this.requestSeq;
         this.loading = true;
         this.errorMessage = null;
         try {
             const data = await getReferrals({ statusFilter: this.status || null });
+            if (seq !== this.requestSeq) return;
             this.rows = data.map((r) => ({
                 ...r,
                 badgeClass: BADGE[r.status] || 'pr-badge',
                 repLabel: r.repFirstName || 'Not assigned yet'
             }));
         } catch (e) {
+            if (seq !== this.requestSeq) return;
             this.errorMessage = e?.body?.message || 'Could not load referrals.';
         } finally {
-            this.loading = false;
+            if (seq === this.requestSeq) this.loading = false;
         }
     }
 }

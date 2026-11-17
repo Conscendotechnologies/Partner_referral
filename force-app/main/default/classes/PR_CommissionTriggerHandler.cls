@@ -24,11 +24,15 @@ public without sharing class PR_CommissionTriggerHandler {
      * Decision F1: every commission is in the settings currency (AUD). Runs before the bypass check, because the
      * services write through the bypass and the payout sums amounts without converting them.
      */
-    private static void requireCurrency(List<Partner_Commission__c> records) {
+    private static void requireCurrency(List<Partner_Commission__c> records, Boolean isInsert) {
         String cur = PR_Settings.currencyCode();
+        // On insert the platform fills a blank currency with the creator's default before this trigger runs,
+        // so a value equal to that default is treated as "not chosen" and stamped with the configured currency.
+        // (An explicit choice of the creator's own default currency cannot be told apart and is stamped too.)
+        String userDefault = UserInfo.getDefaultCurrency();
         for (Partner_Commission__c c : records) {
             Object code = c.get('CurrencyIsoCode');
-            if (code == null) {
+            if (code == null || (isInsert && (String) code == userDefault)) {
                 c.put('CurrencyIsoCode', cur);
             } else if ((String) code != cur) {
                 c.addError('Partner commissions must be in ' + cur + '.');
@@ -37,7 +41,7 @@ public without sharing class PR_CommissionTriggerHandler {
     }
 
     public static void beforeInsert(List<Partner_Commission__c> newList) {
-        requireCurrency(newList);
+        requireCurrency(newList, true);
         if (PR_CommissionService.bypassLocks) return;
         Boolean finance = can(PR_Settings.PERM_MANAGE_PAYOUTS);
         for (Partner_Commission__c c : newList) {
@@ -53,7 +57,7 @@ public without sharing class PR_CommissionTriggerHandler {
     }
 
     public static void beforeUpdate(List<Partner_Commission__c> newList, Map<Id, Partner_Commission__c> oldMap) {
-        requireCurrency(newList);
+        requireCurrency(newList, false);
         if (PR_CommissionService.bypassLocks) return;
         Boolean approver = can(PR_Settings.PERM_APPROVE_COMMISSION);
         Boolean finance = can(PR_Settings.PERM_MANAGE_PAYOUTS);

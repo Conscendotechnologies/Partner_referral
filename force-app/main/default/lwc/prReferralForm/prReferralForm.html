@@ -30,7 +30,7 @@
             <fieldset class="pr-section">
                 <legend class="pr-legend">Mover</legend>
                 <div class="pr-row">
-                    <lightning-input class="pr-field" data-id="firstName" label="First name" required max-length="80"
+                    <lightning-input class="pr-field" data-id="firstName" label="First name" required max-length="40"
                         value={form.firstName} onchange={handleChange} autocomplete="given-name"></lightning-input>
                     <lightning-input class="pr-field" data-id="lastName" label="Last name" required max-length="80"
                         value={form.lastName} onchange={handleChange} autocomplete="family-name"></lightning-input>
@@ -47,7 +47,7 @@
                 <legend class="pr-legend">New address</legend>
                 <lightning-input class="pr-field" data-id="street" label="Street" required max-length="255"
                     value={form.street} onchange={handleChange} autocomplete="address-line1"></lightning-input>
-                <lightning-input class="pr-field" data-id="suburb" label="Suburb" required max-length="80"
+                <lightning-input class="pr-field" data-id="suburb" label="Suburb" required max-length="40"
                     value={form.suburb} onchange={handleChange} autocomplete="address-level2"></lightning-input>
                 <div class="pr-row">
                     <lightning-combobox class="pr-field" data-id="state" label="State" required options={stateOptions}

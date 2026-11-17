@@ -49,6 +49,10 @@ public without sharing class PR_CommissionSharing {
     @TestVisible
     private static Integer PAGE = 5000;
 
+    /** Number of ShareHistoryJob executions in this context (tests assert paging really happened). */
+    @TestVisible
+    private static Integer shareJobExecutions = 0;
+
     public class ShareHistoryJob implements Queueable {
         private List<Id> agencyIds;
         private Id afterId;
@@ -59,6 +63,7 @@ public without sharing class PR_CommissionSharing {
         }
 
         public void execute(QueueableContext ctx) {
+            shareJobExecutions++;
             Id agencyId = agencyIds[0];
             String soql = 'SELECT Id, Agency__c FROM Partner_Commission__c WHERE Agency__c = :agencyId' +
                 (afterId == null ? '' : ' AND Id > :afterId') + ' ORDER BY Id LIMIT :page';

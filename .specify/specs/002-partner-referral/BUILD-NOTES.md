@@ -36,9 +36,32 @@ sf project deploy start -o <org> --test-level RunSpecifiedTests \
   --tests PR_ReferralServiceTest --tests PR_LeadLifecycleTest --tests PR_CommissionPayoutTest
 ```
 
-Before deploying `networks/Connectnow Partners.network-meta.xml` to a new org, set `emailSenderAddress` to a verified
-address (the repo carries a placeholder). Add AUD to the org first (`CurrencyType`), and remember that
-`standardValueSets/` and `settings/BusinessHours` replace the whole value set: retrieve and merge first in another org.
+For a fresh org, check the prerequisites in `.github/README.md` ("Org prerequisites") first: Lead statuses (New,
+Working, Qualified, Unqualified, and Converted marked as converted), AUD, merged value sets and business hours, a
+verified site sender address, and queue staff.
+
+## Queue staff
+
+Referrals are routed to five queues by the new address's state: `PR_NSW_ACT`, `PR_VIC_TAS`, `PR_QLD`, `PR_SA_WA_NT`, and
+`PR_Unassigned` (fallback). The queues deploy with no members, and a queue without members gets no urgent-mover
+emails and its leads wait unassigned. Before referrals arrive:
+
+1. Give each sales rep the `PR_Sales_Rep` permission set (team leads too).
+2. Add the reps for each region to that region's queue: **Setup → Queues → (queue) → Edit → Queue Members**. Each rep
+   can be in more than one queue.
+3. Add at least one team lead to `PR_Unassigned`, which catches referrals with an unknown state.
+4. Check: `SELECT Group.DeveloperName, COUNT(Id) FROM GroupMember WHERE Group.DeveloperName LIKE 'PR%' GROUP BY Group.DeveloperName`
+   should return all five queues.
+
+The demo script `scripts/apex/pr-demo/1-setup-internal.apex` adds only the running admin to every queue. That is enough
+for a demo, not for real routing.
+
+## Currency rule for commissions
+
+Every commission must be in the configured currency (AUD), on both the normal path and the services' bypass path.
+On insert, Salesforce fills a blank currency with the creator's default currency before the trigger runs, so a
+value equal to the creator's own default is treated as "not chosen" and stamped AUD. Any other non-AUD currency is
+rejected, and an update to a non-AUD currency is always rejected.
 
 ## Demo data (S10)
 

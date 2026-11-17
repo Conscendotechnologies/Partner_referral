@@ -8,7 +8,7 @@
     </values>
     <values>
         <field>Consent_Text__c</field>
-        <value xsi:type="xsd:string">The customer agrees that Connectnow may contact them by phone, SMS or email about connecting utilities at their new address, and that the referring agency may be told the status of their referral.</value>
+        <value xsi:type="xsd:string">PLACEHOLDER WORDING (version 1, pending client legal review, Q2). The customer agrees that Connectnow may contact them by phone, SMS or email about connecting electricity, gas, water and internet services at their new address, and that Connectnow may use the details provided by the referring real estate agency for that purpose. The customer also agrees that the referring agency may be told the status of the referral (received, in progress, connected or closed) and the first name of the Connectnow representative handling it. Connectnow will not share plan, retailer or pricing details with the agency.</value>
     </values>
     <values>
         <field>Urgent_Window_Hours__c</field>

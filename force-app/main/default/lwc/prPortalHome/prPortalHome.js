@@ -21,10 +21,18 @@ export default class PrPortalHome extends LightningElement {
         this.load();
     }
 
+    /** Each load gets a number; an older response never replaces a newer summary or error. */
+    requestSeq = 0;
+
     async load() {
+        const seq = ++this.requestSeq;
         try {
-            this.summary = await getHomeSummary();
+            const summary = await getHomeSummary();
+            if (seq !== this.requestSeq) return;
+            this.summary = summary;
+            this.errorMessage = null;
         } catch (e) {
+            if (seq !== this.requestSeq) return;
             this.errorMessage = e?.body?.message || 'Could not load your summary.';
         }
     }
