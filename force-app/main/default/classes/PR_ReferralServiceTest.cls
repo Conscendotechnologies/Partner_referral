@@ -273,22 +273,22 @@ private class PR_ReferralServiceTest {
 
     @IsTest
     static void dmlBudgetCountsAMatchWithAnOpenLeadAsTwoRows() {
-        // 1 new referral (4 rows) + 1 unflagged match with an unconverted Lead (Referral + Lead = 2 rows) = 6.
+        // 1 new referral routed to a queue (3 rows) + 1 unflagged match with an unconverted Lead (Referral + Lead = 2) = 5.
         Referral__c existing = otherAgencyReferral('0499999999', false, true);
         Test.startTest();
         System.runAs(PR_TestFactory.user('pa_ag1')) {
-            PR_ReferralService.dmlRowsAvailableOverride = 5;
+            PR_ReferralService.dmlRowsAvailableOverride = 4;
             try {
                 PR_ReferralService.submit(inputFor('0499999999'));
                 Assert.fail('over budget must be refused before any write');
             } catch (PR_Exception e) {
-                Assert.isTrue(e.getMessage().contains('6 rows, 5 available'), e.getMessage());
+                Assert.isTrue(e.getMessage().contains('5 rows, 4 available'), e.getMessage());
             }
         }
         // Counted as the test runner: the agent can't see the other agency's referral.
         Assert.areEqual(1, [SELECT COUNT() FROM Referral__c], 'nothing was written');
         System.runAs(PR_TestFactory.user('pa_ag1')) {
-            PR_ReferralService.dmlRowsAvailableOverride = 6;
+            PR_ReferralService.dmlRowsAvailableOverride = 5;
             Assert.isTrue(PR_ReferralService.submit(inputFor('0499999999')).saved, 'exactly on budget is accepted');
         }
         Test.stopTest();
@@ -299,11 +299,11 @@ private class PR_ReferralServiceTest {
 
     @IsTest
     static void dmlBudgetIgnoresMatchesThatAreAlreadyFlagged() {
-        // Three matches already flagged need no writes: only the new referral's 4 rows count.
+        // Three matches already flagged need no writes: only the new referral's 3 rows count.
         for (Integer n = 0; n < 3; n++) otherAgencyReferral('0499999998', true, true);
         Test.startTest();
         System.runAs(PR_TestFactory.user('pa_ag1')) {
-            PR_ReferralService.dmlRowsAvailableOverride = 4;
+            PR_ReferralService.dmlRowsAvailableOverride = 3;
             PR_SubmitResult r = PR_ReferralService.submit(inputFor('0499999998'));
             Assert.isTrue(r.saved, 'already-flagged matches must not use up the budget');
         }
@@ -312,20 +312,63 @@ private class PR_ReferralServiceTest {
     }
 
     @IsTest
-    static void submissionOverTheRealDmlLimitIsRefused() {
+    static void overBudgetWithAMatchWithoutALeadIsRefused() {
         Referral__c existing = otherAgencyReferral('0499999997', false, false);
         Test.startTest();
         System.runAs(PR_TestFactory.user('pa_ag1')) {
-            PR_ReferralService.dmlRowsAvailableOverride = 4; // new referral 4 + unflagged match without a Lead 1 = 5
+            PR_ReferralService.dmlRowsAvailableOverride = 3; // new referral 3 + unflagged match without a Lead 1 = 4
             try {
                 PR_ReferralService.submit(inputFor('0499999997'));
                 Assert.fail();
             } catch (PR_Exception e) {
-                Assert.isTrue(e.getMessage().contains('5 rows, 4 available'), e.getMessage());
+                Assert.isTrue(e.getMessage().contains('4 rows, 3 available'), e.getMessage());
             }
         }
         Test.stopTest();
         Assert.isFalse([SELECT Possible_Duplicate__c FROM Referral__c WHERE Id = :existing.Id].Possible_Duplicate__c, 'nothing was flagged');
+    }
+
+    @IsTest
+    static void aSubmissionWithNoMatchesNeedsExactlyThreeRows() {
+        // Routed to a queue, the new Lead's status sync writes nothing: Referral insert, Lead insert, link update.
+        Test.startTest();
+        System.runAs(PR_TestFactory.user('pa_ag1')) {
+            PR_ReferralService.dmlRowsAvailableOverride = 2;
+            try {
+                PR_ReferralService.submit(inputFor('0466111111'));
+                Assert.fail('2 rows are not enough');
+            } catch (PR_Exception e) {
+                Assert.isTrue(e.getMessage().contains('3 rows, 2 available'), e.getMessage());
+            }
+            PR_ReferralService.dmlRowsAvailableOverride = 3;
+            Assert.isTrue(PR_ReferralService.submit(inputFor('0466111111')).saved, 'exactly 3 rows fit');
+        }
+        Test.stopTest();
+        Assert.areEqual(3, PR_ReferralService.createRows([SELECT New_State__c FROM Referral__c]), 'one routed referral = 3 rows');
+        Referral__c unrouted = new Referral__c(New_State__c = null);
+        PR_Settings.routesOverride = new List<PR_State_Route__mdt>();
+        Assert.isNotNull(PR_Settings.routeQueueId(null), 'the Unassigned fallback queue still routes a blank state');
+        Assert.areEqual(3, PR_ReferralService.createRows(new List<Referral__c>{ unrouted }));
+    }
+
+    @IsTest
+    static void theGuardUsesTheRealRemainingDmlLimit() {
+        // No override: the guard reads Limits. Exactly the remaining rows is accepted; one more is refused.
+        Integer remaining = Limits.getLimitDmlRows() - Limits.getDmlRows();
+        PR_ReferralService.requireDmlBudget(remaining);
+        try {
+            PR_ReferralService.requireDmlBudget(remaining + 1);
+            Assert.fail('one row over the real remaining limit must be refused');
+        } catch (PR_Exception e) {
+            Assert.isTrue(e.getMessage().contains((remaining + 1) + ' rows, ' + remaining + ' available'), e.getMessage());
+        }
+        insert new Account(Name = 'Uses a row');
+        try {
+            PR_ReferralService.requireDmlBudget(remaining);
+            Assert.fail('after a write, the same number of rows no longer fits');
+        } catch (PR_Exception e) {
+            Assert.isTrue(e.getMessage().contains((remaining - 1) + ' available'), e.getMessage());
+        }
     }
 
     @IsTest
