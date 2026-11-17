@@ -37,11 +37,17 @@ export default class PrPayoutConsole extends LightningElement {
         const changed = value !== this._recordId;
         this._recordId = value;
         if (changed && this._connected) {
+            // Drop the previous batch at once: if the new load fails, nothing from the old batch stays on screen
+            // or behind the Export and Mark paid buttons.
+            this.data = null;
             this.message = null;
             this.errorMessage = null;
             this.load();
         }
     }
+
+    /** Each load gets a number; only the latest one may update data, errors or the loading state. */
+    _requestSeq = 0;
 
     connectedCallback() {
         this._connected = true;
@@ -50,6 +56,7 @@ export default class PrPayoutConsole extends LightningElement {
 
     disconnectedCallback() {
         this._connected = false;
+        this._requestSeq++; // invalidate anything still in flight
     }
 
     /** Tells sibling components (the record detail panel) that the batch changed on the server. */
@@ -63,14 +70,19 @@ export default class PrPayoutConsole extends LightningElement {
     }
 
     async load() {
+        const seq = ++this._requestSeq;
         this.loading = true;
         try {
-            this.data = await getConsole({ batchId: this.recordId || null });
-            this.period = this.period || this.data.currentPeriod;
+            const data = await getConsole({ batchId: this.recordId || null });
+            if (seq !== this._requestSeq) return; // superseded by a newer load (record changed)
+            this.data = data;
+            this.period = this.period || data.currentPeriod;
         } catch (e) {
+            if (seq !== this._requestSeq) return;
+            this.data = null;
             this.errorMessage = this.msg(e);
         } finally {
-            this.loading = false;
+            if (seq === this._requestSeq) this.loading = false;
         }
     }
 
@@ -140,6 +152,9 @@ export default class PrPayoutConsole extends LightningElement {
     }
 
     async act(fn) {
+        // The batch the action changes: on a record page the console shows only that batch, so it is the record
+        // shown when the action starts. Captured now, so navigating away mid-action still refreshes the right one.
+        const actionBatchId = this.recordId;
         this.errorMessage = null;
         this.message = null;
         this.loading = true;
@@ -147,7 +162,7 @@ export default class PrPayoutConsole extends LightningElement {
             await fn();
             await this.load();
             // On a Payout Batch record page, refresh the detail panel (status, paid date) next to this console.
-            await this.refreshRecord(this.recordId);
+            await this.refreshRecord(actionBatchId);
         } catch (err) {
             this.errorMessage = this.msg(err);
         } finally {
