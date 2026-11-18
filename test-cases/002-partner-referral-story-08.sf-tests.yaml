@@ -51,6 +51,7 @@ cases:
   - Open the Dashboards tab
   - Open the folder "Partner Referrals"
   - Open the dashboard "Partner Referrals – Volume"
+  - Click "Refresh" and wait for the components to reload
   expected:
   - A component shows referrals per agency per week
   - A component shows referrals per agency this month
@@ -67,6 +68,7 @@ cases:
   - Open the Dashboards tab
   - Open the folder "Partner Referrals"
   - Open the dashboard "Partner Referrals – Conversion"
+  - Click "Refresh" and wait for the components to reload
   expected:
   - Each agency shows the number of referrals, the number Connected and a conversion rate percentage
 - id: S08-TC-03
@@ -95,6 +97,7 @@ cases:
   - Open the Dashboards tab
   - Open the folder "Partner Referrals"
   - Open the dashboard "Partner Referrals – SLA"
+  - Click "Refresh" and wait for the components to reload
   expected:
   - There is a component for Leads past SLA Due At with no first contact
   - There is a component for Leads first contacted late

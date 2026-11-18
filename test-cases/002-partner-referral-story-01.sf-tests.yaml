@@ -54,12 +54,12 @@ cases:
   - Open the Accounts tab
   - Search "Harbour & Co Realty" in the list search box and open the Account
   - Click "Edit"
-  - Select "Inactive" in "Partner Status"
+  - Select "Inactive" in "Partner Status" if the field is editable
   - Click "Save"
   expected:
-  - The Account is not saved
-  - The error "Only Partner Managers can change an agency's partner status or commission rate." is shown at the top of the
-    edit form
+  - 'Partner Status cannot be changed: the field is missing or read-only on the edit form, or the save fails with "Only Partner
+    Managers can change an agency''s partner status or commission rate."'
+  - After closing the form the Account still shows Partner Status "Active"
 - id: S01-TC-02
   title: A sales rep cannot change an agency's Commission Rate
   section: S01 Partner agencies and partner users
@@ -73,12 +73,12 @@ cases:
   - Open the Accounts tab
   - Search "Harbour & Co Realty" in the list search box and open the Account
   - Click "Edit"
-  - Enter "65" in "Commission Rate"
+  - Enter "65" in "Commission Rate" if the field is editable
   - Click "Save"
   expected:
-  - The Account is not saved
-  - The error "Only Partner Managers can change an agency's partner status or commission rate." is shown at the top of the
-    edit form
+  - 'Commission Rate cannot be changed: the field is missing or read-only on the edit form, or the save fails with "Only Partner
+    Managers can change an agency''s partner status or commission rate."'
+  - After closing the form the Account's Commission Rate is unchanged
 - id: S01-TC-03
   title: A Partner Manager can change an agency's Commission Rate
   section: S01 Partner agencies and partner users

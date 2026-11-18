@@ -57,7 +57,7 @@ cases:
   expected:
   - '"Lead Status" offers exactly New, Working, Qualified, Unqualified and Converted (no Draft, Submitted, Approved, Pending
     or Rejected)'
-  - '"Lead Source" offers "Partner Referral"'
+  - The "Lead Source" options include the value "Partner Referral" (other values may also be listed)
 - id: S00-TC-03
   title: Partner Referral Opportunity offers the programme stages; other record types are unchanged
   section: 'S00 Foundation: objects, fields, record types, processes, queues, permission sets'

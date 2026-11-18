@@ -51,7 +51,7 @@ cases:
   - Select record type "Partner Referral" and click "Next"
   - Enter "AI-TEST Route VIC <unique suffix>" in "Last Name"
   - Enter "AI-TEST Co" in "Company" if the field is shown
-  - Select "Victoria" in "State/Province" of the address
+  - Enter "VIC" in "State/Province" of the address
   - Enter a date 30 days from today in "Move-in Date"
   - Tick "Electricity" in "Utilities"
   - Click "Save"
@@ -70,7 +70,7 @@ cases:
   - Select record type "Partner Referral" and click "Next"
   - Enter "AI-TEST Urgent <unique suffix>" in "Last Name"
   - Enter "AI-TEST Co" in "Company" if the field is shown
-  - Select "New South Wales" in "State/Province" of the address
+  - Enter "NSW" in "State/Province" of the address
   - Enter tomorrow's date in "Move-in Date"
   - Tick "Electricity" in "Utilities"
   - Click "Save"
@@ -90,13 +90,13 @@ cases:
   - Select record type "Partner Referral" and click "Next"
   - Enter "AI-TEST SLA <unique suffix>" in "Last Name"
   - Enter "AI-TEST Co" in "Company" if the field is shown
-  - Select "Queensland" in "State/Province" of the address
+  - Enter "QLD" in "State/Province" of the address
   - Enter a date 30 days from today in "Move-in Date"
   - Tick "Electricity" in "Utilities"
   - Click "Save"
   expected:
   - The Lead is saved
-  - '"SLA Due At" has a date and time later than the creation time'
+  - '"First Contact Due" has a date and time later than the creation time'
 - id: S03-TC-09
   title: First move to Working stamps First Contacted At
   section: S03 State routing, urgent movers and first-contact SLA
@@ -109,12 +109,12 @@ cases:
   - Open Setup > Users (/lightning/setup/ManageUsers/home)
   - Click "Login" next to the user "Sam Rep (PR test)"
   - Open the Leads tab
-  - Select the "PR - NSW + ACT" list view
+  - Select the "PR - NSW + ACT queue" list view
   - Open the newest "AI-TEST" Lead
   - Change Lead Status to "Working" and save
   expected:
   - '"First Contacted At" now shows the current date and time'
-  - '"SLA Breached" is not ticked when that time is before "SLA Due At"'
+  - '"SLA Breached" is not ticked when that time is before "First Contact Due"'
 - id: S03-TC-11
   title: A queue list view puts urgent Leads first, then by move-in date
   section: S03 State routing, urgent movers and first-contact SLA
@@ -125,7 +125,7 @@ cases:
   - Open Setup > Users (/lightning/setup/ManageUsers/home)
   - Click "Login" next to the user "Sam Rep (PR test)"
   - Open the Leads tab
-  - Select the "PR - NSW + ACT" list view
+  - Select the "PR - NSW + ACT queue" list view
   expected:
   - All Leads with Urgent ticked appear above the non-urgent Leads
   - Within each group Leads are ordered by Move-in Date, earliest first

@@ -72,9 +72,9 @@ cases:
   - Open the commission from the "Partner Commissions" related list
   - Click "Edit"
   expected:
-  - The page shows Agency, Opportunity, Referral, Rate Applied, Services Count, Amount, Status, Approved By, Approved On,
-    Payout Line, Cancellation Reason and Reopened After Approval
-  - In edit mode Amount, Rate Applied and Services Count cannot be edited
+  - The page shows Agency, Opportunity, Referral, Rate Applied, Services Connected, Amount, Status, Approved By, Approved
+    On, Payout Line, Cancellation Reason and Reopened After Approval
+  - In edit mode Amount, Rate Applied and Services Connected cannot be edited
 - id: S12-TC-03
   title: Payout Batch page shows its fields, Lines and the console for that batch only
   section: S12 Page layouts and record pages
@@ -119,11 +119,11 @@ cases:
   - Open Setup > Users (/lightning/setup/ManageUsers/home)
   - Click "Login" next to the user "Sam Rep (PR test)"
   - Open the Leads tab
-  - Select the "PR - NSW + ACT" list view
+  - Select the "PR - NSW + ACT queue" list view
   - Open the first Lead
   expected:
-  - The page shows Referral, Referring Agency, Referring Agent, Move-in Date, Utilities, consent, Urgent, SLA Due At, First
-    Contacted At and SLA Breached
+  - The page shows Referral, Referring Agency, Referring Agent, Move-in Date, Utilities, consent, Urgent, First Contact Due,
+    First Contacted At and SLA Breached
 - id: S12-TC-07
   title: Partner users still see only the portal components
   section: S12 Page layouts and record pages
