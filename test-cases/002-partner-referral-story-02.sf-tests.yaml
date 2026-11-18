@@ -74,9 +74,11 @@ cases:
   preconditions:
   - S02-TC-01 has run
   steps:
-  - Open the Referrals tab
-  - Search "Mover 0201" in the list search box and open the newest matching Referral
-  - Click the Lead link on the Referral
+  - Open the Leads tab and choose the "All Open Leads" list view
+  - Search "Mover 0201" in the list search box and open the newest matching Lead
+  - Click the Referral link on the Lead (the Referrals tab has no list view with records, so the Referral is reached
+    from its Lead)
+  - On the Referral, click the Lead link
   expected:
   - The Referral's owner is Tom Nguyen and its Lead field links to a Lead
   - The Lead has record type "Partner Referral", Lead Status "New" and Lead Source "Partner Referral"
@@ -193,7 +195,8 @@ cases:
   - Enter "Parramatta" in "Suburb"
   - Select "NSW" in "State"
   - Enter "2150" in "Postcode"
-  - Enter the date 6 months and 1 day after today in "Move-in date"
+  - Enter the date 6 months and 2 days after today in "Move-in date" (the org checks against today in Sydney, which can
+    be a day ahead of the tester's date; 2 days keeps the date over the limit in every time zone)
   - Tick "Electricity" under "Services to connect"
   - Tick "The customer gives consent"
   - Click "Send referral"
@@ -293,8 +296,9 @@ cases:
   preconditions:
   - S02-TC-17 has run
   steps:
-  - Open the Referrals tab
-  - Search "0412 000 201" in the list search box
-  - Open the referral from Chloe Tan and then the one from Tom Nguyen
+  - Open the Leads tab and choose the "All Open Leads" list view
+  - Search "Mover 0214" in the list search box, open the Lead and click its Referral link (Chloe Tan's referral)
+  - Go back to the Leads tab, search "Mover 0201", open the newest matching Lead and click its Referral link (Tom
+    Nguyen's referral)
   expected:
   - Both Referrals show "Possible Duplicate" ticked

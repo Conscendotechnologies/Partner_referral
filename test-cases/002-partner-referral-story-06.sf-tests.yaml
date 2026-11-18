@@ -47,14 +47,17 @@ cases:
   - smoke
   mode: both
   preconditions:
-  - A Partner Referral Opportunity "AI-TEST Commission ..." from Harbour & Co Realty with 3 products exists; note the agency's
-    Commission Rate (R)
+  - A Partner Referral Opportunity "AI-TEST Commission ..." from Harbour & Co Realty with 3 products exists at a stage before
+    Utilities Connected (run scripts/apex/pr-demo/7-qa-preconditions.apex); note the agency's Commission Rate (R)
   steps:
   - Open Setup > Users (/lightning/setup/ManageUsers/home)
   - Click "Login" next to the user "Sam Rep (PR test)"
   - Open the Opportunities tab
   - Search "AI-TEST Commission" in the list search box and open the Opportunity
   - Change Stage to "Utilities Connected" and save
+  - Log out of Sam's session with "Log out as Sam Rep (PR test)" and, from Setup > Users, click "Login" next to "Maya
+    Manager (PR test)" (sales reps have no access to commissions, so the commission is checked as the Partner Manager)
+  - Open the Opportunities tab, search "AI-TEST Commission" and open the Opportunity
   - Open the "Partner Commissions" related list and open the commission
   expected:
   - Exactly one commission exists with Status "Pending"

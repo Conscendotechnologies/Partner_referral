@@ -19,9 +19,9 @@ Persona: Admin. Type: positive.
 
 | Step | Action | Expected | Pass/Fail |
 |---|---|---|---|
-| 1 | Open Setup > Permission Sets and Permission Set Groups |  | |
+| 1 | Open Setup > Permission Sets (the design has no permission set groups) |  | |
 | 2 | Open Setup > Custom Permissions |  | |
-| 3 | Open Setup > Sharing Settings and look at Referral, Partner Commission, Payout Batch and Payout Line | PR_Partner_Agent, PR_Partner_Principal, PR_Sales_Rep, PR_Partner_Manager and PR_Finance exist<br>Manage_Partner_Agencies, Approve_Partner_Commission, Manage_Partner_Payouts and the fourth design permission exist<br>Default External Access is Private on all four objects | |
+| 3 | Open Setup > Sharing Settings and look at Referral, Partner Commission, Payout Batch and Payout Line | PR_Partner_Agent, PR_Partner_Principal, PR_Sales_Rep, PR_Partner_Manager and PR_Finance exist<br>Manage_Partner_Agencies, Approve_Partner_Commission, Manage_Partner_Payouts and Partner_Principal exist<br>Default External Access is Private on Referral, Partner Commission and Payout Batch; Payout Line is "Controlled by Parent" (master-detail to Payout Batch) | |
 
 ## S00-TC-09 (AC-00.7): Seed script creates the 4 active products in the price book and is idempotent on re-run
 

@@ -49,8 +49,9 @@ cases:
   preconditions:
   - S02-TC-01 has run
   steps:
-  - Open the Referrals tab
-  - Search "Mover 0201" in the list search box and open the newest matching Referral
+  - Open the Leads tab and choose the "All Open Leads" list view
+  - Search "Mover 0201" in the list search box and open the newest matching Lead
+  - Click the Referral link on the Lead (the Referrals tab has no list view with records)
   expected:
   - The page shows mover name, mobile, new address, Move-in Date, Utilities, consent time and version, Status and Rep First
     Name
@@ -73,7 +74,8 @@ cases:
   - Click "Edit"
   expected:
   - The page shows Agency, Opportunity, Referral, Rate Applied, Services Connected, Amount, Status, Approved By, Approved
-    On, Payout Line, Cancellation Reason and Reopened After Approval
+    On, Cancellation Reason and Reopened After Approval (Payout Line is not expected for a Partner Manager, because
+    payout records are Finance only)
   - In edit mode Amount, Rate Applied and Services Connected cannot be edited
 - id: S12-TC-03
   title: Payout Batch page shows its fields, Lines and the console for that batch only
@@ -89,7 +91,7 @@ cases:
   - Open the "Payouts" tab in the Connectnow Partner Referrals app
   - Click the month link of a batch
   expected:
-  - The page shows Period Month, Status, Run Count, Total and Paid Date
+  - The page shows Period Month, Status, Run Count, Total and Paid On
   - A "Payout Lines" related list is shown
   - The "Commission payouts" console on the page lists only this batch and has no "Run payout" button
 - id: S12-TC-04

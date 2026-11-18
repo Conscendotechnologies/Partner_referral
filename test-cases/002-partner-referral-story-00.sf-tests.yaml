@@ -56,7 +56,7 @@ cases:
   - Click "Cancel"
   expected:
   - '"Lead Status" offers exactly New, Working, Qualified, Unqualified and Converted (no Draft, Submitted, Approved, Pending
-    or Rejected)'
+    or Rejected); the blank "--None--" entry Salesforce adds to every picklist is not counted'
   - The "Lead Source" options include the value "Partner Referral" (other values may also be listed)
 - id: S00-TC-03
   title: Partner Referral Opportunity offers the programme stages; other record types are unchanged
