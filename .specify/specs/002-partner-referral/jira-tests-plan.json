@@ -1,0 +1,2686 @@
+{
+  "project": "KAN",
+  "feature": "002-partner-referral",
+  "labels": [
+    "sdd",
+    "spec-002",
+    "test-case"
+  ],
+  "storyKeys": {
+    "10": "KAN-53",
+    "11": "KAN-54",
+    "12": "KAN-55",
+    "00": "KAN-43",
+    "01": "KAN-44",
+    "02": "KAN-45",
+    "03": "KAN-46",
+    "04": "KAN-47",
+    "05": "KAN-48",
+    "06": "KAN-49",
+    "07": "KAN-50",
+    "08": "KAN-51",
+    "09": "KAN-52"
+  },
+  "issues": [
+    {
+      "ref": "S10-TC-01",
+      "type": "Subtask",
+      "parent": "10",
+      "parentKey": "KAN-53",
+      "summary": "[002-S10-TC-01] Each agency has an active principal and agent who can reach the portal",
+      "description": "Level: ui\nPersona: Admin\nType: positive\nAC: AC-10.1\nSuite: test-cases/002-partner-referral-story-10.sf-tests.yaml",
+      "labels": [
+        "cref-002-S10-TC-01",
+        "sdd",
+        "spec-002",
+        "tc-ui",
+        "test-case"
+      ],
+      "fields": {
+        "Test level": "ui",
+        "Persona": "Admin",
+        "AC id": "AC-10.1"
+      }
+    },
+    {
+      "ref": "S10-TC-02",
+      "type": "Subtask",
+      "parent": "10",
+      "parentKey": "KAN-53",
+      "summary": "[002-S10-TC-02] All four partner users are active with the right agency and portal role",
+      "description": "Level: manual\nPersona: Admin\nType: positive\nAC: AC-10.1\nScript: .specify/specs/002-partner-referral/task_story_10_test_scripts.md",
+      "labels": [
+        "cref-002-S10-TC-02",
+        "sdd",
+        "spec-002",
+        "tc-manual",
+        "test-case"
+      ],
+      "fields": {
+        "Test level": "manual",
+        "Persona": "Admin",
+        "AC id": "AC-10.1"
+      }
+    },
+    {
+      "ref": "S10-TC-03",
+      "type": "Subtask",
+      "parent": "10",
+      "parentKey": "KAN-53",
+      "summary": "[002-S10-TC-03] Every state queue has a member and each internal persona has its permission set",
+      "description": "Level: manual\nPersona: Admin\nType: positive\nAC: AC-10.2\nScript: .specify/specs/002-partner-referral/task_story_10_test_scripts.md",
+      "labels": [
+        "cref-002-S10-TC-03",
+        "sdd",
+        "spec-002",
+        "tc-manual",
+        "test-case"
+      ],
+      "fields": {
+        "Test level": "manual",
+        "Persona": "Admin",
+        "AC id": "AC-10.2"
+      }
+    },
+    {
+      "ref": "S10-TC-04",
+      "type": "Subtask",
+      "parent": "10",
+      "parentKey": "KAN-53",
+      "summary": "[002-S10-TC-04] Each queue has an email address that receives the urgent email",
+      "description": "Level: manual\nPersona: Admin\nType: positive\nAC: AC-10.3\nScript: .specify/specs/002-partner-referral/task_story_10_test_scripts.md",
+      "labels": [
+        "cref-002-S10-TC-04",
+        "sdd",
+        "spec-002",
+        "tc-manual",
+        "test-case"
+      ],
+      "fields": {
+        "Test level": "manual",
+        "Persona": "Admin",
+        "AC id": "AC-10.3"
+      }
+    },
+    {
+      "ref": "S10-TC-05",
+      "type": "Subtask",
+      "parent": "10",
+      "parentKey": "KAN-53",
+      "summary": "[002-S10-TC-05] Two-agency isolation tests run without extra setup",
+      "description": "Level: manual\nPersona: Tester\nType: positive\nAC: AC-10.4\nScript: .specify/specs/002-partner-referral/task_story_10_test_scripts.md",
+      "labels": [
+        "cref-002-S10-TC-05",
+        "sdd",
+        "spec-002",
+        "tc-manual",
+        "test-case"
+      ],
+      "fields": {
+        "Test level": "manual",
+        "Persona": "Tester",
+        "AC id": "AC-10.4"
+      }
+    },
+    {
+      "ref": "S11-TC-01",
+      "type": "Subtask",
+      "parent": "11",
+      "parentKey": "KAN-54",
+      "summary": "[002-S11-TC-01] Marking a batch Paid that is too large for one transaction finishes in the background; the batch shows Paid only after every commission is Paid",
+      "description": "Level: unit\nPersona: System\nType: bulk\nAC: AC-11.1\nApex unit test",
+      "labels": [
+        "cref-002-S11-TC-01",
+        "sdd",
+        "spec-002",
+        "tc-unit",
+        "test-case"
+      ],
+      "fields": {
+        "Test level": "unit",
+        "Persona": "System",
+        "AC id": "AC-11.1"
+      }
+    },
+    {
+      "ref": "S11-TC-02",
+      "type": "Subtask",
+      "parent": "11",
+      "parentKey": "KAN-54",
+      "summary": "[002-S11-TC-02] A second Mark paid while one is processing is refused",
+      "description": "Level: unit\nPersona: Finance\nType: negative\nAC: AC-11.1\nApex unit test",
+      "labels": [
+        "cref-002-S11-TC-02",
+        "sdd",
+        "spec-002",
+        "tc-unit",
+        "test-case"
+      ],
+      "fields": {
+        "Test level": "unit",
+        "Persona": "Finance",
+        "AC id": "AC-11.1"
+      }
+    },
+    {
+      "ref": "S11-TC-03",
+      "type": "Subtask",
+      "parent": "11",
+      "parentKey": "KAN-54",
+      "summary": "[002-S11-TC-03] A test covers the large-batch path (PR_MarkPaidBatchJob)",
+      "description": "Level: unit\nPersona: System\nType: positive\nAC: AC-11.2\nApex unit test",
+      "labels": [
+        "cref-002-S11-TC-03",
+        "sdd",
+        "spec-002",
+        "tc-unit",
+        "test-case"
+      ],
+      "fields": {
+        "Test level": "unit",
+        "Persona": "System",
+        "AC id": "AC-11.2"
+      }
+    },
+    {
+      "ref": "S11-TC-04",
+      "type": "Subtask",
+      "parent": "11",
+      "parentKey": "KAN-54",
+      "summary": "[002-S11-TC-04] pr-validate fails with a clear message when the Apex test step ran zero tests",
+      "description": "Level: manual\nPersona: Developer\nType: negative\nAC: AC-11.3\nScript: .specify/specs/002-partner-referral/task_story_11_test_scripts.md",
+      "labels": [
+        "cref-002-S11-TC-04",
+        "sdd",
+        "spec-002",
+        "tc-manual",
+        "test-case"
+      ],
+      "fields": {
+        "Test level": "manual",
+        "Persona": "Developer",
+        "AC id": "AC-11.3"
+      }
+    },
+    {
+      "ref": "S12-TC-01",
+      "type": "Subtask",
+      "parent": "12",
+      "parentKey": "KAN-55",
+      "summary": "[002-S12-TC-01] Referral page shows the mover, address, dates, services, consent, status, rep, agent, agency, Lead and Opportunity links and Commissions",
+      "description": "Level: ui\nPersona: Admin\nType: positive\nAC: AC-12.1\nSuite: test-cases/002-partner-referral-story-12.sf-tests.yaml",
+      "labels": [
+        "cref-002-S12-TC-01",
+        "sdd",
+        "spec-002",
+        "tc-ui",
+        "test-case"
+      ],
+      "fields": {
+        "Test level": "ui",
+        "Persona": "Admin",
+        "AC id": "AC-12.1"
+      }
+    },
+    {
+      "ref": "S12-TC-02",
+      "type": "Subtask",
+      "parent": "12",
+      "parentKey": "KAN-55",
+      "summary": "[002-S12-TC-02] Commission page shows all its fields; Amount, Rate Applied and Services Count are read-only",
+      "description": "Level: ui\nPersona: Partner Manager\nType: positive\nAC: AC-12.2\nSuite: test-cases/002-partner-referral-story-12.sf-tests.yaml",
+      "labels": [
+        "cref-002-S12-TC-02",
+        "sdd",
+        "spec-002",
+        "tc-ui",
+        "test-case"
+      ],
+      "fields": {
+        "Test level": "ui",
+        "Persona": "Partner Manager",
+        "AC id": "AC-12.2"
+      }
+    },
+    {
+      "ref": "S12-TC-03",
+      "type": "Subtask",
+      "parent": "12",
+      "parentKey": "KAN-55",
+      "summary": "[002-S12-TC-03] Payout Batch page shows its fields, Lines and the console for that batch only",
+      "description": "Level: ui\nPersona: Finance\nType: positive\nAC: AC-12.3\nSuite: test-cases/002-partner-referral-story-12.sf-tests.yaml",
+      "labels": [
+        "cref-002-S12-TC-03",
+        "sdd",
+        "spec-002",
+        "tc-ui",
+        "test-case"
+      ],
+      "fields": {
+        "Test level": "ui",
+        "Persona": "Finance",
+        "AC id": "AC-12.3"
+      }
+    },
+    {
+      "ref": "S12-TC-04",
+      "type": "Subtask",
+      "parent": "12",
+      "parentKey": "KAN-55",
+      "summary": "[002-S12-TC-04] Payout Line page shows agency, ABN, reference, total, count and its Commissions",
+      "description": "Level: ui\nPersona: Finance\nType: positive\nAC: AC-12.3\nSuite: test-cases/002-partner-referral-story-12.sf-tests.yaml",
+      "labels": [
+        "cref-002-S12-TC-04",
+        "sdd",
+        "spec-002",
+        "tc-ui",
+        "test-case"
+      ],
+      "fields": {
+        "Test level": "ui",
+        "Persona": "Finance",
+        "AC id": "AC-12.3"
+      }
+    },
+    {
+      "ref": "S12-TC-05",
+      "type": "Subtask",
+      "parent": "12",
+      "parentKey": "KAN-55",
+      "summary": "[002-S12-TC-05] Partner Referral Lead and Opportunity layouts show the partner referral fields",
+      "description": "Level: ui\nPersona: Sales Rep\nType: positive\nAC: AC-12.4\nSuite: test-cases/002-partner-referral-story-12.sf-tests.yaml",
+      "labels": [
+        "cref-002-S12-TC-05",
+        "sdd",
+        "spec-002",
+        "tc-ui",
+        "test-case"
+      ],
+      "fields": {
+        "Test level": "ui",
+        "Persona": "Sales Rep",
+        "AC id": "AC-12.4"
+      }
+    },
+    {
+      "ref": "S12-TC-06",
+      "type": "Subtask",
+      "parent": "12",
+      "parentKey": "KAN-55",
+      "summary": "[002-S12-TC-06] Partner Referral record type uses the partner layout for every profile that uses it",
+      "description": "Level: manual\nPersona: Admin\nType: positive\nAC: AC-12.4\nScript: .specify/specs/002-partner-referral/task_story_12_test_scripts.md",
+      "labels": [
+        "cref-002-S12-TC-06",
+        "sdd",
+        "spec-002",
+        "tc-manual",
+        "test-case"
+      ],
+      "fields": {
+        "Test level": "manual",
+        "Persona": "Admin",
+        "AC id": "AC-12.4"
+      }
+    },
+    {
+      "ref": "S12-TC-07",
+      "type": "Subtask",
+      "parent": "12",
+      "parentKey": "KAN-55",
+      "summary": "[002-S12-TC-07] Partner users still see only the portal components",
+      "description": "Level: ui\nPersona: Partner Agent\nType: negative\nAC: AC-12.5\nSuite: test-cases/002-partner-referral-story-12.sf-tests.yaml",
+      "labels": [
+        "cref-002-S12-TC-07",
+        "sdd",
+        "spec-002",
+        "tc-ui",
+        "test-case"
+      ],
+      "fields": {
+        "Test level": "ui",
+        "Persona": "Partner Agent",
+        "AC id": "AC-12.5"
+      }
+    },
+    {
+      "ref": "S00-TC-01",
+      "type": "Subtask",
+      "parent": "00",
+      "parentKey": "KAN-43",
+      "summary": "[002-S00-TC-01] The 4 new objects and their design fields exist; Opportunity Key is unique",
+      "description": "Level: unit\nPersona: System\nType: positive\nAC: AC-00.1\nApex unit test",
+      "labels": [
+        "cref-002-S00-TC-01",
+        "sdd",
+        "spec-002",
+        "tc-unit",
+        "test-case"
+      ],
+      "fields": {
+        "Test level": "unit",
+        "Persona": "System",
+        "AC id": "AC-00.1"
+      }
+    },
+    {
+      "ref": "S00-TC-02",
+      "type": "Subtask",
+      "parent": "00",
+      "parentKey": "KAN-43",
+      "summary": "[002-S00-TC-02] Partner Referral Lead offers only the 5 programme statuses and Lead Source \"Partner Referral\"",
+      "description": "Level: ui\nPersona: Sales Rep\nType: positive\nAC: AC-00.2\nSuite: test-cases/002-partner-referral-story-00.sf-tests.yaml",
+      "labels": [
+        "cref-002-S00-TC-02",
+        "sdd",
+        "spec-002",
+        "tc-ui",
+        "test-case"
+      ],
+      "fields": {
+        "Test level": "ui",
+        "Persona": "Sales Rep",
+        "AC id": "AC-00.2"
+      }
+    },
+    {
+      "ref": "S00-TC-03",
+      "type": "Subtask",
+      "parent": "00",
+      "parentKey": "KAN-43",
+      "summary": "[002-S00-TC-03] Partner Referral Opportunity offers the programme stages; other record types are unchanged",
+      "description": "Level: ui\nPersona: Sales Rep\nType: positive\nAC: AC-00.3\nSuite: test-cases/002-partner-referral-story-00.sf-tests.yaml",
+      "labels": [
+        "cref-002-S00-TC-03",
+        "sdd",
+        "spec-002",
+        "tc-ui",
+        "test-case"
+      ],
+      "fields": {
+        "Test level": "ui",
+        "Persona": "Sales Rep",
+        "AC id": "AC-00.3"
+      }
+    },
+    {
+      "ref": "S00-TC-04",
+      "type": "Subtask",
+      "parent": "00",
+      "parentKey": "KAN-43",
+      "summary": "[002-S00-TC-04] Opportunities of other record types keep their original stages",
+      "description": "Level: unit\nPersona: System\nType: negative\nAC: AC-00.3\nApex unit test",
+      "labels": [
+        "cref-002-S00-TC-04",
+        "sdd",
+        "spec-002",
+        "tc-unit",
+        "test-case"
+      ],
+      "fields": {
+        "Test level": "unit",
+        "Persona": "System",
+        "AC id": "AC-00.3"
+      }
+    },
+    {
+      "ref": "S00-TC-05",
+      "type": "Subtask",
+      "parent": "00",
+      "parentKey": "KAN-43",
+      "summary": "[002-S00-TC-05] Lead conversion maps Referral, agency, agent and move-in date onto the Opportunity",
+      "description": "Level: unit\nPersona: System\nType: positive\nAC: AC-00.4\nApex unit test",
+      "labels": [
+        "cref-002-S00-TC-05",
+        "sdd",
+        "spec-002",
+        "tc-unit",
+        "test-case"
+      ],
+      "fields": {
+        "Test level": "unit",
+        "Persona": "System",
+        "AC id": "AC-00.4"
+      }
+    },
+    {
+      "ref": "S00-TC-06",
+      "type": "Subtask",
+      "parent": "00",
+      "parentKey": "KAN-43",
+      "summary": "[002-S00-TC-06] Five Lead queues, \"Connectnow Sales\" business hours and the settings record match the design",
+      "description": "Level: manual\nPersona: Admin\nType: positive\nAC: AC-00.5\nScript: .specify/specs/002-partner-referral/task_story_00_test_scripts.md",
+      "labels": [
+        "cref-002-S00-TC-06",
+        "sdd",
+        "spec-002",
+        "tc-manual",
+        "test-case"
+      ],
+      "fields": {
+        "Test level": "manual",
+        "Persona": "Admin",
+        "AC id": "AC-00.5"
+      }
+    },
+    {
+      "ref": "S00-TC-07",
+      "type": "Subtask",
+      "parent": "00",
+      "parentKey": "KAN-43",
+      "summary": "[002-S00-TC-07] Permission sets, groups and custom permissions exist; external sharing is Private on the new objects",
+      "description": "Level: manual\nPersona: Admin\nType: positive\nAC: AC-00.6\nScript: .specify/specs/002-partner-referral/task_story_00_test_scripts.md",
+      "labels": [
+        "cref-002-S00-TC-07",
+        "sdd",
+        "spec-002",
+        "tc-manual",
+        "test-case"
+      ],
+      "fields": {
+        "Test level": "manual",
+        "Persona": "Admin",
+        "AC id": "AC-00.6"
+      }
+    },
+    {
+      "ref": "S00-TC-08",
+      "type": "Subtask",
+      "parent": "00",
+      "parentKey": "KAN-43",
+      "summary": "[002-S00-TC-08] Partner permission sets grant no access to Lead, Opportunity, Payout Batch or Payout Line",
+      "description": "Level: unit\nPersona: Partner Agent\nType: negative\nAC: AC-00.6\nApex unit test",
+      "labels": [
+        "cref-002-S00-TC-08",
+        "sdd",
+        "spec-002",
+        "tc-unit",
+        "test-case"
+      ],
+      "fields": {
+        "Test level": "unit",
+        "Persona": "Partner Agent",
+        "AC id": "AC-00.6"
+      }
+    },
+    {
+      "ref": "S00-TC-09",
+      "type": "Subtask",
+      "parent": "00",
+      "parentKey": "KAN-43",
+      "summary": "[002-S00-TC-09] Seed script creates the 4 active products in the price book and is idempotent on re-run",
+      "description": "Level: manual\nPersona: Admin\nType: positive\nAC: AC-00.7\nScript: .specify/specs/002-partner-referral/task_story_00_test_scripts.md",
+      "labels": [
+        "cref-002-S00-TC-09",
+        "sdd",
+        "spec-002",
+        "tc-manual",
+        "test-case"
+      ],
+      "fields": {
+        "Test level": "manual",
+        "Persona": "Admin",
+        "AC id": "AC-00.7"
+      }
+    },
+    {
+      "ref": "S00-TC-10",
+      "type": "Subtask",
+      "parent": "00",
+      "parentKey": "KAN-43",
+      "summary": "[002-S00-TC-10] Commission Rate is tracked in Account field history",
+      "description": "Level: manual\nPersona: Admin\nType: positive\nAC: AC-00.8\nScript: .specify/specs/002-partner-referral/task_story_00_test_scripts.md",
+      "labels": [
+        "cref-002-S00-TC-10",
+        "sdd",
+        "spec-002",
+        "tc-manual",
+        "test-case"
+      ],
+      "fields": {
+        "Test level": "manual",
+        "Persona": "Admin",
+        "AC id": "AC-00.8"
+      }
+    },
+    {
+      "ref": "S01-TC-01",
+      "type": "Subtask",
+      "parent": "01",
+      "parentKey": "KAN-44",
+      "summary": "[002-S01-TC-01] A sales rep cannot change an agency's Partner Status",
+      "description": "Level: ui\nPersona: Sales Rep\nType: negative\nAC: AC-01.1\nSuite: test-cases/002-partner-referral-story-01.sf-tests.yaml",
+      "labels": [
+        "cref-002-S01-TC-01",
+        "sdd",
+        "spec-002",
+        "tc-ui",
+        "test-case"
+      ],
+      "fields": {
+        "Test level": "ui",
+        "Persona": "Sales Rep",
+        "AC id": "AC-01.1"
+      }
+    },
+    {
+      "ref": "S01-TC-02",
+      "type": "Subtask",
+      "parent": "01",
+      "parentKey": "KAN-44",
+      "summary": "[002-S01-TC-02] A sales rep cannot change an agency's Commission Rate",
+      "description": "Level: ui\nPersona: Sales Rep\nType: negative\nAC: AC-01.1\nSuite: test-cases/002-partner-referral-story-01.sf-tests.yaml",
+      "labels": [
+        "cref-002-S01-TC-02",
+        "sdd",
+        "spec-002",
+        "tc-ui",
+        "test-case"
+      ],
+      "fields": {
+        "Test level": "ui",
+        "Persona": "Sales Rep",
+        "AC id": "AC-01.1"
+      }
+    },
+    {
+      "ref": "S01-TC-03",
+      "type": "Subtask",
+      "parent": "01",
+      "parentKey": "KAN-44",
+      "summary": "[002-S01-TC-03] A Partner Manager can change an agency's Commission Rate",
+      "description": "Level: ui\nPersona: Partner Manager\nType: positive\nAC: AC-01.1\nSuite: test-cases/002-partner-referral-story-01.sf-tests.yaml",
+      "labels": [
+        "cref-002-S01-TC-03",
+        "sdd",
+        "spec-002",
+        "tc-ui",
+        "test-case"
+      ],
+      "fields": {
+        "Test level": "ui",
+        "Persona": "Partner Manager",
+        "AC id": "AC-01.1"
+      }
+    },
+    {
+      "ref": "S01-TC-04",
+      "type": "Subtask",
+      "parent": "01",
+      "parentKey": "KAN-44",
+      "summary": "[002-S01-TC-04] An ABN with fewer than 11 digits is rejected",
+      "description": "Level: ui\nPersona: Partner Manager\nType: negative\nAC: AC-01.2\nSuite: test-cases/002-partner-referral-story-01.sf-tests.yaml",
+      "labels": [
+        "cref-002-S01-TC-04",
+        "sdd",
+        "spec-002",
+        "tc-ui",
+        "test-case"
+      ],
+      "fields": {
+        "Test level": "ui",
+        "Persona": "Partner Manager",
+        "AC id": "AC-01.2"
+      }
+    },
+    {
+      "ref": "S01-TC-05",
+      "type": "Subtask",
+      "parent": "01",
+      "parentKey": "KAN-44",
+      "summary": "[002-S01-TC-05] ABN boundaries: 12 digits and letters are rejected, exactly 11 digits is accepted",
+      "description": "Level: unit\nPersona: System\nType: boundary\nAC: AC-01.2\nApex unit test",
+      "labels": [
+        "cref-002-S01-TC-05",
+        "sdd",
+        "spec-002",
+        "tc-unit",
+        "test-case"
+      ],
+      "fields": {
+        "Test level": "unit",
+        "Persona": "System",
+        "AC id": "AC-01.2"
+      }
+    },
+    {
+      "ref": "S01-TC-06",
+      "type": "Subtask",
+      "parent": "01",
+      "parentKey": "KAN-44",
+      "summary": "[002-S01-TC-06] A Commission Rate change appears in Account History with old value, new value, user and time",
+      "description": "Level: ui\nPersona: Partner Manager\nType: positive\nAC: AC-01.3\nSuite: test-cases/002-partner-referral-story-01.sf-tests.yaml",
+      "labels": [
+        "cref-002-S01-TC-06",
+        "sdd",
+        "spec-002",
+        "tc-ui",
+        "test-case"
+      ],
+      "fields": {
+        "Test level": "ui",
+        "Persona": "Partner Manager",
+        "AC id": "AC-01.3"
+      }
+    },
+    {
+      "ref": "S01-TC-07",
+      "type": "Subtask",
+      "parent": "01",
+      "parentKey": "KAN-44",
+      "summary": "[002-S01-TC-07] Enabling a Principal contact gives the Executive partner role and PR_Partner_Principal; an Agent gets the User role and PR_Partner_Agent",
+      "description": "Level: unit\nPersona: Partner Manager\nType: positive\nAC: AC-01.4\nApex unit test",
+      "labels": [
+        "cref-002-S01-TC-07",
+        "sdd",
+        "spec-002",
+        "tc-unit",
+        "test-case"
+      ],
+      "fields": {
+        "Test level": "unit",
+        "Persona": "Partner Manager",
+        "AC id": "AC-01.4"
+      }
+    },
+    {
+      "ref": "S01-TC-08",
+      "type": "Subtask",
+      "parent": "01",
+      "parentKey": "KAN-44",
+      "summary": "[002-S01-TC-08] Existing principal and agent users carry the right partner role and permission set",
+      "description": "Level: manual\nPersona: Admin\nType: positive\nAC: AC-01.4\nScript: .specify/specs/002-partner-referral/task_story_01_test_scripts.md",
+      "labels": [
+        "cref-002-S01-TC-08",
+        "sdd",
+        "spec-002",
+        "tc-manual",
+        "test-case"
+      ],
+      "fields": {
+        "Test level": "manual",
+        "Persona": "Admin",
+        "AC id": "AC-01.4"
+      }
+    },
+    {
+      "ref": "S01-TC-09",
+      "type": "Subtask",
+      "parent": "01",
+      "parentKey": "KAN-44",
+      "summary": "[002-S01-TC-09] A newly enabled partner user receives the welcome email, sets a password and logs in",
+      "description": "Level: manual\nPersona: Partner Agent\nType: positive\nAC: AC-01.5\nScript: .specify/specs/002-partner-referral/task_story_01_test_scripts.md",
+      "labels": [
+        "cref-002-S01-TC-09",
+        "sdd",
+        "spec-002",
+        "tc-manual",
+        "test-case"
+      ],
+      "fields": {
+        "Test level": "manual",
+        "Persona": "Partner Agent",
+        "AC id": "AC-01.5"
+      }
+    },
+    {
+      "ref": "S01-TC-10",
+      "type": "Subtask",
+      "parent": "01",
+      "parentKey": "KAN-44",
+      "summary": "[002-S01-TC-10] Users of an Inactive agency can still log in to the portal",
+      "description": "Level: manual\nPersona: Partner Agent\nType: positive\nAC: AC-01.6\nScript: .specify/specs/002-partner-referral/task_story_01_test_scripts.md",
+      "labels": [
+        "cref-002-S01-TC-10",
+        "sdd",
+        "spec-002",
+        "tc-manual",
+        "test-case"
+      ],
+      "fields": {
+        "Test level": "manual",
+        "Persona": "Partner Agent",
+        "AC id": "AC-01.6"
+      }
+    },
+    {
+      "ref": "S01-TC-11",
+      "type": "Subtask",
+      "parent": "01",
+      "parentKey": "KAN-44",
+      "summary": "[002-S01-TC-11] Many partner users enabled in one transaction get roles and permission sets without errors (50 users, licence limit)",
+      "description": "Level: unit\nPersona: System\nType: bulk\nAC: AC-01.7\nApex unit test",
+      "labels": [
+        "cref-002-S01-TC-11",
+        "sdd",
+        "spec-002",
+        "tc-unit",
+        "test-case"
+      ],
+      "fields": {
+        "Test level": "unit",
+        "Persona": "System",
+        "AC id": "AC-01.7"
+      }
+    },
+    {
+      "ref": "S02-TC-01",
+      "type": "Subtask",
+      "parent": "02",
+      "parentKey": "KAN-45",
+      "summary": "[002-S02-TC-01] An agent submits a complete referral and sees the confirmation",
+      "description": "Level: ui\nPersona: Partner Agent\nType: positive\nAC: AC-02.10\nSuite: test-cases/002-partner-referral-story-02.sf-tests.yaml",
+      "labels": [
+        "cref-002-S02-TC-01",
+        "sdd",
+        "spec-002",
+        "tc-ui",
+        "test-case"
+      ],
+      "fields": {
+        "Test level": "ui",
+        "Persona": "Partner Agent",
+        "AC id": "AC-02.10"
+      }
+    },
+    {
+      "ref": "S02-TC-02",
+      "type": "Subtask",
+      "parent": "02",
+      "parentKey": "KAN-45",
+      "summary": "[002-S02-TC-02] The submitted referral creates one Referral owned by the agent and one linked Partner Referral Lead with state code",
+      "description": "Level: ui\nPersona: Admin\nType: positive\nAC: AC-02.10\nSuite: test-cases/002-partner-referral-story-02.sf-tests.yaml",
+      "labels": [
+        "cref-002-S02-TC-02",
+        "sdd",
+        "spec-002",
+        "tc-ui",
+        "test-case"
+      ],
+      "fields": {
+        "Test level": "ui",
+        "Persona": "Admin",
+        "AC id": "AC-02.10"
+      }
+    },
+    {
+      "ref": "S02-TC-03",
+      "type": "Subtask",
+      "parent": "02",
+      "parentKey": "KAN-45",
+      "summary": "[002-S02-TC-03] Submitting an empty form shows a message on every required field",
+      "description": "Level: ui\nPersona: Partner Agent\nType: negative\nAC: AC-02.2\nSuite: test-cases/002-partner-referral-story-02.sf-tests.yaml",
+      "labels": [
+        "cref-002-S02-TC-03",
+        "sdd",
+        "spec-002",
+        "tc-ui",
+        "test-case"
+      ],
+      "fields": {
+        "Test level": "ui",
+        "Persona": "Partner Agent",
+        "AC id": "AC-02.2"
+      }
+    },
+    {
+      "ref": "S02-TC-04",
+      "type": "Subtask",
+      "parent": "02",
+      "parentKey": "KAN-45",
+      "summary": "[002-S02-TC-04] Optional fields left blank do not block submission",
+      "description": "Level: unit\nPersona: Partner Agent\nType: positive\nAC: AC-02.2\nApex unit test",
+      "labels": [
+        "cref-002-S02-TC-04",
+        "sdd",
+        "spec-002",
+        "tc-unit",
+        "test-case"
+      ],
+      "fields": {
+        "Test level": "unit",
+        "Persona": "Partner Agent",
+        "AC id": "AC-02.2"
+      }
+    },
+    {
+      "ref": "S02-TC-05",
+      "type": "Subtask",
+      "parent": "02",
+      "parentKey": "KAN-45",
+      "summary": "[002-S02-TC-05] A landline number is rejected as Mobile",
+      "description": "Level: ui\nPersona: Partner Agent\nType: negative\nAC: AC-02.3\nSuite: test-cases/002-partner-referral-story-02.sf-tests.yaml",
+      "labels": [
+        "cref-002-S02-TC-05",
+        "sdd",
+        "spec-002",
+        "tc-ui",
+        "test-case"
+      ],
+      "fields": {
+        "Test level": "ui",
+        "Persona": "Partner Agent",
+        "AC id": "AC-02.3"
+      }
+    },
+    {
+      "ref": "S02-TC-06",
+      "type": "Subtask",
+      "parent": "02",
+      "parentKey": "KAN-45",
+      "summary": "[002-S02-TC-06] A +614 mobile with spaces is accepted",
+      "description": "Level: ui\nPersona: Partner Agent\nType: positive\nAC: AC-02.3\nSuite: test-cases/002-partner-referral-story-02.sf-tests.yaml",
+      "labels": [
+        "cref-002-S02-TC-06",
+        "sdd",
+        "spec-002",
+        "tc-ui",
+        "test-case"
+      ],
+      "fields": {
+        "Test level": "ui",
+        "Persona": "Partner Agent",
+        "AC id": "AC-02.3"
+      }
+    },
+    {
+      "ref": "S02-TC-07",
+      "type": "Subtask",
+      "parent": "02",
+      "parentKey": "KAN-45",
+      "summary": "[002-S02-TC-07] Mobile formats: 04+8 and +614+8 digits pass, 9 or 11 digits and landlines fail, also in the service",
+      "description": "Level: unit\nPersona: System\nType: boundary\nAC: AC-02.3\nApex unit test",
+      "labels": [
+        "cref-002-S02-TC-07",
+        "sdd",
+        "spec-002",
+        "tc-unit",
+        "test-case"
+      ],
+      "fields": {
+        "Test level": "unit",
+        "Persona": "System",
+        "AC id": "AC-02.3"
+      }
+    },
+    {
+      "ref": "S02-TC-08",
+      "type": "Subtask",
+      "parent": "02",
+      "parentKey": "KAN-45",
+      "summary": "[002-S02-TC-08] A move-in date 8 days in the past is rejected",
+      "description": "Level: ui\nPersona: Partner Agent\nType: negative\nAC: AC-02.4\nSuite: test-cases/002-partner-referral-story-02.sf-tests.yaml",
+      "labels": [
+        "cref-002-S02-TC-08",
+        "sdd",
+        "spec-002",
+        "tc-ui",
+        "test-case"
+      ],
+      "fields": {
+        "Test level": "ui",
+        "Persona": "Partner Agent",
+        "AC id": "AC-02.4"
+      }
+    },
+    {
+      "ref": "S02-TC-09",
+      "type": "Subtask",
+      "parent": "02",
+      "parentKey": "KAN-45",
+      "summary": "[002-S02-TC-09] A move-in date more than 6 months ahead is rejected",
+      "description": "Level: ui\nPersona: Partner Agent\nType: negative\nAC: AC-02.4\nSuite: test-cases/002-partner-referral-story-02.sf-tests.yaml",
+      "labels": [
+        "cref-002-S02-TC-09",
+        "sdd",
+        "spec-002",
+        "tc-ui",
+        "test-case"
+      ],
+      "fields": {
+        "Test level": "ui",
+        "Persona": "Partner Agent",
+        "AC id": "AC-02.4"
+      }
+    },
+    {
+      "ref": "S02-TC-10",
+      "type": "Subtask",
+      "parent": "02",
+      "parentKey": "KAN-45",
+      "summary": "[002-S02-TC-10] Boundary dates today -7 days and today +6 months are accepted; one day beyond each is rejected",
+      "description": "Level: unit\nPersona: System\nType: boundary\nAC: AC-02.4\nApex unit test",
+      "labels": [
+        "cref-002-S02-TC-10",
+        "sdd",
+        "spec-002",
+        "tc-unit",
+        "test-case"
+      ],
+      "fields": {
+        "Test level": "unit",
+        "Persona": "System",
+        "AC id": "AC-02.4"
+      }
+    },
+    {
+      "ref": "S02-TC-11",
+      "type": "Subtask",
+      "parent": "02",
+      "parentKey": "KAN-45",
+      "summary": "[002-S02-TC-11] Consent time and version are stamped on save and read-only to the partner",
+      "description": "Level: unit\nPersona: Partner Agent\nType: positive\nAC: AC-02.5\nApex unit test",
+      "labels": [
+        "cref-002-S02-TC-11",
+        "sdd",
+        "spec-002",
+        "tc-unit",
+        "test-case"
+      ],
+      "fields": {
+        "Test level": "unit",
+        "Persona": "Partner Agent",
+        "AC id": "AC-02.5"
+      }
+    },
+    {
+      "ref": "S02-TC-12",
+      "type": "Subtask",
+      "parent": "02",
+      "parentKey": "KAN-45",
+      "summary": "[002-S02-TC-12] Agent and agency come from the running user; values in the request are ignored",
+      "description": "Level: unit\nPersona: Partner Agent\nType: negative\nAC: AC-02.6\nApex unit test",
+      "labels": [
+        "cref-002-S02-TC-12",
+        "sdd",
+        "spec-002",
+        "tc-unit",
+        "test-case"
+      ],
+      "fields": {
+        "Test level": "unit",
+        "Persona": "Partner Agent",
+        "AC id": "AC-02.6"
+      }
+    },
+    {
+      "ref": "S02-TC-13",
+      "type": "Subtask",
+      "parent": "02",
+      "parentKey": "KAN-45",
+      "summary": "[002-S02-TC-13] An agent of an inactive agency cannot submit and nothing is created",
+      "description": "Level: ui\nPersona: Partner Agent\nType: negative\nAC: AC-02.7\nSuite: test-cases/002-partner-referral-story-02.sf-tests.yaml",
+      "labels": [
+        "cref-002-S02-TC-13",
+        "sdd",
+        "spec-002",
+        "tc-ui",
+        "test-case"
+      ],
+      "fields": {
+        "Test level": "ui",
+        "Persona": "Partner Agent",
+        "AC id": "AC-02.7"
+      }
+    },
+    {
+      "ref": "S02-TC-14",
+      "type": "Subtask",
+      "parent": "02",
+      "parentKey": "KAN-45",
+      "summary": "[002-S02-TC-14] Inactive agency: no Referral or Lead is created (service level)",
+      "description": "Level: unit\nPersona: System\nType: negative\nAC: AC-02.7\nApex unit test",
+      "labels": [
+        "cref-002-S02-TC-14",
+        "sdd",
+        "spec-002",
+        "tc-unit",
+        "test-case"
+      ],
+      "fields": {
+        "Test level": "unit",
+        "Persona": "System",
+        "AC id": "AC-02.7"
+      }
+    },
+    {
+      "ref": "S02-TC-15",
+      "type": "Subtask",
+      "parent": "02",
+      "parentKey": "KAN-45",
+      "summary": "[002-S02-TC-15] Same-agency duplicate shows a warning and can be sent anyway",
+      "description": "Level: ui\nPersona: Partner Agent\nType: positive\nAC: AC-02.8\nSuite: test-cases/002-partner-referral-story-02.sf-tests.yaml",
+      "labels": [
+        "cref-002-S02-TC-15",
+        "sdd",
+        "spec-002",
+        "tc-ui",
+        "test-case"
+      ],
+      "fields": {
+        "Test level": "ui",
+        "Persona": "Partner Agent",
+        "AC id": "AC-02.8"
+      }
+    },
+    {
+      "ref": "S02-TC-16",
+      "type": "Subtask",
+      "parent": "02",
+      "parentKey": "KAN-45",
+      "summary": "[002-S02-TC-16] No warning when the earlier referral is Connected or Closed Lost, or when emails differ",
+      "description": "Level: unit\nPersona: System\nType: negative\nAC: AC-02.8\nApex unit test",
+      "labels": [
+        "cref-002-S02-TC-16",
+        "sdd",
+        "spec-002",
+        "tc-unit",
+        "test-case"
+      ],
+      "fields": {
+        "Test level": "unit",
+        "Persona": "System",
+        "AC id": "AC-02.8"
+      }
+    },
+    {
+      "ref": "S02-TC-17",
+      "type": "Subtask",
+      "parent": "02",
+      "parentKey": "KAN-45",
+      "summary": "[002-S02-TC-17] Cross-agency match submits silently",
+      "description": "Level: ui\nPersona: Partner Agent\nType: positive\nAC: AC-02.9\nSuite: test-cases/002-partner-referral-story-02.sf-tests.yaml",
+      "labels": [
+        "cref-002-S02-TC-17",
+        "sdd",
+        "spec-002",
+        "tc-ui",
+        "test-case"
+      ],
+      "fields": {
+        "Test level": "ui",
+        "Persona": "Partner Agent",
+        "AC id": "AC-02.9"
+      }
+    },
+    {
+      "ref": "S02-TC-18",
+      "type": "Subtask",
+      "parent": "02",
+      "parentKey": "KAN-45",
+      "summary": "[002-S02-TC-18] Cross-agency match flags Possible Duplicate on both referrals (internal only)",
+      "description": "Level: ui\nPersona: Admin\nType: positive\nAC: AC-02.9\nSuite: test-cases/002-partner-referral-story-02.sf-tests.yaml",
+      "labels": [
+        "cref-002-S02-TC-18",
+        "sdd",
+        "spec-002",
+        "tc-ui",
+        "test-case"
+      ],
+      "fields": {
+        "Test level": "ui",
+        "Persona": "Admin",
+        "AC id": "AC-02.9"
+      }
+    },
+    {
+      "ref": "S02-TC-19",
+      "type": "Subtask",
+      "parent": "02",
+      "parentKey": "KAN-45",
+      "summary": "[002-S02-TC-19] A cross-agency match whose Lead cannot be flagged saves nothing",
+      "description": "Level: unit\nPersona: System\nType: negative\nAC: AC-02.9\nApex unit test",
+      "labels": [
+        "cref-002-S02-TC-19",
+        "sdd",
+        "spec-002",
+        "tc-unit",
+        "test-case"
+      ],
+      "fields": {
+        "Test level": "unit",
+        "Persona": "System",
+        "AC id": "AC-02.9"
+      }
+    },
+    {
+      "ref": "S02-TC-20",
+      "type": "Subtask",
+      "parent": "02",
+      "parentKey": "KAN-45",
+      "summary": "[002-S02-TC-20] Invalid data sent straight to the service is rejected by the same rules",
+      "description": "Level: unit\nPersona: Partner Agent\nType: negative\nAC: AC-02.11\nApex unit test",
+      "labels": [
+        "cref-002-S02-TC-20",
+        "sdd",
+        "spec-002",
+        "tc-unit",
+        "test-case"
+      ],
+      "fields": {
+        "Test level": "unit",
+        "Persona": "Partner Agent",
+        "AC id": "AC-02.11"
+      }
+    },
+    {
+      "ref": "S02-TC-21",
+      "type": "Subtask",
+      "parent": "02",
+      "parentKey": "KAN-45",
+      "summary": "[002-S02-TC-21] 200 submissions in one transaction succeed within governor limits",
+      "description": "Level: unit\nPersona: System\nType: bulk\nAC: AC-02.12\nApex unit test",
+      "labels": [
+        "cref-002-S02-TC-21",
+        "sdd",
+        "spec-002",
+        "tc-unit",
+        "test-case"
+      ],
+      "fields": {
+        "Test level": "unit",
+        "Persona": "System",
+        "AC id": "AC-02.12"
+      }
+    },
+    {
+      "ref": "S02-TC-22",
+      "type": "Subtask",
+      "parent": "02",
+      "parentKey": "KAN-45",
+      "summary": "[002-S02-TC-22] The referral form fits a 375 px phone with no horizontal scrolling",
+      "description": "Level: manual\nPersona: Partner Agent\nType: positive\nAC: AC-02.1\nScript: .specify/specs/002-partner-referral/task_story_02_test_scripts.md",
+      "labels": [
+        "cref-002-S02-TC-22",
+        "sdd",
+        "spec-002",
+        "tc-manual",
+        "test-case"
+      ],
+      "fields": {
+        "Test level": "manual",
+        "Persona": "Partner Agent",
+        "AC id": "AC-02.1"
+      }
+    },
+    {
+      "ref": "S02-TC-23",
+      "type": "Subtask",
+      "parent": "02",
+      "parentKey": "KAN-45",
+      "summary": "[002-S02-TC-23] Internal users (not partners) cannot submit referrals through the service",
+      "description": "Level: unit\nPersona: Sales Rep\nType: negative\nAC: AC-02.10\nApex unit test",
+      "labels": [
+        "cref-002-S02-TC-23",
+        "sdd",
+        "spec-002",
+        "tc-unit",
+        "test-case"
+      ],
+      "fields": {
+        "Test level": "unit",
+        "Persona": "Sales Rep",
+        "AC id": "AC-02.10"
+      }
+    },
+    {
+      "ref": "S03-TC-01",
+      "type": "Subtask",
+      "parent": "03",
+      "parentKey": "KAN-46",
+      "summary": "[002-S03-TC-01] A VIC Partner Referral Lead is routed to PR_VIC_TAS",
+      "description": "Level: ui\nPersona: Admin\nType: positive\nAC: AC-03.1\nSuite: test-cases/002-partner-referral-story-03.sf-tests.yaml",
+      "labels": [
+        "cref-002-S03-TC-01",
+        "sdd",
+        "spec-002",
+        "tc-ui",
+        "test-case"
+      ],
+      "fields": {
+        "Test level": "ui",
+        "Persona": "Admin",
+        "AC id": "AC-03.1"
+      }
+    },
+    {
+      "ref": "S03-TC-02",
+      "type": "Subtask",
+      "parent": "03",
+      "parentKey": "KAN-46",
+      "summary": "[002-S03-TC-02] Each state routes to its queue (NSW/ACT, VIC/TAS, QLD, SA/WA/NT) and no state goes to PR_Unassigned",
+      "description": "Level: unit\nPersona: System\nType: positive\nAC: AC-03.1\nApex unit test",
+      "labels": [
+        "cref-002-S03-TC-02",
+        "sdd",
+        "spec-002",
+        "tc-unit",
+        "test-case"
+      ],
+      "fields": {
+        "Test level": "unit",
+        "Persona": "System",
+        "AC id": "AC-03.1"
+      }
+    },
+    {
+      "ref": "S03-TC-03",
+      "type": "Subtask",
+      "parent": "03",
+      "parentKey": "KAN-46",
+      "summary": "[002-S03-TC-03] A Lead with move-in inside 48 hours is urgent",
+      "description": "Level: ui\nPersona: Admin\nType: positive\nAC: AC-03.2\nSuite: test-cases/002-partner-referral-story-03.sf-tests.yaml",
+      "labels": [
+        "cref-002-S03-TC-03",
+        "sdd",
+        "spec-002",
+        "tc-ui",
+        "test-case"
+      ],
+      "fields": {
+        "Test level": "ui",
+        "Persona": "Admin",
+        "AC id": "AC-03.2"
+      }
+    },
+    {
+      "ref": "S03-TC-04",
+      "type": "Subtask",
+      "parent": "03",
+      "parentKey": "KAN-46",
+      "summary": "[002-S03-TC-04] Urgent Lead: queue members get a bell notification and the queue email receives a message",
+      "description": "Level: manual\nPersona: Sales Rep\nType: positive\nAC: AC-03.2\nScript: .specify/specs/002-partner-referral/task_story_03_test_scripts.md",
+      "labels": [
+        "cref-002-S03-TC-04",
+        "sdd",
+        "spec-002",
+        "tc-manual",
+        "test-case"
+      ],
+      "fields": {
+        "Test level": "manual",
+        "Persona": "Sales Rep",
+        "AC id": "AC-03.2"
+      }
+    },
+    {
+      "ref": "S03-TC-05",
+      "type": "Subtask",
+      "parent": "03",
+      "parentKey": "KAN-46",
+      "summary": "[002-S03-TC-05] Move-in changed into the window makes the Lead urgent and notifies once; out of the window clears it and sends nothing",
+      "description": "Level: unit\nPersona: System\nType: positive\nAC: AC-03.3\nApex unit test",
+      "labels": [
+        "cref-002-S03-TC-05",
+        "sdd",
+        "spec-002",
+        "tc-unit",
+        "test-case"
+      ],
+      "fields": {
+        "Test level": "unit",
+        "Persona": "System",
+        "AC id": "AC-03.3"
+      }
+    },
+    {
+      "ref": "S03-TC-06",
+      "type": "Subtask",
+      "parent": "03",
+      "parentKey": "KAN-46",
+      "summary": "[002-S03-TC-06] Scheduled check sends the urgent notification at move-in minus 2 days",
+      "description": "Level: manual\nPersona: Sales Rep\nType: positive\nAC: AC-03.4\nScript: .specify/specs/002-partner-referral/task_story_03_test_scripts.md",
+      "labels": [
+        "cref-002-S03-TC-06",
+        "sdd",
+        "spec-002",
+        "tc-manual",
+        "test-case"
+      ],
+      "fields": {
+        "Test level": "manual",
+        "Persona": "Sales Rep",
+        "AC id": "AC-03.4"
+      }
+    },
+    {
+      "ref": "S03-TC-07",
+      "type": "Subtask",
+      "parent": "03",
+      "parentKey": "KAN-46",
+      "summary": "[002-S03-TC-07] SLA Due At is 2 business hours later on the Connectnow Sales calendar (Saturday 19:30 -> Monday 09:30)",
+      "description": "Level: unit\nPersona: System\nType: boundary\nAC: AC-03.5\nApex unit test",
+      "labels": [
+        "cref-002-S03-TC-07",
+        "sdd",
+        "spec-002",
+        "tc-unit",
+        "test-case"
+      ],
+      "fields": {
+        "Test level": "unit",
+        "Persona": "System",
+        "AC id": "AC-03.5"
+      }
+    },
+    {
+      "ref": "S03-TC-08",
+      "type": "Subtask",
+      "parent": "03",
+      "parentKey": "KAN-46",
+      "summary": "[002-S03-TC-08] A new Lead shows SLA Due At",
+      "description": "Level: ui\nPersona: Admin\nType: positive\nAC: AC-03.5\nSuite: test-cases/002-partner-referral-story-03.sf-tests.yaml",
+      "labels": [
+        "cref-002-S03-TC-08",
+        "sdd",
+        "spec-002",
+        "tc-ui",
+        "test-case"
+      ],
+      "fields": {
+        "Test level": "ui",
+        "Persona": "Admin",
+        "AC id": "AC-03.5"
+      }
+    },
+    {
+      "ref": "S03-TC-09",
+      "type": "Subtask",
+      "parent": "03",
+      "parentKey": "KAN-46",
+      "summary": "[002-S03-TC-09] First move to Working stamps First Contacted At",
+      "description": "Level: ui\nPersona: Sales Rep\nType: positive\nAC: AC-03.6\nSuite: test-cases/002-partner-referral-story-03.sf-tests.yaml",
+      "labels": [
+        "cref-002-S03-TC-09",
+        "sdd",
+        "spec-002",
+        "tc-ui",
+        "test-case"
+      ],
+      "fields": {
+        "Test level": "ui",
+        "Persona": "Sales Rep",
+        "AC id": "AC-03.6"
+      }
+    },
+    {
+      "ref": "S03-TC-10",
+      "type": "Subtask",
+      "parent": "03",
+      "parentKey": "KAN-46",
+      "summary": "[002-S03-TC-10] Later moves to Working keep the first stamp; first contact after SLA Due At sets SLA Breached",
+      "description": "Level: unit\nPersona: System\nType: boundary\nAC: AC-03.6\nApex unit test",
+      "labels": [
+        "cref-002-S03-TC-10",
+        "sdd",
+        "spec-002",
+        "tc-unit",
+        "test-case"
+      ],
+      "fields": {
+        "Test level": "unit",
+        "Persona": "System",
+        "AC id": "AC-03.6"
+      }
+    },
+    {
+      "ref": "S03-TC-11",
+      "type": "Subtask",
+      "parent": "03",
+      "parentKey": "KAN-46",
+      "summary": "[002-S03-TC-11] A queue list view puts urgent Leads first, then by move-in date",
+      "description": "Level: ui\nPersona: Sales Rep\nType: positive\nAC: AC-03.7\nSuite: test-cases/002-partner-referral-story-03.sf-tests.yaml",
+      "labels": [
+        "cref-002-S03-TC-11",
+        "sdd",
+        "spec-002",
+        "tc-ui",
+        "test-case"
+      ],
+      "fields": {
+        "Test level": "ui",
+        "Persona": "Sales Rep",
+        "AC id": "AC-03.7"
+      }
+    },
+    {
+      "ref": "S03-TC-12",
+      "type": "Subtask",
+      "parent": "03",
+      "parentKey": "KAN-46",
+      "summary": "[002-S03-TC-12] 200 Leads inserted together get correct routing, urgency and SLA fields",
+      "description": "Level: unit\nPersona: System\nType: bulk\nAC: AC-03.8\nApex unit test",
+      "labels": [
+        "cref-002-S03-TC-12",
+        "sdd",
+        "spec-002",
+        "tc-unit",
+        "test-case"
+      ],
+      "fields": {
+        "Test level": "unit",
+        "Persona": "System",
+        "AC id": "AC-03.8"
+      }
+    },
+    {
+      "ref": "S03-TC-13",
+      "type": "Subtask",
+      "parent": "03",
+      "parentKey": "KAN-46",
+      "summary": "[002-S03-TC-13] Leads of other record types are not routed, flagged or SLA-stamped",
+      "description": "Level: unit\nPersona: System\nType: negative\nAC: AC-03.9\nApex unit test",
+      "labels": [
+        "cref-002-S03-TC-13",
+        "sdd",
+        "spec-002",
+        "tc-unit",
+        "test-case"
+      ],
+      "fields": {
+        "Test level": "unit",
+        "Persona": "System",
+        "AC id": "AC-03.9"
+      }
+    },
+    {
+      "ref": "S04-TC-01",
+      "type": "Subtask",
+      "parent": "04",
+      "parentKey": "KAN-47",
+      "summary": "[002-S04-TC-01] Partner status follows Lead and Opportunity changes through every mapping",
+      "description": "Level: unit\nPersona: System\nType: positive\nAC: AC-04.1\nApex unit test",
+      "labels": [
+        "cref-002-S04-TC-01",
+        "sdd",
+        "spec-002",
+        "tc-unit",
+        "test-case"
+      ],
+      "fields": {
+        "Test level": "unit",
+        "Persona": "System",
+        "AC id": "AC-04.1"
+      }
+    },
+    {
+      "ref": "S04-TC-02",
+      "type": "Subtask",
+      "parent": "04",
+      "parentKey": "KAN-47",
+      "summary": "[002-S04-TC-02] A Lead moved to Working shows \"In Progress\" to the agent",
+      "description": "Level: ui\nPersona: Partner Agent\nType: positive\nAC: AC-04.1\nSuite: test-cases/002-partner-referral-story-04.sf-tests.yaml",
+      "labels": [
+        "cref-002-S04-TC-02",
+        "sdd",
+        "spec-002",
+        "tc-ui",
+        "test-case"
+      ],
+      "fields": {
+        "Test level": "ui",
+        "Persona": "Partner Agent",
+        "AC id": "AC-04.1"
+      }
+    },
+    {
+      "ref": "S04-TC-03",
+      "type": "Subtask",
+      "parent": "04",
+      "parentKey": "KAN-47",
+      "summary": "[002-S04-TC-03] Rep first name only when a user owns the Lead; blank when a queue owns it",
+      "description": "Level: unit\nPersona: System\nType: positive\nAC: AC-04.2\nApex unit test",
+      "labels": [
+        "cref-002-S04-TC-03",
+        "sdd",
+        "spec-002",
+        "tc-unit",
+        "test-case"
+      ],
+      "fields": {
+        "Test level": "unit",
+        "Persona": "System",
+        "AC id": "AC-04.2"
+      }
+    },
+    {
+      "ref": "S04-TC-04",
+      "type": "Subtask",
+      "parent": "04",
+      "parentKey": "KAN-47",
+      "summary": "[002-S04-TC-04] An agent sees only their own referrals with the partner-safe columns",
+      "description": "Level: ui\nPersona: Partner Agent\nType: positive\nAC: AC-04.3\nSuite: test-cases/002-partner-referral-story-04.sf-tests.yaml",
+      "labels": [
+        "cref-002-S04-TC-04",
+        "sdd",
+        "spec-002",
+        "tc-ui",
+        "test-case"
+      ],
+      "fields": {
+        "Test level": "ui",
+        "Persona": "Partner Agent",
+        "AC id": "AC-04.3"
+      }
+    },
+    {
+      "ref": "S04-TC-05",
+      "type": "Subtask",
+      "parent": "04",
+      "parentKey": "KAN-47",
+      "summary": "[002-S04-TC-05] A principal sees every referral of their agency",
+      "description": "Level: ui\nPersona: Partner Principal\nType: positive\nAC: AC-04.4\nSuite: test-cases/002-partner-referral-story-04.sf-tests.yaml",
+      "labels": [
+        "cref-002-S04-TC-05",
+        "sdd",
+        "spec-002",
+        "tc-ui",
+        "test-case"
+      ],
+      "fields": {
+        "Test level": "ui",
+        "Persona": "Partner Principal",
+        "AC id": "AC-04.4"
+      }
+    },
+    {
+      "ref": "S04-TC-06",
+      "type": "Subtask",
+      "parent": "04",
+      "parentKey": "KAN-47",
+      "summary": "[002-S04-TC-06] Agency B's principal sees none of agency A's referrals",
+      "description": "Level: ui\nPersona: Partner Principal\nType: negative\nAC: AC-04.5\nSuite: test-cases/002-partner-referral-story-04.sf-tests.yaml",
+      "labels": [
+        "cref-002-S04-TC-06",
+        "sdd",
+        "spec-002",
+        "tc-ui",
+        "test-case"
+      ],
+      "fields": {
+        "Test level": "ui",
+        "Persona": "Partner Principal",
+        "AC id": "AC-04.5"
+      }
+    },
+    {
+      "ref": "S04-TC-07",
+      "type": "Subtask",
+      "parent": "04",
+      "parentKey": "KAN-47",
+      "summary": "[002-S04-TC-07] Partner users cannot read other agencies' referrals, Leads or Opportunities through Apex, LWCs or the API",
+      "description": "Level: unit\nPersona: Partner Agent\nType: negative\nAC: AC-04.5\nApex unit test",
+      "labels": [
+        "cref-002-S04-TC-07",
+        "sdd",
+        "spec-002",
+        "tc-unit",
+        "test-case"
+      ],
+      "fields": {
+        "Test level": "unit",
+        "Persona": "Partner Agent",
+        "AC id": "AC-04.5"
+      }
+    },
+    {
+      "ref": "S04-TC-08",
+      "type": "Subtask",
+      "parent": "04",
+      "parentKey": "KAN-47",
+      "summary": "[002-S04-TC-08] Partner user is refused a Lead or another agency's Referral by direct URL",
+      "description": "Level: manual\nPersona: Partner Agent\nType: negative\nAC: AC-04.5\nScript: .specify/specs/002-partner-referral/task_story_04_test_scripts.md",
+      "labels": [
+        "cref-002-S04-TC-08",
+        "sdd",
+        "spec-002",
+        "tc-manual",
+        "test-case"
+      ],
+      "fields": {
+        "Test level": "manual",
+        "Persona": "Partner Agent",
+        "AC id": "AC-04.5"
+      }
+    },
+    {
+      "ref": "S04-TC-09",
+      "type": "Subtask",
+      "parent": "04",
+      "parentKey": "KAN-47",
+      "summary": "[002-S04-TC-09] Home page counts this month's visible referrals by partner status",
+      "description": "Level: ui\nPersona: Partner Agent\nType: positive\nAC: AC-04.6\nSuite: test-cases/002-partner-referral-story-04.sf-tests.yaml",
+      "labels": [
+        "cref-002-S04-TC-09",
+        "sdd",
+        "spec-002",
+        "tc-ui",
+        "test-case"
+      ],
+      "fields": {
+        "Test level": "ui",
+        "Persona": "Partner Agent",
+        "AC id": "AC-04.6"
+      }
+    },
+    {
+      "ref": "S04-TC-10",
+      "type": "Subtask",
+      "parent": "04",
+      "parentKey": "KAN-47",
+      "summary": "[002-S04-TC-10] A converted referral stays visible with the Opportunity's status",
+      "description": "Level: unit\nPersona: System\nType: positive\nAC: AC-04.7\nApex unit test",
+      "labels": [
+        "cref-002-S04-TC-10",
+        "sdd",
+        "spec-002",
+        "tc-unit",
+        "test-case"
+      ],
+      "fields": {
+        "Test level": "unit",
+        "Persona": "System",
+        "AC id": "AC-04.7"
+      }
+    },
+    {
+      "ref": "S04-TC-11",
+      "type": "Subtask",
+      "parent": "04",
+      "parentKey": "KAN-47",
+      "summary": "[002-S04-TC-11] 200 Leads or Opportunities updated together update all related Referrals",
+      "description": "Level: unit\nPersona: System\nType: bulk\nAC: AC-04.8\nApex unit test",
+      "labels": [
+        "cref-002-S04-TC-11",
+        "sdd",
+        "spec-002",
+        "tc-unit",
+        "test-case"
+      ],
+      "fields": {
+        "Test level": "unit",
+        "Persona": "System",
+        "AC id": "AC-04.8"
+      }
+    },
+    {
+      "ref": "S04-TC-12",
+      "type": "Subtask",
+      "parent": "04",
+      "parentKey": "KAN-47",
+      "summary": "[002-S04-TC-12] Tracker and home page fit a 375 px phone",
+      "description": "Level: manual\nPersona: Partner Agent\nType: positive\nAC: AC-04.9\nScript: .specify/specs/002-partner-referral/task_story_04_test_scripts.md",
+      "labels": [
+        "cref-002-S04-TC-12",
+        "sdd",
+        "spec-002",
+        "tc-manual",
+        "test-case"
+      ],
+      "fields": {
+        "Test level": "manual",
+        "Persona": "Partner Agent",
+        "AC id": "AC-04.9"
+      }
+    },
+    {
+      "ref": "S05-TC-01",
+      "type": "Subtask",
+      "parent": "05",
+      "parentKey": "KAN-48",
+      "summary": "[002-S05-TC-01] Converting a Partner Referral Lead creates a Person Account and a Partner Referral Opportunity at Qualification",
+      "description": "Level: ui\nPersona: Sales Rep\nType: positive\nAC: AC-05.1\nSuite: test-cases/002-partner-referral-story-05.sf-tests.yaml",
+      "labels": [
+        "cref-002-S05-TC-01",
+        "sdd",
+        "spec-002",
+        "tc-ui",
+        "test-case"
+      ],
+      "fields": {
+        "Test level": "ui",
+        "Persona": "Sales Rep",
+        "AC id": "AC-05.1"
+      }
+    },
+    {
+      "ref": "S05-TC-02",
+      "type": "Subtask",
+      "parent": "05",
+      "parentKey": "KAN-48",
+      "summary": "[002-S05-TC-02] The converted Opportunity has exactly the Lead's utilities as products",
+      "description": "Level: ui\nPersona: Sales Rep\nType: positive\nAC: AC-05.2\nSuite: test-cases/002-partner-referral-story-05.sf-tests.yaml",
+      "labels": [
+        "cref-002-S05-TC-02",
+        "sdd",
+        "spec-002",
+        "tc-ui",
+        "test-case"
+      ],
+      "fields": {
+        "Test level": "ui",
+        "Persona": "Sales Rep",
+        "AC id": "AC-05.2"
+      }
+    },
+    {
+      "ref": "S05-TC-03",
+      "type": "Subtask",
+      "parent": "05",
+      "parentKey": "KAN-48",
+      "summary": "[002-S05-TC-03] The Opportunity carries agency, agent, Referral and move-in date; the Referral links to it",
+      "description": "Level: unit\nPersona: System\nType: positive\nAC: AC-05.3\nApex unit test",
+      "labels": [
+        "cref-002-S05-TC-03",
+        "sdd",
+        "spec-002",
+        "tc-unit",
+        "test-case"
+      ],
+      "fields": {
+        "Test level": "unit",
+        "Persona": "System",
+        "AC id": "AC-05.3"
+      }
+    },
+    {
+      "ref": "S05-TC-04",
+      "type": "Subtask",
+      "parent": "05",
+      "parentKey": "KAN-48",
+      "summary": "[002-S05-TC-04] A rep can delete a product that will not be connected before Utilities Connected",
+      "description": "Level: ui\nPersona: Sales Rep\nType: positive\nAC: AC-05.4\nSuite: test-cases/002-partner-referral-story-05.sf-tests.yaml",
+      "labels": [
+        "cref-002-S05-TC-04",
+        "sdd",
+        "spec-002",
+        "tc-ui",
+        "test-case"
+      ],
+      "fields": {
+        "Test level": "ui",
+        "Persona": "Sales Rep",
+        "AC id": "AC-05.4"
+      }
+    },
+    {
+      "ref": "S05-TC-05",
+      "type": "Subtask",
+      "parent": "05",
+      "parentKey": "KAN-48",
+      "summary": "[002-S05-TC-05] 200 Leads converted together each get the right products and fields",
+      "description": "Level: unit\nPersona: System\nType: bulk\nAC: AC-05.5\nApex unit test",
+      "labels": [
+        "cref-002-S05-TC-05",
+        "sdd",
+        "spec-002",
+        "tc-unit",
+        "test-case"
+      ],
+      "fields": {
+        "Test level": "unit",
+        "Persona": "System",
+        "AC id": "AC-05.5"
+      }
+    },
+    {
+      "ref": "S05-TC-06",
+      "type": "Subtask",
+      "parent": "05",
+      "parentKey": "KAN-48",
+      "summary": "[002-S05-TC-06] Converting a Lead of another record type runs none of this logic",
+      "description": "Level: unit\nPersona: System\nType: negative\nAC: AC-05.6\nApex unit test",
+      "labels": [
+        "cref-002-S05-TC-06",
+        "sdd",
+        "spec-002",
+        "tc-unit",
+        "test-case"
+      ],
+      "fields": {
+        "Test level": "unit",
+        "Persona": "System",
+        "AC id": "AC-05.6"
+      }
+    },
+    {
+      "ref": "S05-TC-07",
+      "type": "Subtask",
+      "parent": "05",
+      "parentKey": "KAN-48",
+      "summary": "[002-S05-TC-07] A Lead owned by a Standard User sales rep (PR_Sales_Rep) converts to a Person Account and Partner Referral Opportunity when converted as that rep (System.runAs)",
+      "description": "Level: unit\nPersona: Sales Rep\nType: positive\nAC: AC-05.1\nApex unit test",
+      "labels": [
+        "cref-002-S05-TC-07",
+        "sdd",
+        "spec-002",
+        "tc-unit",
+        "test-case"
+      ],
+      "fields": {
+        "Test level": "unit",
+        "Persona": "Sales Rep",
+        "AC id": "AC-05.1"
+      }
+    },
+    {
+      "ref": "S06-TC-01",
+      "type": "Subtask",
+      "parent": "06",
+      "parentKey": "KAN-49",
+      "summary": "[002-S06-TC-01] Utilities Connected with 3 products at rate 60 creates one Pending commission of 180",
+      "description": "Level: unit\nPersona: System\nType: positive\nAC: AC-06.1\nApex unit test",
+      "labels": [
+        "cref-002-S06-TC-01",
+        "sdd",
+        "spec-002",
+        "tc-unit",
+        "test-case"
+      ],
+      "fields": {
+        "Test level": "unit",
+        "Persona": "System",
+        "AC id": "AC-06.1"
+      }
+    },
+    {
+      "ref": "S06-TC-02",
+      "type": "Subtask",
+      "parent": "06",
+      "parentKey": "KAN-49",
+      "summary": "[002-S06-TC-02] Moving an Opportunity to Utilities Connected shows a Pending commission",
+      "description": "Level: ui\nPersona: Sales Rep\nType: positive\nAC: AC-06.1\nSuite: test-cases/002-partner-referral-story-06.sf-tests.yaml",
+      "labels": [
+        "cref-002-S06-TC-02",
+        "sdd",
+        "spec-002",
+        "tc-ui",
+        "test-case"
+      ],
+      "fields": {
+        "Test level": "ui",
+        "Persona": "Sales Rep",
+        "AC id": "AC-06.1"
+      }
+    },
+    {
+      "ref": "S06-TC-03",
+      "type": "Subtask",
+      "parent": "06",
+      "parentKey": "KAN-49",
+      "summary": "[002-S06-TC-03] Reopen and re-win, or two racing updates, never leave two live commissions",
+      "description": "Level: unit\nPersona: System\nType: boundary\nAC: AC-06.2\nApex unit test",
+      "labels": [
+        "cref-002-S06-TC-03",
+        "sdd",
+        "spec-002",
+        "tc-unit",
+        "test-case"
+      ],
+      "fields": {
+        "Test level": "unit",
+        "Persona": "System",
+        "AC id": "AC-06.2"
+      }
+    },
+    {
+      "ref": "S06-TC-04",
+      "type": "Subtask",
+      "parent": "06",
+      "parentKey": "KAN-49",
+      "summary": "[002-S06-TC-04] Changing the agency rate leaves existing commissions unchanged",
+      "description": "Level: unit\nPersona: System\nType: positive\nAC: AC-06.3\nApex unit test",
+      "labels": [
+        "cref-002-S06-TC-04",
+        "sdd",
+        "spec-002",
+        "tc-unit",
+        "test-case"
+      ],
+      "fields": {
+        "Test level": "unit",
+        "Persona": "System",
+        "AC id": "AC-06.3"
+      }
+    },
+    {
+      "ref": "S06-TC-05",
+      "type": "Subtask",
+      "parent": "06",
+      "parentKey": "KAN-49",
+      "summary": "[002-S06-TC-05] Reopening cancels a Pending commission with reason \"Opportunity reopened\"",
+      "description": "Level: unit\nPersona: System\nType: positive\nAC: AC-06.4\nApex unit test",
+      "labels": [
+        "cref-002-S06-TC-05",
+        "sdd",
+        "spec-002",
+        "tc-unit",
+        "test-case"
+      ],
+      "fields": {
+        "Test level": "unit",
+        "Persona": "System",
+        "AC id": "AC-06.4"
+      }
+    },
+    {
+      "ref": "S06-TC-06",
+      "type": "Subtask",
+      "parent": "06",
+      "parentKey": "KAN-49",
+      "summary": "[002-S06-TC-06] Reopening after approval keeps the commission, sets Reopened After Approval and notifies Finance (retried if the send fails)",
+      "description": "Level: unit\nPersona: System\nType: positive\nAC: AC-06.4\nApex unit test",
+      "labels": [
+        "cref-002-S06-TC-06",
+        "sdd",
+        "spec-002",
+        "tc-unit",
+        "test-case"
+      ],
+      "fields": {
+        "Test level": "unit",
+        "Persona": "System",
+        "AC id": "AC-06.4"
+      }
+    },
+    {
+      "ref": "S06-TC-07",
+      "type": "Subtask",
+      "parent": "06",
+      "parentKey": "KAN-49",
+      "summary": "[002-S06-TC-07] Finance receives the reopened-after-approval bell notification",
+      "description": "Level: manual\nPersona: Finance\nType: positive\nAC: AC-06.4\nScript: .specify/specs/002-partner-referral/task_story_06_test_scripts.md",
+      "labels": [
+        "cref-002-S06-TC-07",
+        "sdd",
+        "spec-002",
+        "tc-manual",
+        "test-case"
+      ],
+      "fields": {
+        "Test level": "manual",
+        "Persona": "Finance",
+        "AC id": "AC-06.4"
+      }
+    },
+    {
+      "ref": "S06-TC-08",
+      "type": "Subtask",
+      "parent": "06",
+      "parentKey": "KAN-49",
+      "summary": "[002-S06-TC-08] Nobody, not even an admin without bypass, can edit Amount, Rate, Opportunity or Agency",
+      "description": "Level: unit\nPersona: Admin\nType: negative\nAC: AC-06.5\nApex unit test",
+      "labels": [
+        "cref-002-S06-TC-08",
+        "sdd",
+        "spec-002",
+        "tc-unit",
+        "test-case"
+      ],
+      "fields": {
+        "Test level": "unit",
+        "Persona": "Admin",
+        "AC id": "AC-06.5"
+      }
+    },
+    {
+      "ref": "S06-TC-09",
+      "type": "Subtask",
+      "parent": "06",
+      "parentKey": "KAN-49",
+      "summary": "[002-S06-TC-09] Editing a commission's Amount is refused with a clear message",
+      "description": "Level: ui\nPersona: Admin\nType: negative\nAC: AC-06.5\nSuite: test-cases/002-partner-referral-story-06.sf-tests.yaml",
+      "labels": [
+        "cref-002-S06-TC-09",
+        "sdd",
+        "spec-002",
+        "tc-ui",
+        "test-case"
+      ],
+      "fields": {
+        "Test level": "ui",
+        "Persona": "Admin",
+        "AC id": "AC-06.5"
+      }
+    },
+    {
+      "ref": "S06-TC-10",
+      "type": "Subtask",
+      "parent": "06",
+      "parentKey": "KAN-49",
+      "summary": "[002-S06-TC-10] A Partner Manager approves a Pending commission and Approved By / On are stamped",
+      "description": "Level: ui\nPersona: Partner Manager\nType: positive\nAC: AC-06.6\nSuite: test-cases/002-partner-referral-story-06.sf-tests.yaml",
+      "labels": [
+        "cref-002-S06-TC-10",
+        "sdd",
+        "spec-002",
+        "tc-ui",
+        "test-case"
+      ],
+      "fields": {
+        "Test level": "ui",
+        "Persona": "Partner Manager",
+        "AC id": "AC-06.6"
+      }
+    },
+    {
+      "ref": "S06-TC-11",
+      "type": "Subtask",
+      "parent": "06",
+      "parentKey": "KAN-49",
+      "summary": "[002-S06-TC-11] A sales rep cannot approve a commission",
+      "description": "Level: ui\nPersona: Sales Rep\nType: negative\nAC: AC-06.6\nSuite: test-cases/002-partner-referral-story-06.sf-tests.yaml",
+      "labels": [
+        "cref-002-S06-TC-11",
+        "sdd",
+        "spec-002",
+        "tc-ui",
+        "test-case"
+      ],
+      "fields": {
+        "Test level": "ui",
+        "Persona": "Sales Rep",
+        "AC id": "AC-06.6"
+      }
+    },
+    {
+      "ref": "S06-TC-12",
+      "type": "Subtask",
+      "parent": "06",
+      "parentKey": "KAN-49",
+      "summary": "[002-S06-TC-12] A Partner Manager cannot change an Approved commission; Finance can",
+      "description": "Level: unit\nPersona: Partner Manager\nType: negative\nAC: AC-06.7\nApex unit test",
+      "labels": [
+        "cref-002-S06-TC-12",
+        "sdd",
+        "spec-002",
+        "tc-unit",
+        "test-case"
+      ],
+      "fields": {
+        "Test level": "unit",
+        "Persona": "Partner Manager",
+        "AC id": "AC-06.7"
+      }
+    },
+    {
+      "ref": "S06-TC-13",
+      "type": "Subtask",
+      "parent": "06",
+      "parentKey": "KAN-49",
+      "summary": "[002-S06-TC-13] Partner Manager is refused when moving an Approved commission back to Pending",
+      "description": "Level: ui\nPersona: Partner Manager\nType: negative\nAC: AC-06.7\nSuite: test-cases/002-partner-referral-story-06.sf-tests.yaml",
+      "labels": [
+        "cref-002-S06-TC-13",
+        "sdd",
+        "spec-002",
+        "tc-ui",
+        "test-case"
+      ],
+      "fields": {
+        "Test level": "ui",
+        "Persona": "Partner Manager",
+        "AC id": "AC-06.7"
+      }
+    },
+    {
+      "ref": "S06-TC-14",
+      "type": "Subtask",
+      "parent": "06",
+      "parentKey": "KAN-49",
+      "summary": "[002-S06-TC-14] Commission is shared read-only with the agency's Executive role only; agents and other agencies have no access",
+      "description": "Level: unit\nPersona: Partner Principal\nType: negative\nAC: AC-06.8\nApex unit test",
+      "labels": [
+        "cref-002-S06-TC-14",
+        "sdd",
+        "spec-002",
+        "tc-unit",
+        "test-case"
+      ],
+      "fields": {
+        "Test level": "unit",
+        "Persona": "Partner Principal",
+        "AC id": "AC-06.8"
+      }
+    },
+    {
+      "ref": "S06-TC-15",
+      "type": "Subtask",
+      "parent": "06",
+      "parentKey": "KAN-49",
+      "summary": "[002-S06-TC-15] A principal sees this month's and last month's commission totals",
+      "description": "Level: ui\nPersona: Partner Principal\nType: positive\nAC: AC-06.9\nSuite: test-cases/002-partner-referral-story-06.sf-tests.yaml",
+      "labels": [
+        "cref-002-S06-TC-15",
+        "sdd",
+        "spec-002",
+        "tc-ui",
+        "test-case"
+      ],
+      "fields": {
+        "Test level": "ui",
+        "Persona": "Partner Principal",
+        "AC id": "AC-06.9"
+      }
+    },
+    {
+      "ref": "S06-TC-16",
+      "type": "Subtask",
+      "parent": "06",
+      "parentKey": "KAN-49",
+      "summary": "[002-S06-TC-16] An agent does not see the commission tiles",
+      "description": "Level: ui\nPersona: Partner Agent\nType: negative\nAC: AC-06.9\nSuite: test-cases/002-partner-referral-story-06.sf-tests.yaml",
+      "labels": [
+        "cref-002-S06-TC-16",
+        "sdd",
+        "spec-002",
+        "tc-ui",
+        "test-case"
+      ],
+      "fields": {
+        "Test level": "ui",
+        "Persona": "Partner Agent",
+        "AC id": "AC-06.9"
+      }
+    },
+    {
+      "ref": "S06-TC-17",
+      "type": "Subtask",
+      "parent": "06",
+      "parentKey": "KAN-49",
+      "summary": "[002-S06-TC-17] Tile totals count non-cancelled commissions by created month",
+      "description": "Level: unit\nPersona: System\nType: positive\nAC: AC-06.9\nApex unit test",
+      "labels": [
+        "cref-002-S06-TC-17",
+        "sdd",
+        "spec-002",
+        "tc-unit",
+        "test-case"
+      ],
+      "fields": {
+        "Test level": "unit",
+        "Persona": "System",
+        "AC id": "AC-06.9"
+      }
+    },
+    {
+      "ref": "S06-TC-18",
+      "type": "Subtask",
+      "parent": "06",
+      "parentKey": "KAN-49",
+      "summary": "[002-S06-TC-18] 200 Opportunities to Utilities Connected create and share 200 commissions",
+      "description": "Level: unit\nPersona: System\nType: bulk\nAC: AC-06.10\nApex unit test",
+      "labels": [
+        "cref-002-S06-TC-18",
+        "sdd",
+        "spec-002",
+        "tc-unit",
+        "test-case"
+      ],
+      "fields": {
+        "Test level": "unit",
+        "Persona": "System",
+        "AC id": "AC-06.10"
+      }
+    },
+    {
+      "ref": "S06-TC-19",
+      "type": "Subtask",
+      "parent": "06",
+      "parentKey": "KAN-49",
+      "summary": "[002-S06-TC-19] A Partner Manager (Standard User + PR_Partner_Manager) who does not own the commission can approve a Pending commission owned by a sales rep (System.runAs)",
+      "description": "Level: unit\nPersona: Partner Manager\nType: positive\nAC: AC-06.6\nApex unit test",
+      "labels": [
+        "cref-002-S06-TC-19",
+        "sdd",
+        "spec-002",
+        "tc-unit",
+        "test-case"
+      ],
+      "fields": {
+        "Test level": "unit",
+        "Persona": "Partner Manager",
+        "AC id": "AC-06.6"
+      }
+    },
+    {
+      "ref": "S07-TC-01",
+      "type": "Subtask",
+      "parent": "07",
+      "parentKey": "KAN-50",
+      "summary": "[002-S07-TC-01] First-business-day run builds a Draft batch with one line per agency and links the commissions",
+      "description": "Level: unit\nPersona: System\nType: positive\nAC: AC-07.1\nApex unit test",
+      "labels": [
+        "cref-002-S07-TC-01",
+        "sdd",
+        "spec-002",
+        "tc-unit",
+        "test-case"
+      ],
+      "fields": {
+        "Test level": "unit",
+        "Persona": "System",
+        "AC id": "AC-07.1"
+      }
+    },
+    {
+      "ref": "S07-TC-02",
+      "type": "Subtask",
+      "parent": "07",
+      "parentKey": "KAN-50",
+      "summary": "[002-S07-TC-02] A same-day re-run adds only newly approved commissions; none is batched twice",
+      "description": "Level: unit\nPersona: System\nType: boundary\nAC: AC-07.2\nApex unit test",
+      "labels": [
+        "cref-002-S07-TC-02",
+        "sdd",
+        "spec-002",
+        "tc-unit",
+        "test-case"
+      ],
+      "fields": {
+        "Test level": "unit",
+        "Persona": "System",
+        "AC id": "AC-07.2"
+      }
+    },
+    {
+      "ref": "S07-TC-03",
+      "type": "Subtask",
+      "parent": "07",
+      "parentKey": "KAN-50",
+      "summary": "[002-S07-TC-03] Finance runs the payout on demand from the Payouts console",
+      "description": "Level: ui\nPersona: Finance\nType: positive\nAC: AC-07.3\nSuite: test-cases/002-partner-referral-story-07.sf-tests.yaml",
+      "labels": [
+        "cref-002-S07-TC-03",
+        "sdd",
+        "spec-002",
+        "tc-ui",
+        "test-case"
+      ],
+      "fields": {
+        "Test level": "ui",
+        "Persona": "Finance",
+        "AC id": "AC-07.3"
+      }
+    },
+    {
+      "ref": "S07-TC-04",
+      "type": "Subtask",
+      "parent": "07",
+      "parentKey": "KAN-50",
+      "summary": "[002-S07-TC-04] A user without Manage Partner Payouts cannot run, export or pay",
+      "description": "Level: ui\nPersona: Partner Manager\nType: negative\nAC: AC-07.3\nSuite: test-cases/002-partner-referral-story-07.sf-tests.yaml",
+      "labels": [
+        "cref-002-S07-TC-04",
+        "sdd",
+        "spec-002",
+        "tc-ui",
+        "test-case"
+      ],
+      "fields": {
+        "Test level": "ui",
+        "Persona": "Partner Manager",
+        "AC id": "AC-07.3"
+      }
+    },
+    {
+      "ref": "S07-TC-05",
+      "type": "Subtask",
+      "parent": "07",
+      "parentKey": "KAN-50",
+      "summary": "[002-S07-TC-05] Service refuses a payout run from a user without the permission",
+      "description": "Level: unit\nPersona: Partner Manager\nType: negative\nAC: AC-07.3\nApex unit test",
+      "labels": [
+        "cref-002-S07-TC-05",
+        "sdd",
+        "spec-002",
+        "tc-unit",
+        "test-case"
+      ],
+      "fields": {
+        "Test level": "unit",
+        "Persona": "Partner Manager",
+        "AC id": "AC-07.3"
+      }
+    },
+    {
+      "ref": "S07-TC-06",
+      "type": "Subtask",
+      "parent": "07",
+      "parentKey": "KAN-50",
+      "summary": "[002-S07-TC-06] An Exported batch is not changed by a re-run; new approvals wait for next month",
+      "description": "Level: unit\nPersona: System\nType: negative\nAC: AC-07.4\nApex unit test",
+      "labels": [
+        "cref-002-S07-TC-06",
+        "sdd",
+        "spec-002",
+        "tc-unit",
+        "test-case"
+      ],
+      "fields": {
+        "Test level": "unit",
+        "Persona": "System",
+        "AC id": "AC-07.4"
+      }
+    },
+    {
+      "ref": "S07-TC-07",
+      "type": "Subtask",
+      "parent": "07",
+      "parentKey": "KAN-50",
+      "summary": "[002-S07-TC-07] Download Xero CSV downloads the file and moves the batch to Exported",
+      "description": "Level: ui\nPersona: Finance\nType: positive\nAC: AC-07.5\nSuite: test-cases/002-partner-referral-story-07.sf-tests.yaml",
+      "labels": [
+        "cref-002-S07-TC-07",
+        "sdd",
+        "spec-002",
+        "tc-ui",
+        "test-case"
+      ],
+      "fields": {
+        "Test level": "ui",
+        "Persona": "Finance",
+        "AC id": "AC-07.5"
+      }
+    },
+    {
+      "ref": "S07-TC-08",
+      "type": "Subtask",
+      "parent": "07",
+      "parentKey": "KAN-50",
+      "summary": "[002-S07-TC-08] CSV has one row per line with agency name, ABN, reference <YYYYMM>-<ABN>, total ex GST, count and month",
+      "description": "Level: unit\nPersona: System\nType: positive\nAC: AC-07.5\nApex unit test",
+      "labels": [
+        "cref-002-S07-TC-08",
+        "sdd",
+        "spec-002",
+        "tc-unit",
+        "test-case"
+      ],
+      "fields": {
+        "Test level": "unit",
+        "Persona": "System",
+        "AC id": "AC-07.5"
+      }
+    },
+    {
+      "ref": "S07-TC-09",
+      "type": "Subtask",
+      "parent": "07",
+      "parentKey": "KAN-50",
+      "summary": "[002-S07-TC-09] Mark paid sets the batch and every commission in it to Paid",
+      "description": "Level: ui\nPersona: Finance\nType: positive\nAC: AC-07.6\nSuite: test-cases/002-partner-referral-story-07.sf-tests.yaml",
+      "labels": [
+        "cref-002-S07-TC-09",
+        "sdd",
+        "spec-002",
+        "tc-ui",
+        "test-case"
+      ],
+      "fields": {
+        "Test level": "ui",
+        "Persona": "Finance",
+        "AC id": "AC-07.6"
+      }
+    },
+    {
+      "ref": "S07-TC-10",
+      "type": "Subtask",
+      "parent": "07",
+      "parentKey": "KAN-50",
+      "summary": "[002-S07-TC-10] Mark paid is refused before the CSV is downloaded",
+      "description": "Level: unit\nPersona: Finance\nType: negative\nAC: AC-07.6\nApex unit test",
+      "labels": [
+        "cref-002-S07-TC-10",
+        "sdd",
+        "spec-002",
+        "tc-unit",
+        "test-case"
+      ],
+      "fields": {
+        "Test level": "unit",
+        "Persona": "Finance",
+        "AC id": "AC-07.6"
+      }
+    },
+    {
+      "ref": "S07-TC-11",
+      "type": "Subtask",
+      "parent": "07",
+      "parentKey": "KAN-50",
+      "summary": "[002-S07-TC-11] 3,000 Approved commissions across 40 agencies run within limits and give 40 lines",
+      "description": "Level: unit\nPersona: System\nType: bulk\nAC: AC-07.7\nApex unit test",
+      "labels": [
+        "cref-002-S07-TC-11",
+        "sdd",
+        "spec-002",
+        "tc-unit",
+        "test-case"
+      ],
+      "fields": {
+        "Test level": "unit",
+        "Persona": "System",
+        "AC id": "AC-07.7"
+      }
+    },
+    {
+      "ref": "S07-TC-12",
+      "type": "Subtask",
+      "parent": "07",
+      "parentKey": "KAN-50",
+      "summary": "[002-S07-TC-12] Payout objects have no bank fields and partner users cannot see them",
+      "description": "Level: unit\nPersona: Partner Principal\nType: negative\nAC: AC-07.8\nApex unit test",
+      "labels": [
+        "cref-002-S07-TC-12",
+        "sdd",
+        "spec-002",
+        "tc-unit",
+        "test-case"
+      ],
+      "fields": {
+        "Test level": "unit",
+        "Persona": "Partner Principal",
+        "AC id": "AC-07.8"
+      }
+    },
+    {
+      "ref": "S08-TC-01",
+      "type": "Subtask",
+      "parent": "08",
+      "parentKey": "KAN-51",
+      "summary": "[002-S08-TC-01] Volume dashboard shows referrals per agency per week and per month",
+      "description": "Level: ui\nPersona: Partner Manager\nType: positive\nAC: AC-08.1\nSuite: test-cases/002-partner-referral-story-08.sf-tests.yaml",
+      "labels": [
+        "cref-002-S08-TC-01",
+        "sdd",
+        "spec-002",
+        "tc-ui",
+        "test-case"
+      ],
+      "fields": {
+        "Test level": "ui",
+        "Persona": "Partner Manager",
+        "AC id": "AC-08.1"
+      }
+    },
+    {
+      "ref": "S08-TC-02",
+      "type": "Subtask",
+      "parent": "08",
+      "parentKey": "KAN-51",
+      "summary": "[002-S08-TC-02] Conversion dashboard shows referrals in vs Connected per agency with the rate",
+      "description": "Level: ui\nPersona: Partner Manager\nType: positive\nAC: AC-08.2\nSuite: test-cases/002-partner-referral-story-08.sf-tests.yaml",
+      "labels": [
+        "cref-002-S08-TC-02",
+        "sdd",
+        "spec-002",
+        "tc-ui",
+        "test-case"
+      ],
+      "fields": {
+        "Test level": "ui",
+        "Persona": "Partner Manager",
+        "AC id": "AC-08.2"
+      }
+    },
+    {
+      "ref": "S08-TC-03",
+      "type": "Subtask",
+      "parent": "08",
+      "parentKey": "KAN-51",
+      "summary": "[002-S08-TC-03] Commission dashboard shows this month's Pending and Approved commission per agency in AUD",
+      "description": "Level: ui\nPersona: Finance\nType: positive\nAC: AC-08.3\nSuite: test-cases/002-partner-referral-story-08.sf-tests.yaml",
+      "labels": [
+        "cref-002-S08-TC-03",
+        "sdd",
+        "spec-002",
+        "tc-ui",
+        "test-case"
+      ],
+      "fields": {
+        "Test level": "ui",
+        "Persona": "Finance",
+        "AC id": "AC-08.3"
+      }
+    },
+    {
+      "ref": "S08-TC-04",
+      "type": "Subtask",
+      "parent": "08",
+      "parentKey": "KAN-51",
+      "summary": "[002-S08-TC-04] SLA dashboard lists uncontacted overdue Leads, late first contacts and moved-in referrals not connected",
+      "description": "Level: ui\nPersona: Partner Manager\nType: positive\nAC: AC-08.4\nSuite: test-cases/002-partner-referral-story-08.sf-tests.yaml",
+      "labels": [
+        "cref-002-S08-TC-04",
+        "sdd",
+        "spec-002",
+        "tc-ui",
+        "test-case"
+      ],
+      "fields": {
+        "Test level": "ui",
+        "Persona": "Partner Manager",
+        "AC id": "AC-08.4"
+      }
+    },
+    {
+      "ref": "S08-TC-05",
+      "type": "Subtask",
+      "parent": "08",
+      "parentKey": "KAN-51",
+      "summary": "[002-S08-TC-05] Report and dashboard folders are shared with team leads, Partner Managers and Finance only",
+      "description": "Level: manual\nPersona: Admin\nType: positive\nAC: AC-08.5\nScript: .specify/specs/002-partner-referral/task_story_08_test_scripts.md",
+      "labels": [
+        "cref-002-S08-TC-05",
+        "sdd",
+        "spec-002",
+        "tc-manual",
+        "test-case"
+      ],
+      "fields": {
+        "Test level": "manual",
+        "Persona": "Admin",
+        "AC id": "AC-08.5"
+      }
+    },
+    {
+      "ref": "S08-TC-06",
+      "type": "Subtask",
+      "parent": "08",
+      "parentKey": "KAN-51",
+      "summary": "[002-S08-TC-06] Partner users cannot open the reports or dashboards",
+      "description": "Level: manual\nPersona: Partner Principal\nType: negative\nAC: AC-08.5\nScript: .specify/specs/002-partner-referral/task_story_08_test_scripts.md",
+      "labels": [
+        "cref-002-S08-TC-06",
+        "sdd",
+        "spec-002",
+        "tc-manual",
+        "test-case"
+      ],
+      "fields": {
+        "Test level": "manual",
+        "Persona": "Partner Principal",
+        "AC id": "AC-08.5"
+      }
+    },
+    {
+      "ref": "S09-TC-01",
+      "type": "Subtask",
+      "parent": "09",
+      "parentKey": "KAN-52",
+      "summary": "[002-S09-TC-01] Currency decision is recorded and AUD is active",
+      "description": "Level: manual\nPersona: Admin\nType: positive\nAC: AC-09.1\nScript: .specify/specs/002-partner-referral/task_story_09_test_scripts.md",
+      "labels": [
+        "cref-002-S09-TC-01",
+        "sdd",
+        "spec-002",
+        "tc-manual",
+        "test-case"
+      ],
+      "fields": {
+        "Test level": "manual",
+        "Persona": "Admin",
+        "AC id": "AC-09.1"
+      }
+    },
+    {
+      "ref": "S09-TC-02",
+      "type": "Subtask",
+      "parent": "09",
+      "parentKey": "KAN-52",
+      "summary": "[002-S09-TC-02] State and Country picklists are enabled with the 8 Australian states and territories",
+      "description": "Level: manual\nPersona: Admin\nType: positive\nAC: AC-09.2\nScript: .specify/specs/002-partner-referral/task_story_09_test_scripts.md",
+      "labels": [
+        "cref-002-S09-TC-02",
+        "sdd",
+        "spec-002",
+        "tc-manual",
+        "test-case"
+      ],
+      "fields": {
+        "Test level": "manual",
+        "Persona": "Admin",
+        "AC id": "AC-09.2"
+      }
+    },
+    {
+      "ref": "S09-TC-03",
+      "type": "Subtask",
+      "parent": "09",
+      "parentKey": "KAN-52",
+      "summary": "[002-S09-TC-03] Custom Address fields, Digital Experiences and enough Partner Community licences",
+      "description": "Level: manual\nPersona: Admin\nType: positive\nAC: AC-09.3\nScript: .specify/specs/002-partner-referral/task_story_09_test_scripts.md",
+      "labels": [
+        "cref-002-S09-TC-03",
+        "sdd",
+        "spec-002",
+        "tc-manual",
+        "test-case"
+      ],
+      "fields": {
+        "Test level": "manual",
+        "Persona": "Admin",
+        "AC id": "AC-09.3"
+      }
+    },
+    {
+      "ref": "S09-TC-04",
+      "type": "Subtask",
+      "parent": "09",
+      "parentKey": "KAN-52",
+      "summary": "[002-S09-TC-04] Existing Account, Contact and Lead records of other demos still save",
+      "description": "Level: manual\nPersona: Admin\nType: positive\nAC: AC-09.4\nScript: .specify/specs/002-partner-referral/task_story_09_test_scripts.md",
+      "labels": [
+        "cref-002-S09-TC-04",
+        "sdd",
+        "spec-002",
+        "tc-manual",
+        "test-case"
+      ],
+      "fields": {
+        "Test level": "manual",
+        "Persona": "Admin",
+        "AC id": "AC-09.4"
+      }
+    }
+  ]
+}

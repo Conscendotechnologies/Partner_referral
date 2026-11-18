@@ -1,0 +1,97 @@
+{
+  "feature": "002-partner-referral",
+  "story": "00",
+  "title": "Foundation: objects, fields, record types, processes, queues, permission sets",
+  "cases": [
+    {
+      "id": "S00-TC-01",
+      "ac": "AC-00.1",
+      "title": "The 4 new objects and their design fields exist; Opportunity Key is unique",
+      "level": "unit",
+      "persona": "System",
+      "type": "positive",
+      "automated": true
+    },
+    {
+      "id": "S00-TC-02",
+      "ac": "AC-00.2",
+      "title": "Partner Referral Lead offers only the 5 programme statuses and Lead Source \"Partner Referral\"",
+      "level": "ui",
+      "persona": "Sales Rep",
+      "type": "positive",
+      "automated": true
+    },
+    {
+      "id": "S00-TC-03",
+      "ac": "AC-00.3",
+      "title": "Partner Referral Opportunity offers the programme stages; other record types are unchanged",
+      "level": "ui",
+      "persona": "Sales Rep",
+      "type": "positive",
+      "automated": true
+    },
+    {
+      "id": "S00-TC-04",
+      "ac": "AC-00.3",
+      "title": "Opportunities of other record types keep their original stages",
+      "level": "unit",
+      "persona": "System",
+      "type": "negative",
+      "automated": true
+    },
+    {
+      "id": "S00-TC-05",
+      "ac": "AC-00.4",
+      "title": "Lead conversion maps Referral, agency, agent and move-in date onto the Opportunity",
+      "level": "unit",
+      "persona": "System",
+      "type": "positive",
+      "automated": true
+    },
+    {
+      "id": "S00-TC-06",
+      "ac": "AC-00.5",
+      "title": "Five Lead queues, \"Connectnow Sales\" business hours and the settings record match the design",
+      "level": "manual",
+      "persona": "Admin",
+      "type": "positive",
+      "automated": false
+    },
+    {
+      "id": "S00-TC-07",
+      "ac": "AC-00.6",
+      "title": "Permission sets, groups and custom permissions exist; external sharing is Private on the new objects",
+      "level": "manual",
+      "persona": "Admin",
+      "type": "positive",
+      "automated": false
+    },
+    {
+      "id": "S00-TC-08",
+      "ac": "AC-00.6",
+      "title": "Partner permission sets grant no access to Lead, Opportunity, Payout Batch or Payout Line",
+      "level": "unit",
+      "persona": "Partner Agent",
+      "type": "negative",
+      "automated": true
+    },
+    {
+      "id": "S00-TC-09",
+      "ac": "AC-00.7",
+      "title": "Seed script creates the 4 active products in the price book and is idempotent on re-run",
+      "level": "manual",
+      "persona": "Admin",
+      "type": "positive",
+      "automated": false
+    },
+    {
+      "id": "S00-TC-10",
+      "ac": "AC-00.8",
+      "title": "Commission Rate is tracked in Account field history",
+      "level": "manual",
+      "persona": "Admin",
+      "type": "positive",
+      "automated": false
+    }
+  ]
+}

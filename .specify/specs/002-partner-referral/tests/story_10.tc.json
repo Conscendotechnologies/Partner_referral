@@ -1,0 +1,52 @@
+{
+  "feature": "002-partner-referral",
+  "story": "10",
+  "title": "Demo personas and data",
+  "cases": [
+    {
+      "id": "S10-TC-01",
+      "ac": "AC-10.1",
+      "title": "Each agency has an active principal and agent who can reach the portal",
+      "level": "ui",
+      "persona": "Admin",
+      "type": "positive",
+      "automated": true
+    },
+    {
+      "id": "S10-TC-02",
+      "ac": "AC-10.1",
+      "title": "All four partner users are active with the right agency and portal role",
+      "level": "manual",
+      "persona": "Admin",
+      "type": "positive",
+      "automated": false
+    },
+    {
+      "id": "S10-TC-03",
+      "ac": "AC-10.2",
+      "title": "Every state queue has a member and each internal persona has its permission set",
+      "level": "manual",
+      "persona": "Admin",
+      "type": "positive",
+      "automated": false
+    },
+    {
+      "id": "S10-TC-04",
+      "ac": "AC-10.3",
+      "title": "Each queue has an email address that receives the urgent email",
+      "level": "manual",
+      "persona": "Admin",
+      "type": "positive",
+      "automated": false
+    },
+    {
+      "id": "S10-TC-05",
+      "ac": "AC-10.4",
+      "title": "Two-agency isolation tests run without extra setup",
+      "level": "manual",
+      "persona": "Tester",
+      "type": "positive",
+      "automated": false
+    }
+  ]
+}

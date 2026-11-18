@@ -1,0 +1,43 @@
+{
+  "feature": "002-partner-referral",
+  "story": "09",
+  "title": "Org preparation: currency, state and country picklists, Experience Cloud",
+  "cases": [
+    {
+      "id": "S09-TC-01",
+      "ac": "AC-09.1",
+      "title": "Currency decision is recorded and AUD is active",
+      "level": "manual",
+      "persona": "Admin",
+      "type": "positive",
+      "automated": false
+    },
+    {
+      "id": "S09-TC-02",
+      "ac": "AC-09.2",
+      "title": "State and Country picklists are enabled with the 8 Australian states and territories",
+      "level": "manual",
+      "persona": "Admin",
+      "type": "positive",
+      "automated": false
+    },
+    {
+      "id": "S09-TC-03",
+      "ac": "AC-09.3",
+      "title": "Custom Address fields, Digital Experiences and enough Partner Community licences",
+      "level": "manual",
+      "persona": "Admin",
+      "type": "positive",
+      "automated": false
+    },
+    {
+      "id": "S09-TC-04",
+      "ac": "AC-09.4",
+      "title": "Existing Account, Contact and Lead records of other demos still save",
+      "level": "manual",
+      "persona": "Admin",
+      "type": "positive",
+      "automated": false
+    }
+  ]
+}

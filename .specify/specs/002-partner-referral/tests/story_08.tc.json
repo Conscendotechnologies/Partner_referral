@@ -1,0 +1,61 @@
+{
+  "feature": "002-partner-referral",
+  "story": "08",
+  "title": "Reports and dashboards",
+  "cases": [
+    {
+      "id": "S08-TC-01",
+      "ac": "AC-08.1",
+      "title": "Volume dashboard shows referrals per agency per week and per month",
+      "level": "ui",
+      "persona": "Partner Manager",
+      "type": "positive",
+      "automated": true
+    },
+    {
+      "id": "S08-TC-02",
+      "ac": "AC-08.2",
+      "title": "Conversion dashboard shows referrals in vs Connected per agency with the rate",
+      "level": "ui",
+      "persona": "Partner Manager",
+      "type": "positive",
+      "automated": true
+    },
+    {
+      "id": "S08-TC-03",
+      "ac": "AC-08.3",
+      "title": "Commission dashboard shows this month's Pending and Approved commission per agency in AUD",
+      "level": "ui",
+      "persona": "Finance",
+      "type": "positive",
+      "automated": true
+    },
+    {
+      "id": "S08-TC-04",
+      "ac": "AC-08.4",
+      "title": "SLA dashboard lists uncontacted overdue Leads, late first contacts and moved-in referrals not connected",
+      "level": "ui",
+      "persona": "Partner Manager",
+      "type": "positive",
+      "automated": true
+    },
+    {
+      "id": "S08-TC-05",
+      "ac": "AC-08.5",
+      "title": "Report and dashboard folders are shared with team leads, Partner Managers and Finance only",
+      "level": "manual",
+      "persona": "Admin",
+      "type": "positive",
+      "automated": false
+    },
+    {
+      "id": "S08-TC-06",
+      "ac": "AC-08.5",
+      "title": "Partner users cannot open the reports or dashboards",
+      "level": "manual",
+      "persona": "Partner Principal",
+      "type": "negative",
+      "automated": false
+    }
+  ]
+}

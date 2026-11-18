@@ -1,0 +1,116 @@
+name: 002-partner-referral S04 Referral tracker and partner status
+context: 'Connectnow partner referral programme (feature 002) in the SDO org salesOrgSDO (a demo org, not a sandbox: every
+
+  record a case creates starts with AI-TEST so it can be cleaned up).
+
+  Partner portal: Experience Cloud site "Connectnow Partners" (https://co1778135180529.my.site.com/partners). Its home
+
+  page holds the "Referrals this month" tiles, the commission tiles (principals only), the "Refer a mover" form and the
+
+  referral tracker. Partner cases start as the admin and use "Log in to Experience as User" on the partner''s Contact.
+
+  Internal app: "Connectnow Partner Referrals". Internal cases log in as a test user from Setup > Users.
+
+  Personas:
+
+  - Tom Nguyen: partner Agent, agency Harbour & Co Realty (Active).
+
+  - Priya Shah: partner Principal, Harbour & Co Realty.
+
+  - Chloe Tan: partner Agent, agency Bayside Property Group (Active).
+
+  - Marco Rossi: partner Principal, Bayside Property Group.
+
+  - Sam Rep (PR test): sales rep (PR_Sales_Rep), member of queues PR_NSW_ACT and PR_VIC_TAS.
+
+  - Maya Manager (PR test): Partner Manager (PR_Partner_Manager + PR_Sales_Rep).
+
+  - Fiona Finance (PR test): Finance (PR_Finance).
+
+  Business terms: a referral (Referral__c, label "Referral") creates a Partner Referral Lead; converting it gives a
+
+  Partner Referral Opportunity; at stage "Utilities Connected" a Partner Commission is created; Finance pays approved
+
+  commissions monthly through a Payout Batch and the Xero CSV. Amounts are AUD ex GST.
+
+  Assumptions (no story files in the repo; designed from the Jira acceptance criteria): UI labels were read from the
+
+  org and the deployed components on 2026-11-18.
+
+  '
+cases:
+- id: S04-TC-02
+  title: A Lead moved to Working shows "In Progress" to the agent
+  section: S04 Referral tracker and partner status
+  tags:
+  - story-04
+  - regression
+  preconditions:
+  - S03-TC-09 moved a Lead to Working; or move the Lead of the S02-TC-01 referral to Working as admin
+  steps:
+  - Open the Contacts tab
+  - Search "Tom Nguyen" in the list search box and open the Contact "Tom Nguyen"
+  - Click "Log in to Experience as User" (in the actions menu) and choose "Connectnow Partners" if asked
+  - Find the referral "Mover 0201" in the referral tracker
+  expected:
+  - Its status shows "In Progress"
+- id: S04-TC-04
+  title: An agent sees only their own referrals with the partner-safe columns
+  section: S04 Referral tracker and partner status
+  tags:
+  - story-04
+  - smoke
+  - security
+  steps:
+  - Open the Contacts tab
+  - Search "Tom Nguyen" in the list search box and open the Contact "Tom Nguyen"
+  - Click "Log in to Experience as User" (in the actions menu) and choose "Connectnow Partners" if asked
+  - Look at the referral tracker on the home page
+  expected:
+  - Every row was sent by Tom Nguyen (none from Priya Shah or another agency)
+  - Rows show mover name, Move-in, Services, status and Connectnow rep
+  - The Connectnow rep column shows a first name only, never a surname
+  - No loss reason, plan, retailer or internal notes are shown
+- id: S04-TC-05
+  title: A principal sees every referral of their agency
+  section: S04 Referral tracker and partner status
+  tags:
+  - story-04
+  - regression
+  - security
+  steps:
+  - Open the Contacts tab
+  - Search "Priya Shah" in the list search box and open the Contact "Priya Shah"
+  - Click "Log in to Experience as User" (in the actions menu) and choose "Connectnow Partners" if asked
+  - Look at the referral tracker on the home page
+  expected:
+  - Referrals sent by Tom Nguyen and by Priya Shah are both listed, with the "Sent by" column
+  - No referral of Bayside Property Group (Chloe Tan or Marco Rossi) is listed
+- id: S04-TC-06
+  title: Agency B's principal sees none of agency A's referrals
+  section: S04 Referral tracker and partner status
+  tags:
+  - story-04
+  - regression
+  - security
+  steps:
+  - Open the Contacts tab
+  - Search "Marco Rossi" in the list search box and open the Contact "Marco Rossi"
+  - Click "Log in to Experience as User" (in the actions menu) and choose "Connectnow Partners" if asked
+  - Look at the referral tracker on the home page
+  expected:
+  - No referral sent by Tom Nguyen or Priya Shah (Harbour & Co Realty) is listed
+- id: S04-TC-09
+  title: Home page counts this month's visible referrals by partner status
+  section: S04 Referral tracker and partner status
+  tags:
+  - story-04
+  - regression
+  steps:
+  - Open the Contacts tab
+  - Search "Tom Nguyen" in the list search box and open the Contact "Tom Nguyen"
+  - Click "Log in to Experience as User" (in the actions menu) and choose "Connectnow Partners" if asked
+  - Look at the "Referrals this month" tiles
+  expected:
+  - Each status tile (Received, In Progress, Connected, Closed Lost) shows a number
+  - The numbers add up to the referrals of this month in Tom's tracker

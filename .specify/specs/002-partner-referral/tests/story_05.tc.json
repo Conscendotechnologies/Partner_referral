@@ -1,0 +1,70 @@
+{
+  "feature": "002-partner-referral",
+  "story": "05",
+  "title": "Lead conversion to a Partner Referral Opportunity with products",
+  "cases": [
+    {
+      "id": "S05-TC-01",
+      "ac": "AC-05.1",
+      "title": "Converting a Partner Referral Lead creates a Person Account and a Partner Referral Opportunity at Qualification",
+      "level": "ui",
+      "persona": "Sales Rep",
+      "type": "positive",
+      "automated": true
+    },
+    {
+      "id": "S05-TC-02",
+      "ac": "AC-05.2",
+      "title": "The converted Opportunity has exactly the Lead's utilities as products",
+      "level": "ui",
+      "persona": "Sales Rep",
+      "type": "positive",
+      "automated": true
+    },
+    {
+      "id": "S05-TC-03",
+      "ac": "AC-05.3",
+      "title": "The Opportunity carries agency, agent, Referral and move-in date; the Referral links to it",
+      "level": "unit",
+      "persona": "System",
+      "type": "positive",
+      "automated": true
+    },
+    {
+      "id": "S05-TC-04",
+      "ac": "AC-05.4",
+      "title": "A rep can delete a product that will not be connected before Utilities Connected",
+      "level": "ui",
+      "persona": "Sales Rep",
+      "type": "positive",
+      "automated": true
+    },
+    {
+      "id": "S05-TC-05",
+      "ac": "AC-05.5",
+      "title": "200 Leads converted together each get the right products and fields",
+      "level": "unit",
+      "persona": "System",
+      "type": "bulk",
+      "automated": true
+    },
+    {
+      "id": "S05-TC-06",
+      "ac": "AC-05.6",
+      "title": "Converting a Lead of another record type runs none of this logic",
+      "level": "unit",
+      "persona": "System",
+      "type": "negative",
+      "automated": true
+    },
+    {
+      "id": "S05-TC-07",
+      "ac": "AC-05.1",
+      "title": "A Lead owned by a Standard User sales rep (PR_Sales_Rep) converts to a Person Account and Partner Referral Opportunity when converted as that rep (System.runAs)",
+      "level": "unit",
+      "persona": "Sales Rep",
+      "type": "positive",
+      "automated": true
+    }
+  ]
+}
