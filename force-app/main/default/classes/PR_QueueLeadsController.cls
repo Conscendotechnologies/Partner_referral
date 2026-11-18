@@ -3,33 +3,18 @@
  * then by move-in date. List view metadata cannot carry a sort order, so this replaces sorting by hand.
  */
 public with sharing class PR_QueueLeadsController {
-    public class LeadRow {
-        @AuraEnabled public Id id;
-        @AuraEnabled public String name;
-        @AuraEnabled public String queue;
-        @AuraEnabled public String state;
-        @AuraEnabled public String status;
-        @AuraEnabled public Boolean urgent;
-        @AuraEnabled public Date moveInDate;
-        @AuraEnabled public Datetime firstContactDue;
-        @AuraEnabled public Boolean slaBreached;
-        @AuraEnabled public String agency;
-    }
+    @TestVisible
+    private static Integer rowLimit = 500;
 
     @AuraEnabled(cacheable=false)
-    public static List<LeadRow> getQueueLeads() {
-        Set<Id> queueIds = new Set<Id>();
-        for (GroupMember m : [
-            SELECT GroupId
-            FROM GroupMember
-            WHERE UserOrGroupId = :UserInfo.getUserId() AND Group.Type = 'Queue' AND Group.DeveloperName LIKE 'PR\\_%'
-        ]) {
-            queueIds.add(m.GroupId);
-        }
-        List<LeadRow> rows = new List<LeadRow>();
+    public static PR_QueueLeadsResult getQueueLeads() {
+        PR_QueueLeadsResult result = new PR_QueueLeadsResult();
+        result.rowLimit = rowLimit;
+        Set<Id> queueIds = partnerQueueIds(UserInfo.getUserId());
         if (queueIds.isEmpty()) {
-            return rows;
+            return result;
         }
+        // One row over the limit tells us whether the list is cut.
         for (Lead l : [
             SELECT Id, Name, Owner.Name, State, Status, Is_Urgent__c, Move_In_Date__c, SLA_Due_At__c, SLA_Breached__c,
                 Referring_Agency__r.Name
@@ -40,21 +25,55 @@ public with sharing class PR_QueueLeadsController {
                 AND Status != :PR_Settings.LEAD_UNQUALIFIED
             WITH USER_MODE
             ORDER BY Is_Urgent__c DESC, Move_In_Date__c ASC NULLS LAST, CreatedDate ASC
-            LIMIT 500
+            LIMIT :(rowLimit + 1)
         ]) {
-            LeadRow r = new LeadRow();
-            r.id = l.Id;
-            r.name = l.Name;
-            r.queue = l.Owner.Name;
-            r.state = l.State;
-            r.status = l.Status;
-            r.urgent = l.Is_Urgent__c;
-            r.moveInDate = l.Move_In_Date__c;
-            r.firstContactDue = l.SLA_Due_At__c;
-            r.slaBreached = l.SLA_Breached__c;
-            r.agency = l.Referring_Agency__r?.Name;
-            rows.add(r);
+            if (result.rows.size() == rowLimit) {
+                result.hasMore = true;
+                break;
+            }
+            result.rows.add(toRow(l));
         }
-        return rows;
+        return result;
+    }
+
+    /**
+     * The PR_ queues the user belongs to, directly or through a public group that is a queue member
+     * (one level of group nesting, the way queues are set up in this org).
+     */
+    private static Set<Id> partnerQueueIds(Id userId) {
+        Set<Id> members = new Set<Id>{ userId };
+        for (GroupMember m : [
+            SELECT GroupId
+            FROM GroupMember
+            WHERE UserOrGroupId = :userId AND Group.Type = 'Regular'
+            LIMIT 1000
+        ]) {
+            members.add(m.GroupId);
+        }
+        Set<Id> queueIds = new Set<Id>();
+        for (GroupMember m : [
+            SELECT GroupId
+            FROM GroupMember
+            WHERE UserOrGroupId IN :members AND Group.Type = 'Queue' AND Group.DeveloperName LIKE 'PR\\_%'
+            LIMIT 200
+        ]) {
+            queueIds.add(m.GroupId);
+        }
+        return queueIds;
+    }
+
+    private static PR_QueueLeadRow toRow(Lead l) {
+        PR_QueueLeadRow r = new PR_QueueLeadRow();
+        r.id = l.Id;
+        r.name = l.Name;
+        r.queue = l.Owner.Name;
+        r.state = l.State;
+        r.status = l.Status;
+        r.urgent = l.Is_Urgent__c;
+        r.moveInDate = l.Move_In_Date__c;
+        r.firstContactDue = l.SLA_Due_At__c;
+        r.slaBreached = l.SLA_Breached__c;
+        r.agency = l.Referring_Agency__r?.Name;
+        return r;
     }
 }

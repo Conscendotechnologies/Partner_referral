@@ -31,7 +31,7 @@ describe('c-pr-queue-leads', () => {
     });
 
     it('shows the rows in the order the server returns (urgent first, then move-in date)', async () => {
-        getQueueLeads.mockResolvedValue(ROWS);
+        getQueueLeads.mockResolvedValue({ rows: ROWS, hasMore: false, rowLimit: 500 });
         const element = mount();
         await flush();
         const table = element.shadowRoot.querySelector('lightning-datatable');
@@ -41,11 +41,21 @@ describe('c-pr-queue-leads', () => {
     });
 
     it('says so when the queues are empty', async () => {
-        getQueueLeads.mockResolvedValue([]);
+        getQueueLeads.mockResolvedValue({ rows: [], hasMore: false, rowLimit: 500 });
         const element = mount();
         await flush();
         expect(element.shadowRoot.querySelector('lightning-datatable')).toBeNull();
         expect(element.shadowRoot.querySelector('.empty')).not.toBeNull();
+    });
+
+    it('says when the list is cut at the row limit', async () => {
+        getQueueLeads.mockResolvedValue({ rows: ROWS.slice(0, 2), hasMore: true, rowLimit: 2 });
+        const element = mount();
+        await flush();
+        expect(element.shadowRoot.querySelector('.partial').textContent).toContain('cut at 2 Leads');
+        expect(element.shadowRoot.querySelector('.count').textContent).toBe(
+            'Showing the first 2 open (1 urgent); more are in your queues'
+        );
     });
 
     it('shows the server error', async () => {
@@ -56,7 +66,7 @@ describe('c-pr-queue-leads', () => {
     });
 
     it('reloads on Refresh', async () => {
-        getQueueLeads.mockResolvedValue(ROWS);
+        getQueueLeads.mockResolvedValue({ rows: ROWS, hasMore: false, rowLimit: 500 });
         const element = mount();
         await flush();
         element.shadowRoot.querySelector('lightning-button').click();

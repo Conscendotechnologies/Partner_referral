@@ -173,5 +173,5 @@ QA (G6, PR 7) found four build defects that the admin-profile unit tests could n
 | D4: queue list view not sorted urgent first | S03 | List view metadata cannot carry a sort. New **Referral Queue** tab (`PR_Referral_Queue` app page, `prQueueLeads` LWC, `PR_QueueLeadsController`) lists the open Partner Referral Leads of the rep's own PR_ queues, urgent first, then by move-in date. In the app and in `PR_Sales_Rep` |
 
 New tests use real Standard User personas (`PR_TestFactory.standardUser`): `aStandardUserRepConvertsToAPersonAccount`
-(S05-TC-07), `standardUserManagerAndFinanceWorkOnCommissionsTheyDoNotOwn` (S06-TC-19) and `PR_LeadLifecycleTest.referralQueue*`
+(S05-TC-07), `standardUserManagerAndFinanceWorkOnCommissionsTheyDoNotOwn` (S06-TC-19) and `PR_LeadLifecycleTest.referralQueue*` (S03-TC-11: a Standard User rep who reaches the queue through a public group, the row-limit warning, and a user in no queue)
 (S03-TC-11).

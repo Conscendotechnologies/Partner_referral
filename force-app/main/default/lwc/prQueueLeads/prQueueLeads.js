@@ -30,6 +30,8 @@ const COLUMNS = [
 export default class PrQueueLeads extends LightningElement {
     columns = COLUMNS;
     rows = [];
+    hasMore = false;
+    rowLimit;
     loading = false;
     errorMessage;
 
@@ -43,17 +45,22 @@ export default class PrQueueLeads extends LightningElement {
 
     get countLabel() {
         const urgent = this.rows.filter((r) => r.urgent).length;
-        return `${this.rows.length} open, ${urgent} urgent`;
+        return this.hasMore
+            ? `Showing the first ${this.rows.length} open (${urgent} urgent); more are in your queues`
+            : `${this.rows.length} open, ${urgent} urgent`;
     }
 
     async load() {
         this.loading = true;
         this.errorMessage = null;
         try {
-            const data = await getQueueLeads();
-            this.rows = (data || []).map((r) => ({ ...r, url: '/' + r.id }));
+            const data = (await getQueueLeads()) || {};
+            this.rows = (data.rows || []).map((r) => ({ ...r, url: '/' + r.id }));
+            this.hasMore = !!data.hasMore;
+            this.rowLimit = data.rowLimit;
         } catch (e) {
             this.rows = [];
+            this.hasMore = false;
             this.errorMessage = (e && e.body && e.body.message) || 'The queue could not be loaded.';
         } finally {
             this.loading = false;

@@ -10,6 +10,11 @@
             <template lwc:if={loading}>
                 <lightning-spinner alternative-text="Loading" size="small"></lightning-spinner>
             </template>
+            <template lwc:if={hasMore}>
+                <p class="partial slds-text-color_error slds-m-bottom_x-small">
+                    This list is cut at {rowLimit} Leads. The most urgent are shown; work these first, then refresh.
+                </p>
+            </template>
             <template lwc:if={errorMessage}>
                 <p class="error slds-text-color_error">{errorMessage}</p>
             </template>
