@@ -96,7 +96,7 @@
     {
       "id": "S03-TC-11",
       "ac": "AC-03.7",
-      "title": "A queue list view puts urgent Leads first, then by move-in date",
+      "title": "The rep's Referral Queue puts urgent Leads first, then by move-in date",
       "level": "ui",
       "persona": "Sales Rep",
       "type": "positive",

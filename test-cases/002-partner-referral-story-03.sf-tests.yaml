@@ -116,16 +116,18 @@ cases:
   - '"First Contacted At" now shows the current date and time'
   - '"SLA Breached" is not ticked when that time is before "First Contact Due"'
 - id: S03-TC-11
-  title: A queue list view puts urgent Leads first, then by move-in date
+  title: The rep's Referral Queue puts urgent Leads first, then by move-in date
   section: S03 State routing, urgent movers and first-contact SLA
   tags:
   - story-03
   - regression
+  preconditions:
+  - PR 8 (G6 defect D4) is deployed. List views cannot carry a sort, so the queue is the "Referral Queue" tab
   steps:
   - Open Setup > Users (/lightning/setup/ManageUsers/home)
   - Click "Login" next to the user "Sam Rep (PR test)"
-  - Open the Leads tab
-  - Select the "PR - NSW + ACT queue" list view
+  - Open the app "Connectnow Partner Referrals" and click the "Referral Queue" tab
   expected:
+  - Only Leads from Sam's queues (PR - NSW + ACT and PR - VIC + TAS) are listed
   - All Leads with Urgent ticked appear above the non-urgent Leads
   - Within each group Leads are ordered by Move-in Date, earliest first
