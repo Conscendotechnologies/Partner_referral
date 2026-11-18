@@ -1,0 +1,115 @@
+{
+  "feature": "002-partner-referral",
+  "story": "07",
+  "title": "Monthly payout batch and Xero CSV",
+  "cases": [
+    {
+      "id": "S07-TC-01",
+      "ac": "AC-07.1",
+      "title": "First-business-day run builds a Draft batch with one line per agency and links the commissions",
+      "level": "unit",
+      "persona": "System",
+      "type": "positive",
+      "automated": true
+    },
+    {
+      "id": "S07-TC-02",
+      "ac": "AC-07.2",
+      "title": "A same-day re-run adds only newly approved commissions; none is batched twice",
+      "level": "unit",
+      "persona": "System",
+      "type": "boundary",
+      "automated": true
+    },
+    {
+      "id": "S07-TC-03",
+      "ac": "AC-07.3",
+      "title": "Finance runs the payout on demand from the Payouts console",
+      "level": "ui",
+      "persona": "Finance",
+      "type": "positive",
+      "automated": true
+    },
+    {
+      "id": "S07-TC-04",
+      "ac": "AC-07.3",
+      "title": "A user without Manage Partner Payouts cannot run, export or pay",
+      "level": "ui",
+      "persona": "Partner Manager",
+      "type": "negative",
+      "automated": true
+    },
+    {
+      "id": "S07-TC-05",
+      "ac": "AC-07.3",
+      "title": "Service refuses a payout run from a user without the permission",
+      "level": "unit",
+      "persona": "Partner Manager",
+      "type": "negative",
+      "automated": true
+    },
+    {
+      "id": "S07-TC-06",
+      "ac": "AC-07.4",
+      "title": "An Exported batch is not changed by a re-run; new approvals wait for next month",
+      "level": "unit",
+      "persona": "System",
+      "type": "negative",
+      "automated": true
+    },
+    {
+      "id": "S07-TC-07",
+      "ac": "AC-07.5",
+      "title": "Download Xero CSV downloads the file and moves the batch to Exported",
+      "level": "ui",
+      "persona": "Finance",
+      "type": "positive",
+      "automated": true
+    },
+    {
+      "id": "S07-TC-08",
+      "ac": "AC-07.5",
+      "title": "CSV has one row per line with agency name, ABN, reference <YYYYMM>-<ABN>, total ex GST, count and month",
+      "level": "unit",
+      "persona": "System",
+      "type": "positive",
+      "automated": true
+    },
+    {
+      "id": "S07-TC-09",
+      "ac": "AC-07.6",
+      "title": "Mark paid sets the batch and every commission in it to Paid",
+      "level": "ui",
+      "persona": "Finance",
+      "type": "positive",
+      "automated": true
+    },
+    {
+      "id": "S07-TC-10",
+      "ac": "AC-07.6",
+      "title": "Mark paid is refused before the CSV is downloaded",
+      "level": "unit",
+      "persona": "Finance",
+      "type": "negative",
+      "automated": true
+    },
+    {
+      "id": "S07-TC-11",
+      "ac": "AC-07.7",
+      "title": "3,000 Approved commissions across 40 agencies run within limits and give 40 lines",
+      "level": "unit",
+      "persona": "System",
+      "type": "bulk",
+      "automated": true
+    },
+    {
+      "id": "S07-TC-12",
+      "ac": "AC-07.8",
+      "title": "Payout objects have no bank fields and partner users cannot see them",
+      "level": "unit",
+      "persona": "Partner Principal",
+      "type": "negative",
+      "automated": true
+    }
+  ]
+}

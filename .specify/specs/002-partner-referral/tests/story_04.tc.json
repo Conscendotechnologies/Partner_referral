@@ -1,0 +1,115 @@
+{
+  "feature": "002-partner-referral",
+  "story": "04",
+  "title": "Referral tracker and partner status",
+  "cases": [
+    {
+      "id": "S04-TC-01",
+      "ac": "AC-04.1",
+      "title": "Partner status follows Lead and Opportunity changes through every mapping",
+      "level": "unit",
+      "persona": "System",
+      "type": "positive",
+      "automated": true
+    },
+    {
+      "id": "S04-TC-02",
+      "ac": "AC-04.1",
+      "title": "A Lead moved to Working shows \"In Progress\" to the agent",
+      "level": "ui",
+      "persona": "Partner Agent",
+      "type": "positive",
+      "automated": true
+    },
+    {
+      "id": "S04-TC-03",
+      "ac": "AC-04.2",
+      "title": "Rep first name only when a user owns the Lead; blank when a queue owns it",
+      "level": "unit",
+      "persona": "System",
+      "type": "positive",
+      "automated": true
+    },
+    {
+      "id": "S04-TC-04",
+      "ac": "AC-04.3",
+      "title": "An agent sees only their own referrals with the partner-safe columns",
+      "level": "ui",
+      "persona": "Partner Agent",
+      "type": "positive",
+      "automated": true
+    },
+    {
+      "id": "S04-TC-05",
+      "ac": "AC-04.4",
+      "title": "A principal sees every referral of their agency",
+      "level": "ui",
+      "persona": "Partner Principal",
+      "type": "positive",
+      "automated": true
+    },
+    {
+      "id": "S04-TC-06",
+      "ac": "AC-04.5",
+      "title": "Agency B's principal sees none of agency A's referrals",
+      "level": "ui",
+      "persona": "Partner Principal",
+      "type": "negative",
+      "automated": true
+    },
+    {
+      "id": "S04-TC-07",
+      "ac": "AC-04.5",
+      "title": "Partner users cannot read other agencies' referrals, Leads or Opportunities through Apex, LWCs or the API",
+      "level": "unit",
+      "persona": "Partner Agent",
+      "type": "negative",
+      "automated": true
+    },
+    {
+      "id": "S04-TC-08",
+      "ac": "AC-04.5",
+      "title": "Partner user is refused a Lead or another agency's Referral by direct URL",
+      "level": "manual",
+      "persona": "Partner Agent",
+      "type": "negative",
+      "automated": false
+    },
+    {
+      "id": "S04-TC-09",
+      "ac": "AC-04.6",
+      "title": "Home page counts this month's visible referrals by partner status",
+      "level": "ui",
+      "persona": "Partner Agent",
+      "type": "positive",
+      "automated": true
+    },
+    {
+      "id": "S04-TC-10",
+      "ac": "AC-04.7",
+      "title": "A converted referral stays visible with the Opportunity's status",
+      "level": "unit",
+      "persona": "System",
+      "type": "positive",
+      "automated": true
+    },
+    {
+      "id": "S04-TC-11",
+      "ac": "AC-04.8",
+      "title": "200 Leads or Opportunities updated together update all related Referrals",
+      "level": "unit",
+      "persona": "System",
+      "type": "bulk",
+      "automated": true
+    },
+    {
+      "id": "S04-TC-12",
+      "ac": "AC-04.9",
+      "title": "Tracker and home page fit a 375 px phone",
+      "level": "manual",
+      "persona": "Partner Agent",
+      "type": "positive",
+      "automated": false
+    }
+  ]
+}

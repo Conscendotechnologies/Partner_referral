@@ -1,0 +1,44 @@
+{
+  "feature": "002-partner-referral",
+  "story": "11",
+  "title": "Mark paid at scale and zero-test CI check",
+  "cases": [
+    {
+      "id": "S11-TC-01",
+      "ac": "AC-11.1",
+      "title": "Marking a batch Paid that is too large for one transaction finishes in the background; the batch shows Paid only after every commission is Paid",
+      "level": "unit",
+      "persona": "System",
+      "type": "bulk",
+      "automated": true
+    },
+    {
+      "id": "S11-TC-02",
+      "ac": "AC-11.1",
+      "title": "A second Mark paid while one is processing is refused",
+      "level": "unit",
+      "persona": "Finance",
+      "type": "negative",
+      "automated": true
+    },
+    {
+      "id": "S11-TC-03",
+      "ac": "AC-11.2",
+      "title": "A test covers the large-batch path (PR_MarkPaidBatchJob)",
+      "level": "unit",
+      "persona": "System",
+      "type": "positive",
+      "automated": true
+    },
+    {
+      "id": "S11-TC-04",
+      "ac": "AC-11.3",
+      "title": "pr-validate fails with a clear message when the Apex test step ran zero tests",
+      "level": "manual",
+      "persona": "Developer",
+      "type": "negative",
+      "automated": false,
+      "note": "Blocked: the check is not built yet; it needs the Architect's decision."
+    }
+  ]
+}

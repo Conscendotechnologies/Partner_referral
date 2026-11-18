@@ -1,0 +1,300 @@
+name: 002-partner-referral S02 Submit a referral from the partner portal
+context: 'Connectnow partner referral programme (feature 002) in the SDO org salesOrgSDO (a demo org, not a sandbox: every
+
+  record a case creates starts with AI-TEST so it can be cleaned up).
+
+  Partner portal: Experience Cloud site "Connectnow Partners" (https://co1778135180529.my.site.com/partners). Its home
+
+  page holds the "Referrals this month" tiles, the commission tiles (principals only), the "Refer a mover" form and the
+
+  referral tracker. Partner cases start as the admin and use "Log in to Experience as User" on the partner''s Contact.
+
+  Internal app: "Connectnow Partner Referrals". Internal cases log in as a test user from Setup > Users.
+
+  Personas:
+
+  - Tom Nguyen: partner Agent, agency Harbour & Co Realty (Active).
+
+  - Priya Shah: partner Principal, Harbour & Co Realty.
+
+  - Chloe Tan: partner Agent, agency Bayside Property Group (Active).
+
+  - Marco Rossi: partner Principal, Bayside Property Group.
+
+  - Sam Rep (PR test): sales rep (PR_Sales_Rep), member of queues PR_NSW_ACT and PR_VIC_TAS.
+
+  - Maya Manager (PR test): Partner Manager (PR_Partner_Manager + PR_Sales_Rep).
+
+  - Fiona Finance (PR test): Finance (PR_Finance).
+
+  Business terms: a referral (Referral__c, label "Referral") creates a Partner Referral Lead; converting it gives a
+
+  Partner Referral Opportunity; at stage "Utilities Connected" a Partner Commission is created; Finance pays approved
+
+  commissions monthly through a Payout Batch and the Xero CSV. Amounts are AUD ex GST.
+
+  Assumptions (no story files in the repo; designed from the Jira acceptance criteria): UI labels were read from the
+
+  org and the deployed components on 2026-11-18.
+
+  '
+cases:
+- id: S02-TC-01
+  title: An agent submits a complete referral and sees the confirmation
+  section: S02 Submit a referral from the partner portal
+  tags:
+  - story-02
+  - smoke
+  mode: both
+  steps:
+  - Open the Contacts tab
+  - Search "Tom Nguyen" in the list search box and open the Contact "Tom Nguyen"
+  - Click "Log in to Experience as User" (in the actions menu) and choose "Connectnow Partners" if asked
+  - Click "Refer a mover"
+  - Enter "AI-TEST" in "First name"
+  - Enter "Mover 0201 <unique suffix>" in "Last name"
+  - Enter "0412 000 201" in "Mobile"
+  - Enter "1 AI-TEST Street" in "Street"
+  - Enter "Parramatta" in "Suburb"
+  - Select "NSW" in "State"
+  - Enter "2150" in "Postcode"
+  - Enter a date 30 days from today in "Move-in date"
+  - Tick "Electricity" under "Services to connect"
+  - Tick "The customer gives consent"
+  - Click "Send referral"
+  expected:
+  - The form shows "Referral sent"
+  - The referral appears in the referral tracker on the home page with status "Received"
+- id: S02-TC-02
+  title: The submitted referral creates one Referral owned by the agent and one linked Partner Referral Lead with state code
+  section: S02 Submit a referral from the partner portal
+  tags:
+  - story-02
+  - regression
+  preconditions:
+  - S02-TC-01 has run
+  steps:
+  - Open the Referrals tab
+  - Search "Mover 0201" in the list search box and open the newest matching Referral
+  - Click the Lead link on the Referral
+  expected:
+  - The Referral's owner is Tom Nguyen and its Lead field links to a Lead
+  - The Lead has record type "Partner Referral", Lead Status "New" and Lead Source "Partner Referral"
+  - The Lead's address shows "1 AI-TEST Street", Parramatta, NSW 2150
+  - The Lead's owner is the queue "PR_NSW_ACT" (assignment ran)
+  - The Lead links back to the same Referral
+- id: S02-TC-03
+  title: Submitting an empty form shows a message on every required field
+  section: S02 Submit a referral from the partner portal
+  tags:
+  - story-02
+  - regression
+  steps:
+  - Open the Contacts tab
+  - Search "Tom Nguyen" in the list search box and open the Contact "Tom Nguyen"
+  - Click "Log in to Experience as User" (in the actions menu) and choose "Connectnow Partners" if asked
+  - Click "Refer a mover"
+  - Click "Send referral"
+  expected:
+  - No referral is sent ("Referral sent" is not shown)
+  - First name, Last name, Mobile, Street, Suburb, State, Postcode and Move-in date each show a required-field message
+  - Services to connect shows "Choose at least one"
+  - The consent checkbox shows a required message
+  - Email (optional), Previous address and Notes for Connectnow show no message
+- id: S02-TC-05
+  title: A landline number is rejected as Mobile
+  section: S02 Submit a referral from the partner portal
+  tags:
+  - story-02
+  - regression
+  steps:
+  - Open the Contacts tab
+  - Search "Tom Nguyen" in the list search box and open the Contact "Tom Nguyen"
+  - Click "Log in to Experience as User" (in the actions menu) and choose "Connectnow Partners" if asked
+  - Click "Refer a mover"
+  - Enter "AI-TEST" in "First name"
+  - Enter "Mover 0203" in "Last name"
+  - Enter "02 9123 4567" in "Mobile"
+  - Enter "1 AI-TEST Street" in "Street"
+  - Enter "Parramatta" in "Suburb"
+  - Select "NSW" in "State"
+  - Enter "2150" in "Postcode"
+  - Enter a date 30 days from today in "Move-in date"
+  - Tick "Electricity" under "Services to connect"
+  - Tick "The customer gives consent"
+  - Click "Send referral"
+  expected:
+  - No referral is sent
+  - The Mobile field shows "Use 04 and 8 digits, or +614 and 8 digits."
+- id: S02-TC-06
+  title: A +614 mobile with spaces is accepted
+  section: S02 Submit a referral from the partner portal
+  tags:
+  - story-02
+  - regression
+  steps:
+  - Open the Contacts tab
+  - Search "Tom Nguyen" in the list search box and open the Contact "Tom Nguyen"
+  - Click "Log in to Experience as User" (in the actions menu) and choose "Connectnow Partners" if asked
+  - Click "Refer a mover"
+  - Enter "AI-TEST" in "First name"
+  - Enter "Mover 0204 <unique suffix>" in "Last name"
+  - Enter "+61 412 000 204" in "Mobile"
+  - Enter "1 AI-TEST Street" in "Street"
+  - Enter "Parramatta" in "Suburb"
+  - Select "NSW" in "State"
+  - Enter "2150" in "Postcode"
+  - Enter a date 30 days from today in "Move-in date"
+  - Tick "Electricity" under "Services to connect"
+  - Tick "The customer gives consent"
+  - Click "Send referral"
+  expected:
+  - The form shows "Referral sent"
+- id: S02-TC-08
+  title: A move-in date 8 days in the past is rejected
+  section: S02 Submit a referral from the partner portal
+  tags:
+  - story-02
+  - regression
+  steps:
+  - Open the Contacts tab
+  - Search "Tom Nguyen" in the list search box and open the Contact "Tom Nguyen"
+  - Click "Log in to Experience as User" (in the actions menu) and choose "Connectnow Partners" if asked
+  - Click "Refer a mover"
+  - Enter "AI-TEST" in "First name"
+  - Enter "Mover 0206" in "Last name"
+  - Enter "0412 000 206" in "Mobile"
+  - Enter "1 AI-TEST Street" in "Street"
+  - Enter "Parramatta" in "Suburb"
+  - Select "NSW" in "State"
+  - Enter "2150" in "Postcode"
+  - Enter the date 8 days before today in "Move-in date"
+  - Tick "Electricity" under "Services to connect"
+  - Tick "The customer gives consent"
+  - Click "Send referral"
+  expected:
+  - No referral is sent
+  - The Move-in date field shows "No more than 7 days ago."
+- id: S02-TC-09
+  title: A move-in date more than 6 months ahead is rejected
+  section: S02 Submit a referral from the partner portal
+  tags:
+  - story-02
+  - regression
+  steps:
+  - Open the Contacts tab
+  - Search "Tom Nguyen" in the list search box and open the Contact "Tom Nguyen"
+  - Click "Log in to Experience as User" (in the actions menu) and choose "Connectnow Partners" if asked
+  - Click "Refer a mover"
+  - Enter "AI-TEST" in "First name"
+  - Enter "Mover 0207" in "Last name"
+  - Enter "0412 000 207" in "Mobile"
+  - Enter "1 AI-TEST Street" in "Street"
+  - Enter "Parramatta" in "Suburb"
+  - Select "NSW" in "State"
+  - Enter "2150" in "Postcode"
+  - Enter the date 6 months and 1 day after today in "Move-in date"
+  - Tick "Electricity" under "Services to connect"
+  - Tick "The customer gives consent"
+  - Click "Send referral"
+  expected:
+  - No referral is sent
+  - The Move-in date field shows "No more than 6 months ahead."
+- id: S02-TC-13
+  title: An agent of an inactive agency cannot submit and nothing is created
+  section: S02 Submit a referral from the partner portal
+  tags:
+  - story-02
+  - regression
+  preconditions:
+  - Bayside Property Group's Partner Status has been set to "Inactive" by a Partner Manager; set it back to "Active" afterwards
+  steps:
+  - Open the Contacts tab
+  - Search "Chloe Tan" in the list search box and open the Contact "Chloe Tan"
+  - Click "Log in to Experience as User" (in the actions menu) and choose "Connectnow Partners" if asked
+  - Click "Refer a mover"
+  - Enter "AI-TEST" in "First name"
+  - Enter "Mover 0210" in "Last name"
+  - Enter "0412 000 210" in "Mobile"
+  - Enter "1 AI-TEST Street" in "Street"
+  - Enter "Parramatta" in "Suburb"
+  - Select "NSW" in "State"
+  - Enter "2150" in "Postcode"
+  - Enter a date 30 days from today in "Move-in date"
+  - Tick "Electricity" under "Services to connect"
+  - Tick "The customer gives consent"
+  - Click "Send referral"
+  expected:
+  - '"Referral sent" is not shown'
+  - The message "Your agency is not active, so new referrals cannot be submitted. Contact your Connectnow Partner Manager."
+    is shown
+  - The referral tracker shows no referral for "Mover 0210"
+- id: S02-TC-15
+  title: Same-agency duplicate shows a warning and can be sent anyway
+  section: S02 Submit a referral from the partner portal
+  tags:
+  - story-02
+  - regression
+  preconditions:
+  - 'S02-TC-01 has run: Tom''s agency has an open referral with mobile 0412 000 201'
+  steps:
+  - Open the Contacts tab
+  - Search "Tom Nguyen" in the list search box and open the Contact "Tom Nguyen"
+  - Click "Log in to Experience as User" (in the actions menu) and choose "Connectnow Partners" if asked
+  - Click "Refer a mover"
+  - Enter "AI-TEST" in "First name"
+  - Enter "Mover 0212" in "Last name"
+  - Enter "0412 000 201" in "Mobile"
+  - Enter "1 AI-TEST Street" in "Street"
+  - Enter "Parramatta" in "Suburb"
+  - Select "NSW" in "State"
+  - Enter "2150" in "Postcode"
+  - Enter a date 30 days from today in "Move-in date"
+  - Tick "Electricity" under "Services to connect"
+  - Tick "The customer gives consent"
+  - Click "Send referral"
+  - Click "Send anyway"
+  expected:
+  - After "Send referral" the form shows "Your agency already referred this mover:" with the earlier referral, and "Send it
+    anyway only if this is a different move."
+  - After "Send anyway" the form shows "Referral sent"
+- id: S02-TC-17
+  title: Cross-agency match submits silently
+  section: S02 Submit a referral from the partner portal
+  tags:
+  - story-02
+  - regression
+  preconditions:
+  - 'S02-TC-01 has run: Harbour & Co Realty has an open referral with mobile 0412 000 201'
+  steps:
+  - Open the Contacts tab
+  - Search "Chloe Tan" in the list search box and open the Contact "Chloe Tan"
+  - Click "Log in to Experience as User" (in the actions menu) and choose "Connectnow Partners" if asked
+  - Click "Refer a mover"
+  - Enter "AI-TEST" in "First name"
+  - Enter "Mover 0214" in "Last name"
+  - Enter "0412 000 201" in "Mobile"
+  - Enter "1 AI-TEST Street" in "Street"
+  - Enter "Parramatta" in "Suburb"
+  - Select "NSW" in "State"
+  - Enter "2150" in "Postcode"
+  - Enter a date 30 days from today in "Move-in date"
+  - Tick "Electricity" under "Services to connect"
+  - Tick "The customer gives consent"
+  - Click "Send referral"
+  expected:
+  - The form shows "Referral sent" with no duplicate warning
+- id: S02-TC-18
+  title: Cross-agency match flags Possible Duplicate on both referrals (internal only)
+  section: S02 Submit a referral from the partner portal
+  tags:
+  - story-02
+  - regression
+  preconditions:
+  - S02-TC-17 has run
+  steps:
+  - Open the Referrals tab
+  - Search "0412 000 201" in the list search box
+  - Open the referral from Chloe Tan and then the one from Tom Nguyen
+  expected:
+  - Both Referrals show "Possible Duplicate" ticked
