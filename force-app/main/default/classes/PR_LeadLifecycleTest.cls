@@ -193,6 +193,33 @@ private class PR_LeadLifecycleTest {
         Assert.areEqual('Connected', PR_ReferralStatusSync.statusForStage('Utilities Connected'));
     }
 
+    // S05-TC-07 (AC-05.1): a sales rep on the Standard User profile converts their own Partner Referral Lead.
+    @IsTest
+    static void aStandardUserRepConvertsToAPersonAccount() {
+        User rep = PR_TestFactory.standardUser('prstdrep', new List<String>{ 'PR_Sales_Rep' });
+        Test.startTest();
+        Referral__c r = submit('0411000041', 'NSW', 20, new List<String>{ 'Electricity', 'Internet' });
+        update new Lead(Id = r.Lead__c, OwnerId = rep.Id, Status = 'Working');
+        Id oppId;
+        System.runAs(rep) {
+            Database.LeadConvert lc = new Database.LeadConvert();
+            lc.setLeadId(r.Lead__c);
+            lc.setConvertedStatus('Converted');
+            Database.LeadConvertResult res = Database.convertLead(lc, false);
+            Assert.isTrue(res.isSuccess(), String.valueOf(res.getErrors()));
+            oppId = res.getOpportunityId();
+        }
+        Test.stopTest();
+        Opportunity o = [
+            SELECT RecordType.DeveloperName, StageName, Account.IsPersonAccount, (SELECT Id FROM OpportunityLineItems)
+            FROM Opportunity WHERE Id = :oppId
+        ];
+        Assert.isTrue(o.Account.IsPersonAccount, 'the rep gets a Person Account');
+        Assert.areEqual('Partner_Referral', o.RecordType.DeveloperName);
+        Assert.areEqual('Qualification', o.StageName);
+        Assert.areEqual(2, o.OpportunityLineItems.size(), 'one product per utility');
+    }
+
     @IsTest
     static void conversionBuildsOpportunityProductsAndCommission() {
         Test.startTest();

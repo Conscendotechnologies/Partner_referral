@@ -66,6 +66,19 @@ public class PR_TestFactory {
         return u;
     }
 
+    /**
+     * Internal user on the Standard User profile with PR permission sets, like the real reps, Partner Managers and
+     * Finance users (the other internal test users are System Administrators and hide profile-level gaps).
+     */
+    public static User standardUser(String alias, List<String> permissionSets) {
+        User u = baseUser(alias, [SELECT Id FROM Profile WHERE Name = 'Standard User' LIMIT 1].Id);
+        System.runAs(new User(Id = UserInfo.getUserId())) {
+            insert u;
+            assign(u.Id, permissionSets);
+        }
+        return u;
+    }
+
     /** Enables a partner login for an agency contact. Call inside System.runAs to keep setup DML separate. */
     public static User portalUser(Contact c, String alias) {
         User u = baseUser(alias, [SELECT Id FROM Profile WHERE Name = 'Connectnow Partner User' LIMIT 1].Id);

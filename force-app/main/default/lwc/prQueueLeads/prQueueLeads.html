@@ -1,0 +1,29 @@
+<template>
+    <lightning-card title="My partner referral queue" icon-name="standard:lead">
+        <div slot="actions">
+            <lightning-button label="Refresh" onclick={handleRefresh} disabled={loading}></lightning-button>
+        </div>
+        <div class="slds-p-horizontal_medium">
+            <p class="slds-text-body_small slds-text-color_weak slds-m-bottom_small">
+                Urgent movers first, then by move-in date. <span class="count">{countLabel}</span>
+            </p>
+            <template lwc:if={loading}>
+                <lightning-spinner alternative-text="Loading" size="small"></lightning-spinner>
+            </template>
+            <template lwc:if={errorMessage}>
+                <p class="error slds-text-color_error">{errorMessage}</p>
+            </template>
+            <template lwc:if={isEmpty}>
+                <p class="empty">No open partner referrals in your queues.</p>
+            </template>
+            <template lwc:if={rows.length}>
+                <lightning-datatable
+                    key-field="id"
+                    data={rows}
+                    columns={columns}
+                    hide-checkbox-column
+                ></lightning-datatable>
+            </template>
+        </div>
+    </lightning-card>
+</template>
