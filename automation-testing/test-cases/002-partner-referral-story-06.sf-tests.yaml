@@ -114,11 +114,12 @@ cases:
   - Click "Login" next to the user "Sam Rep (PR test)"
   - Open the Opportunities tab
   - Search "AI-TEST Commission" in the list search box and open the Opportunity
-  - Open a Pending commission from the "Partner Commissions" related list
-  - Change Status to "Approved" and save
+  - Open a Pending commission from the "Partner Commissions" related list, if it is shown
+  - If the commission opened, change Status to "Approved" and save
   expected:
-  - The commission is not saved
-  - The error "Only Partner Managers can approve commissions." is shown
+  - 'Sam cannot approve: either the commission is not reachable (sales reps have no access to commissions, so there is
+    no "Partner Commissions" related list), or the save fails with "Only Partner Managers can approve commissions."'
+  - The commission's Status is still "Pending" (check as admin if needed)
 - id: S06-TC-13
   title: Partner Manager is refused when moving an Approved commission back to Pending
   section: S06 Commission creation, approval, locking and principal view
