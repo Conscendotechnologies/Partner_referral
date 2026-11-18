@@ -56,6 +56,15 @@
       "persona": "System",
       "type": "negative",
       "automated": true
+    },
+    {
+      "id": "S05-TC-07",
+      "ac": "AC-05.1",
+      "title": "A Lead owned by a Standard User sales rep (PR_Sales_Rep) converts to a Person Account and Partner Referral Opportunity when converted as that rep (System.runAs)",
+      "level": "unit",
+      "persona": "Sales Rep",
+      "type": "positive",
+      "automated": true
     }
   ]
 }

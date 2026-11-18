@@ -164,6 +164,15 @@
       "persona": "System",
       "type": "bulk",
       "automated": true
+    },
+    {
+      "id": "S06-TC-19",
+      "ac": "AC-06.6",
+      "title": "A Partner Manager (Standard User + PR_Partner_Manager) who does not own the commission can approve a Pending commission owned by a sales rep (System.runAs)",
+      "level": "unit",
+      "persona": "Partner Manager",
+      "type": "positive",
+      "automated": true
     }
   ]
 }
