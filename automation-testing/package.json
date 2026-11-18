@@ -1,0 +1,13 @@
+{
+  "name": "salesdemoorg-automation-testing",
+  "private": true,
+  "version": "1.0.0",
+  "description": "UI test automation for the Salesforce project: SF AI Tester suites and the Playwright specs generated from them. Never deployed to the org.",
+  "scripts": {
+    "test": "playwright test --config playwright.sf-ai.config.ts",
+    "test:list": "playwright test --config playwright.sf-ai.config.ts --list"
+  },
+  "devDependencies": {
+    "@playwright/test": "1.63.0"
+  }
+}

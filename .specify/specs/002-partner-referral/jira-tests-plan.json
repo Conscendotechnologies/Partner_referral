@@ -28,7 +28,7 @@
       "parent": "10",
       "parentKey": "KAN-53",
       "summary": "[002-S10-TC-01] Each agency has an active principal and agent who can reach the portal",
-      "description": "Level: ui\nPersona: Admin\nType: positive\nAC: AC-10.1\nSuite: test-cases/002-partner-referral-story-10.sf-tests.yaml",
+      "description": "Level: ui\nPersona: Admin\nType: positive\nAC: AC-10.1\nSuite: automation-testing/test-cases/002-partner-referral-story-10.sf-tests.yaml",
       "labels": [
         "cref-002-S10-TC-01",
         "sdd",
@@ -208,7 +208,7 @@
       "parent": "12",
       "parentKey": "KAN-55",
       "summary": "[002-S12-TC-01] Referral page shows the mover, address, dates, services, consent, status, rep, agent, agency, Lead and Opportunity links and Commissions",
-      "description": "Level: ui\nPersona: Admin\nType: positive\nAC: AC-12.1\nSuite: test-cases/002-partner-referral-story-12.sf-tests.yaml",
+      "description": "Level: ui\nPersona: Admin\nType: positive\nAC: AC-12.1\nSuite: automation-testing/test-cases/002-partner-referral-story-12.sf-tests.yaml",
       "labels": [
         "cref-002-S12-TC-01",
         "sdd",
@@ -228,7 +228,7 @@
       "parent": "12",
       "parentKey": "KAN-55",
       "summary": "[002-S12-TC-02] Commission page shows all its fields; Amount, Rate Applied and Services Count are read-only",
-      "description": "Level: ui\nPersona: Partner Manager\nType: positive\nAC: AC-12.2\nSuite: test-cases/002-partner-referral-story-12.sf-tests.yaml",
+      "description": "Level: ui\nPersona: Partner Manager\nType: positive\nAC: AC-12.2\nSuite: automation-testing/test-cases/002-partner-referral-story-12.sf-tests.yaml",
       "labels": [
         "cref-002-S12-TC-02",
         "sdd",
@@ -248,7 +248,7 @@
       "parent": "12",
       "parentKey": "KAN-55",
       "summary": "[002-S12-TC-03] Payout Batch page shows its fields, Lines and the console for that batch only",
-      "description": "Level: ui\nPersona: Finance\nType: positive\nAC: AC-12.3\nSuite: test-cases/002-partner-referral-story-12.sf-tests.yaml",
+      "description": "Level: ui\nPersona: Finance\nType: positive\nAC: AC-12.3\nSuite: automation-testing/test-cases/002-partner-referral-story-12.sf-tests.yaml",
       "labels": [
         "cref-002-S12-TC-03",
         "sdd",
@@ -268,7 +268,7 @@
       "parent": "12",
       "parentKey": "KAN-55",
       "summary": "[002-S12-TC-04] Payout Line page shows agency, ABN, reference, total, count and its Commissions",
-      "description": "Level: ui\nPersona: Finance\nType: positive\nAC: AC-12.3\nSuite: test-cases/002-partner-referral-story-12.sf-tests.yaml",
+      "description": "Level: ui\nPersona: Finance\nType: positive\nAC: AC-12.3\nSuite: automation-testing/test-cases/002-partner-referral-story-12.sf-tests.yaml",
       "labels": [
         "cref-002-S12-TC-04",
         "sdd",
@@ -288,7 +288,7 @@
       "parent": "12",
       "parentKey": "KAN-55",
       "summary": "[002-S12-TC-05] Partner Referral Lead and Opportunity layouts show the partner referral fields",
-      "description": "Level: ui\nPersona: Sales Rep\nType: positive\nAC: AC-12.4\nSuite: test-cases/002-partner-referral-story-12.sf-tests.yaml",
+      "description": "Level: ui\nPersona: Sales Rep\nType: positive\nAC: AC-12.4\nSuite: automation-testing/test-cases/002-partner-referral-story-12.sf-tests.yaml",
       "labels": [
         "cref-002-S12-TC-05",
         "sdd",
@@ -328,7 +328,7 @@
       "parent": "12",
       "parentKey": "KAN-55",
       "summary": "[002-S12-TC-07] Partner users still see only the portal components",
-      "description": "Level: ui\nPersona: Partner Agent\nType: negative\nAC: AC-12.5\nSuite: test-cases/002-partner-referral-story-12.sf-tests.yaml",
+      "description": "Level: ui\nPersona: Partner Agent\nType: negative\nAC: AC-12.5\nSuite: automation-testing/test-cases/002-partner-referral-story-12.sf-tests.yaml",
       "labels": [
         "cref-002-S12-TC-07",
         "sdd",
@@ -368,7 +368,7 @@
       "parent": "00",
       "parentKey": "KAN-43",
       "summary": "[002-S00-TC-02] Partner Referral Lead offers only the 5 programme statuses and Lead Source \"Partner Referral\"",
-      "description": "Level: ui\nPersona: Sales Rep\nType: positive\nAC: AC-00.2\nSuite: test-cases/002-partner-referral-story-00.sf-tests.yaml",
+      "description": "Level: ui\nPersona: Sales Rep\nType: positive\nAC: AC-00.2\nSuite: automation-testing/test-cases/002-partner-referral-story-00.sf-tests.yaml",
       "labels": [
         "cref-002-S00-TC-02",
         "sdd",
@@ -388,7 +388,7 @@
       "parent": "00",
       "parentKey": "KAN-43",
       "summary": "[002-S00-TC-03] Partner Referral Opportunity offers the programme stages; other record types are unchanged",
-      "description": "Level: ui\nPersona: Sales Rep\nType: positive\nAC: AC-00.3\nSuite: test-cases/002-partner-referral-story-00.sf-tests.yaml",
+      "description": "Level: ui\nPersona: Sales Rep\nType: positive\nAC: AC-00.3\nSuite: automation-testing/test-cases/002-partner-referral-story-00.sf-tests.yaml",
       "labels": [
         "cref-002-S00-TC-03",
         "sdd",
@@ -548,7 +548,7 @@
       "parent": "01",
       "parentKey": "KAN-44",
       "summary": "[002-S01-TC-01] A sales rep cannot change an agency's Partner Status",
-      "description": "Level: ui\nPersona: Sales Rep\nType: negative\nAC: AC-01.1\nSuite: test-cases/002-partner-referral-story-01.sf-tests.yaml",
+      "description": "Level: ui\nPersona: Sales Rep\nType: negative\nAC: AC-01.1\nSuite: automation-testing/test-cases/002-partner-referral-story-01.sf-tests.yaml",
       "labels": [
         "cref-002-S01-TC-01",
         "sdd",
@@ -568,7 +568,7 @@
       "parent": "01",
       "parentKey": "KAN-44",
       "summary": "[002-S01-TC-02] A sales rep cannot change an agency's Commission Rate",
-      "description": "Level: ui\nPersona: Sales Rep\nType: negative\nAC: AC-01.1\nSuite: test-cases/002-partner-referral-story-01.sf-tests.yaml",
+      "description": "Level: ui\nPersona: Sales Rep\nType: negative\nAC: AC-01.1\nSuite: automation-testing/test-cases/002-partner-referral-story-01.sf-tests.yaml",
       "labels": [
         "cref-002-S01-TC-02",
         "sdd",
@@ -588,7 +588,7 @@
       "parent": "01",
       "parentKey": "KAN-44",
       "summary": "[002-S01-TC-03] A Partner Manager can change an agency's Commission Rate",
-      "description": "Level: ui\nPersona: Partner Manager\nType: positive\nAC: AC-01.1\nSuite: test-cases/002-partner-referral-story-01.sf-tests.yaml",
+      "description": "Level: ui\nPersona: Partner Manager\nType: positive\nAC: AC-01.1\nSuite: automation-testing/test-cases/002-partner-referral-story-01.sf-tests.yaml",
       "labels": [
         "cref-002-S01-TC-03",
         "sdd",
@@ -608,7 +608,7 @@
       "parent": "01",
       "parentKey": "KAN-44",
       "summary": "[002-S01-TC-04] An ABN with fewer than 11 digits is rejected",
-      "description": "Level: ui\nPersona: Partner Manager\nType: negative\nAC: AC-01.2\nSuite: test-cases/002-partner-referral-story-01.sf-tests.yaml",
+      "description": "Level: ui\nPersona: Partner Manager\nType: negative\nAC: AC-01.2\nSuite: automation-testing/test-cases/002-partner-referral-story-01.sf-tests.yaml",
       "labels": [
         "cref-002-S01-TC-04",
         "sdd",
@@ -648,7 +648,7 @@
       "parent": "01",
       "parentKey": "KAN-44",
       "summary": "[002-S01-TC-06] A Commission Rate change appears in Account History with old value, new value, user and time",
-      "description": "Level: ui\nPersona: Partner Manager\nType: positive\nAC: AC-01.3\nSuite: test-cases/002-partner-referral-story-01.sf-tests.yaml",
+      "description": "Level: ui\nPersona: Partner Manager\nType: positive\nAC: AC-01.3\nSuite: automation-testing/test-cases/002-partner-referral-story-01.sf-tests.yaml",
       "labels": [
         "cref-002-S01-TC-06",
         "sdd",
@@ -768,7 +768,7 @@
       "parent": "02",
       "parentKey": "KAN-45",
       "summary": "[002-S02-TC-01] An agent submits a complete referral and sees the confirmation",
-      "description": "Level: ui\nPersona: Partner Agent\nType: positive\nAC: AC-02.10\nSuite: test-cases/002-partner-referral-story-02.sf-tests.yaml",
+      "description": "Level: ui\nPersona: Partner Agent\nType: positive\nAC: AC-02.10\nSuite: automation-testing/test-cases/002-partner-referral-story-02.sf-tests.yaml",
       "labels": [
         "cref-002-S02-TC-01",
         "sdd",
@@ -788,7 +788,7 @@
       "parent": "02",
       "parentKey": "KAN-45",
       "summary": "[002-S02-TC-02] The submitted referral creates one Referral owned by the agent and one linked Partner Referral Lead with state code",
-      "description": "Level: ui\nPersona: Admin\nType: positive\nAC: AC-02.10\nSuite: test-cases/002-partner-referral-story-02.sf-tests.yaml",
+      "description": "Level: ui\nPersona: Admin\nType: positive\nAC: AC-02.10\nSuite: automation-testing/test-cases/002-partner-referral-story-02.sf-tests.yaml",
       "labels": [
         "cref-002-S02-TC-02",
         "sdd",
@@ -808,7 +808,7 @@
       "parent": "02",
       "parentKey": "KAN-45",
       "summary": "[002-S02-TC-03] Submitting an empty form shows a message on every required field",
-      "description": "Level: ui\nPersona: Partner Agent\nType: negative\nAC: AC-02.2\nSuite: test-cases/002-partner-referral-story-02.sf-tests.yaml",
+      "description": "Level: ui\nPersona: Partner Agent\nType: negative\nAC: AC-02.2\nSuite: automation-testing/test-cases/002-partner-referral-story-02.sf-tests.yaml",
       "labels": [
         "cref-002-S02-TC-03",
         "sdd",
@@ -848,7 +848,7 @@
       "parent": "02",
       "parentKey": "KAN-45",
       "summary": "[002-S02-TC-05] A landline number is rejected as Mobile",
-      "description": "Level: ui\nPersona: Partner Agent\nType: negative\nAC: AC-02.3\nSuite: test-cases/002-partner-referral-story-02.sf-tests.yaml",
+      "description": "Level: ui\nPersona: Partner Agent\nType: negative\nAC: AC-02.3\nSuite: automation-testing/test-cases/002-partner-referral-story-02.sf-tests.yaml",
       "labels": [
         "cref-002-S02-TC-05",
         "sdd",
@@ -868,7 +868,7 @@
       "parent": "02",
       "parentKey": "KAN-45",
       "summary": "[002-S02-TC-06] A +614 mobile with spaces is accepted",
-      "description": "Level: ui\nPersona: Partner Agent\nType: positive\nAC: AC-02.3\nSuite: test-cases/002-partner-referral-story-02.sf-tests.yaml",
+      "description": "Level: ui\nPersona: Partner Agent\nType: positive\nAC: AC-02.3\nSuite: automation-testing/test-cases/002-partner-referral-story-02.sf-tests.yaml",
       "labels": [
         "cref-002-S02-TC-06",
         "sdd",
@@ -908,7 +908,7 @@
       "parent": "02",
       "parentKey": "KAN-45",
       "summary": "[002-S02-TC-08] A move-in date 8 days in the past is rejected",
-      "description": "Level: ui\nPersona: Partner Agent\nType: negative\nAC: AC-02.4\nSuite: test-cases/002-partner-referral-story-02.sf-tests.yaml",
+      "description": "Level: ui\nPersona: Partner Agent\nType: negative\nAC: AC-02.4\nSuite: automation-testing/test-cases/002-partner-referral-story-02.sf-tests.yaml",
       "labels": [
         "cref-002-S02-TC-08",
         "sdd",
@@ -928,7 +928,7 @@
       "parent": "02",
       "parentKey": "KAN-45",
       "summary": "[002-S02-TC-09] A move-in date more than 6 months ahead is rejected",
-      "description": "Level: ui\nPersona: Partner Agent\nType: negative\nAC: AC-02.4\nSuite: test-cases/002-partner-referral-story-02.sf-tests.yaml",
+      "description": "Level: ui\nPersona: Partner Agent\nType: negative\nAC: AC-02.4\nSuite: automation-testing/test-cases/002-partner-referral-story-02.sf-tests.yaml",
       "labels": [
         "cref-002-S02-TC-09",
         "sdd",
@@ -1008,7 +1008,7 @@
       "parent": "02",
       "parentKey": "KAN-45",
       "summary": "[002-S02-TC-13] An agent of an inactive agency cannot submit and nothing is created",
-      "description": "Level: ui\nPersona: Partner Agent\nType: negative\nAC: AC-02.7\nSuite: test-cases/002-partner-referral-story-02.sf-tests.yaml",
+      "description": "Level: ui\nPersona: Partner Agent\nType: negative\nAC: AC-02.7\nSuite: automation-testing/test-cases/002-partner-referral-story-02.sf-tests.yaml",
       "labels": [
         "cref-002-S02-TC-13",
         "sdd",
@@ -1048,7 +1048,7 @@
       "parent": "02",
       "parentKey": "KAN-45",
       "summary": "[002-S02-TC-15] Same-agency duplicate shows a warning and can be sent anyway",
-      "description": "Level: ui\nPersona: Partner Agent\nType: positive\nAC: AC-02.8\nSuite: test-cases/002-partner-referral-story-02.sf-tests.yaml",
+      "description": "Level: ui\nPersona: Partner Agent\nType: positive\nAC: AC-02.8\nSuite: automation-testing/test-cases/002-partner-referral-story-02.sf-tests.yaml",
       "labels": [
         "cref-002-S02-TC-15",
         "sdd",
@@ -1088,7 +1088,7 @@
       "parent": "02",
       "parentKey": "KAN-45",
       "summary": "[002-S02-TC-17] Cross-agency match submits silently",
-      "description": "Level: ui\nPersona: Partner Agent\nType: positive\nAC: AC-02.9\nSuite: test-cases/002-partner-referral-story-02.sf-tests.yaml",
+      "description": "Level: ui\nPersona: Partner Agent\nType: positive\nAC: AC-02.9\nSuite: automation-testing/test-cases/002-partner-referral-story-02.sf-tests.yaml",
       "labels": [
         "cref-002-S02-TC-17",
         "sdd",
@@ -1108,7 +1108,7 @@
       "parent": "02",
       "parentKey": "KAN-45",
       "summary": "[002-S02-TC-18] Cross-agency match flags Possible Duplicate on both referrals (internal only)",
-      "description": "Level: ui\nPersona: Admin\nType: positive\nAC: AC-02.9\nSuite: test-cases/002-partner-referral-story-02.sf-tests.yaml",
+      "description": "Level: ui\nPersona: Admin\nType: positive\nAC: AC-02.9\nSuite: automation-testing/test-cases/002-partner-referral-story-02.sf-tests.yaml",
       "labels": [
         "cref-002-S02-TC-18",
         "sdd",
@@ -1228,7 +1228,7 @@
       "parent": "03",
       "parentKey": "KAN-46",
       "summary": "[002-S03-TC-01] A VIC Partner Referral Lead is routed to PR_VIC_TAS",
-      "description": "Level: ui\nPersona: Admin\nType: positive\nAC: AC-03.1\nSuite: test-cases/002-partner-referral-story-03.sf-tests.yaml",
+      "description": "Level: ui\nPersona: Admin\nType: positive\nAC: AC-03.1\nSuite: automation-testing/test-cases/002-partner-referral-story-03.sf-tests.yaml",
       "labels": [
         "cref-002-S03-TC-01",
         "sdd",
@@ -1268,7 +1268,7 @@
       "parent": "03",
       "parentKey": "KAN-46",
       "summary": "[002-S03-TC-03] A Lead with move-in inside 48 hours is urgent",
-      "description": "Level: ui\nPersona: Admin\nType: positive\nAC: AC-03.2\nSuite: test-cases/002-partner-referral-story-03.sf-tests.yaml",
+      "description": "Level: ui\nPersona: Admin\nType: positive\nAC: AC-03.2\nSuite: automation-testing/test-cases/002-partner-referral-story-03.sf-tests.yaml",
       "labels": [
         "cref-002-S03-TC-03",
         "sdd",
@@ -1368,7 +1368,7 @@
       "parent": "03",
       "parentKey": "KAN-46",
       "summary": "[002-S03-TC-08] A new Lead shows SLA Due At",
-      "description": "Level: ui\nPersona: Admin\nType: positive\nAC: AC-03.5\nSuite: test-cases/002-partner-referral-story-03.sf-tests.yaml",
+      "description": "Level: ui\nPersona: Admin\nType: positive\nAC: AC-03.5\nSuite: automation-testing/test-cases/002-partner-referral-story-03.sf-tests.yaml",
       "labels": [
         "cref-002-S03-TC-08",
         "sdd",
@@ -1388,7 +1388,7 @@
       "parent": "03",
       "parentKey": "KAN-46",
       "summary": "[002-S03-TC-09] First move to Working stamps First Contacted At",
-      "description": "Level: ui\nPersona: Sales Rep\nType: positive\nAC: AC-03.6\nSuite: test-cases/002-partner-referral-story-03.sf-tests.yaml",
+      "description": "Level: ui\nPersona: Sales Rep\nType: positive\nAC: AC-03.6\nSuite: automation-testing/test-cases/002-partner-referral-story-03.sf-tests.yaml",
       "labels": [
         "cref-002-S03-TC-09",
         "sdd",
@@ -1428,7 +1428,7 @@
       "parent": "03",
       "parentKey": "KAN-46",
       "summary": "[002-S03-TC-11] A queue list view puts urgent Leads first, then by move-in date",
-      "description": "Level: ui\nPersona: Sales Rep\nType: positive\nAC: AC-03.7\nSuite: test-cases/002-partner-referral-story-03.sf-tests.yaml",
+      "description": "Level: ui\nPersona: Sales Rep\nType: positive\nAC: AC-03.7\nSuite: automation-testing/test-cases/002-partner-referral-story-03.sf-tests.yaml",
       "labels": [
         "cref-002-S03-TC-11",
         "sdd",
@@ -1508,7 +1508,7 @@
       "parent": "04",
       "parentKey": "KAN-47",
       "summary": "[002-S04-TC-02] A Lead moved to Working shows \"In Progress\" to the agent",
-      "description": "Level: ui\nPersona: Partner Agent\nType: positive\nAC: AC-04.1\nSuite: test-cases/002-partner-referral-story-04.sf-tests.yaml",
+      "description": "Level: ui\nPersona: Partner Agent\nType: positive\nAC: AC-04.1\nSuite: automation-testing/test-cases/002-partner-referral-story-04.sf-tests.yaml",
       "labels": [
         "cref-002-S04-TC-02",
         "sdd",
@@ -1548,7 +1548,7 @@
       "parent": "04",
       "parentKey": "KAN-47",
       "summary": "[002-S04-TC-04] An agent sees only their own referrals with the partner-safe columns",
-      "description": "Level: ui\nPersona: Partner Agent\nType: positive\nAC: AC-04.3\nSuite: test-cases/002-partner-referral-story-04.sf-tests.yaml",
+      "description": "Level: ui\nPersona: Partner Agent\nType: positive\nAC: AC-04.3\nSuite: automation-testing/test-cases/002-partner-referral-story-04.sf-tests.yaml",
       "labels": [
         "cref-002-S04-TC-04",
         "sdd",
@@ -1568,7 +1568,7 @@
       "parent": "04",
       "parentKey": "KAN-47",
       "summary": "[002-S04-TC-05] A principal sees every referral of their agency",
-      "description": "Level: ui\nPersona: Partner Principal\nType: positive\nAC: AC-04.4\nSuite: test-cases/002-partner-referral-story-04.sf-tests.yaml",
+      "description": "Level: ui\nPersona: Partner Principal\nType: positive\nAC: AC-04.4\nSuite: automation-testing/test-cases/002-partner-referral-story-04.sf-tests.yaml",
       "labels": [
         "cref-002-S04-TC-05",
         "sdd",
@@ -1588,7 +1588,7 @@
       "parent": "04",
       "parentKey": "KAN-47",
       "summary": "[002-S04-TC-06] Agency B's principal sees none of agency A's referrals",
-      "description": "Level: ui\nPersona: Partner Principal\nType: negative\nAC: AC-04.5\nSuite: test-cases/002-partner-referral-story-04.sf-tests.yaml",
+      "description": "Level: ui\nPersona: Partner Principal\nType: negative\nAC: AC-04.5\nSuite: automation-testing/test-cases/002-partner-referral-story-04.sf-tests.yaml",
       "labels": [
         "cref-002-S04-TC-06",
         "sdd",
@@ -1648,7 +1648,7 @@
       "parent": "04",
       "parentKey": "KAN-47",
       "summary": "[002-S04-TC-09] Home page counts this month's visible referrals by partner status",
-      "description": "Level: ui\nPersona: Partner Agent\nType: positive\nAC: AC-04.6\nSuite: test-cases/002-partner-referral-story-04.sf-tests.yaml",
+      "description": "Level: ui\nPersona: Partner Agent\nType: positive\nAC: AC-04.6\nSuite: automation-testing/test-cases/002-partner-referral-story-04.sf-tests.yaml",
       "labels": [
         "cref-002-S04-TC-09",
         "sdd",
@@ -1728,7 +1728,7 @@
       "parent": "05",
       "parentKey": "KAN-48",
       "summary": "[002-S05-TC-01] Converting a Partner Referral Lead creates a Person Account and a Partner Referral Opportunity at Qualification",
-      "description": "Level: ui\nPersona: Sales Rep\nType: positive\nAC: AC-05.1\nSuite: test-cases/002-partner-referral-story-05.sf-tests.yaml",
+      "description": "Level: ui\nPersona: Sales Rep\nType: positive\nAC: AC-05.1\nSuite: automation-testing/test-cases/002-partner-referral-story-05.sf-tests.yaml",
       "labels": [
         "cref-002-S05-TC-01",
         "sdd",
@@ -1748,7 +1748,7 @@
       "parent": "05",
       "parentKey": "KAN-48",
       "summary": "[002-S05-TC-02] The converted Opportunity has exactly the Lead's utilities as products",
-      "description": "Level: ui\nPersona: Sales Rep\nType: positive\nAC: AC-05.2\nSuite: test-cases/002-partner-referral-story-05.sf-tests.yaml",
+      "description": "Level: ui\nPersona: Sales Rep\nType: positive\nAC: AC-05.2\nSuite: automation-testing/test-cases/002-partner-referral-story-05.sf-tests.yaml",
       "labels": [
         "cref-002-S05-TC-02",
         "sdd",
@@ -1788,7 +1788,7 @@
       "parent": "05",
       "parentKey": "KAN-48",
       "summary": "[002-S05-TC-04] A rep can delete a product that will not be connected before Utilities Connected",
-      "description": "Level: ui\nPersona: Sales Rep\nType: positive\nAC: AC-05.4\nSuite: test-cases/002-partner-referral-story-05.sf-tests.yaml",
+      "description": "Level: ui\nPersona: Sales Rep\nType: positive\nAC: AC-05.4\nSuite: automation-testing/test-cases/002-partner-referral-story-05.sf-tests.yaml",
       "labels": [
         "cref-002-S05-TC-04",
         "sdd",
@@ -1888,7 +1888,7 @@
       "parent": "06",
       "parentKey": "KAN-49",
       "summary": "[002-S06-TC-02] Moving an Opportunity to Utilities Connected shows a Pending commission",
-      "description": "Level: ui\nPersona: Sales Rep\nType: positive\nAC: AC-06.1\nSuite: test-cases/002-partner-referral-story-06.sf-tests.yaml",
+      "description": "Level: ui\nPersona: Sales Rep\nType: positive\nAC: AC-06.1\nSuite: automation-testing/test-cases/002-partner-referral-story-06.sf-tests.yaml",
       "labels": [
         "cref-002-S06-TC-02",
         "sdd",
@@ -2028,7 +2028,7 @@
       "parent": "06",
       "parentKey": "KAN-49",
       "summary": "[002-S06-TC-09] Editing a commission's Amount is refused with a clear message",
-      "description": "Level: ui\nPersona: Admin\nType: negative\nAC: AC-06.5\nSuite: test-cases/002-partner-referral-story-06.sf-tests.yaml",
+      "description": "Level: ui\nPersona: Admin\nType: negative\nAC: AC-06.5\nSuite: automation-testing/test-cases/002-partner-referral-story-06.sf-tests.yaml",
       "labels": [
         "cref-002-S06-TC-09",
         "sdd",
@@ -2048,7 +2048,7 @@
       "parent": "06",
       "parentKey": "KAN-49",
       "summary": "[002-S06-TC-10] A Partner Manager approves a Pending commission and Approved By / On are stamped",
-      "description": "Level: ui\nPersona: Partner Manager\nType: positive\nAC: AC-06.6\nSuite: test-cases/002-partner-referral-story-06.sf-tests.yaml",
+      "description": "Level: ui\nPersona: Partner Manager\nType: positive\nAC: AC-06.6\nSuite: automation-testing/test-cases/002-partner-referral-story-06.sf-tests.yaml",
       "labels": [
         "cref-002-S06-TC-10",
         "sdd",
@@ -2068,7 +2068,7 @@
       "parent": "06",
       "parentKey": "KAN-49",
       "summary": "[002-S06-TC-11] A sales rep cannot approve a commission",
-      "description": "Level: ui\nPersona: Sales Rep\nType: negative\nAC: AC-06.6\nSuite: test-cases/002-partner-referral-story-06.sf-tests.yaml",
+      "description": "Level: ui\nPersona: Sales Rep\nType: negative\nAC: AC-06.6\nSuite: automation-testing/test-cases/002-partner-referral-story-06.sf-tests.yaml",
       "labels": [
         "cref-002-S06-TC-11",
         "sdd",
@@ -2108,7 +2108,7 @@
       "parent": "06",
       "parentKey": "KAN-49",
       "summary": "[002-S06-TC-13] Partner Manager is refused when moving an Approved commission back to Pending",
-      "description": "Level: ui\nPersona: Partner Manager\nType: negative\nAC: AC-06.7\nSuite: test-cases/002-partner-referral-story-06.sf-tests.yaml",
+      "description": "Level: ui\nPersona: Partner Manager\nType: negative\nAC: AC-06.7\nSuite: automation-testing/test-cases/002-partner-referral-story-06.sf-tests.yaml",
       "labels": [
         "cref-002-S06-TC-13",
         "sdd",
@@ -2148,7 +2148,7 @@
       "parent": "06",
       "parentKey": "KAN-49",
       "summary": "[002-S06-TC-15] A principal sees this month's and last month's commission totals",
-      "description": "Level: ui\nPersona: Partner Principal\nType: positive\nAC: AC-06.9\nSuite: test-cases/002-partner-referral-story-06.sf-tests.yaml",
+      "description": "Level: ui\nPersona: Partner Principal\nType: positive\nAC: AC-06.9\nSuite: automation-testing/test-cases/002-partner-referral-story-06.sf-tests.yaml",
       "labels": [
         "cref-002-S06-TC-15",
         "sdd",
@@ -2168,7 +2168,7 @@
       "parent": "06",
       "parentKey": "KAN-49",
       "summary": "[002-S06-TC-16] An agent does not see the commission tiles",
-      "description": "Level: ui\nPersona: Partner Agent\nType: negative\nAC: AC-06.9\nSuite: test-cases/002-partner-referral-story-06.sf-tests.yaml",
+      "description": "Level: ui\nPersona: Partner Agent\nType: negative\nAC: AC-06.9\nSuite: automation-testing/test-cases/002-partner-referral-story-06.sf-tests.yaml",
       "labels": [
         "cref-002-S06-TC-16",
         "sdd",
@@ -2288,7 +2288,7 @@
       "parent": "07",
       "parentKey": "KAN-50",
       "summary": "[002-S07-TC-03] Finance runs the payout on demand from the Payouts console",
-      "description": "Level: ui\nPersona: Finance\nType: positive\nAC: AC-07.3\nSuite: test-cases/002-partner-referral-story-07.sf-tests.yaml",
+      "description": "Level: ui\nPersona: Finance\nType: positive\nAC: AC-07.3\nSuite: automation-testing/test-cases/002-partner-referral-story-07.sf-tests.yaml",
       "labels": [
         "cref-002-S07-TC-03",
         "sdd",
@@ -2308,7 +2308,7 @@
       "parent": "07",
       "parentKey": "KAN-50",
       "summary": "[002-S07-TC-04] A user without Manage Partner Payouts cannot run, export or pay",
-      "description": "Level: ui\nPersona: Partner Manager\nType: negative\nAC: AC-07.3\nSuite: test-cases/002-partner-referral-story-07.sf-tests.yaml",
+      "description": "Level: ui\nPersona: Partner Manager\nType: negative\nAC: AC-07.3\nSuite: automation-testing/test-cases/002-partner-referral-story-07.sf-tests.yaml",
       "labels": [
         "cref-002-S07-TC-04",
         "sdd",
@@ -2368,7 +2368,7 @@
       "parent": "07",
       "parentKey": "KAN-50",
       "summary": "[002-S07-TC-07] Download Xero CSV downloads the file and moves the batch to Exported",
-      "description": "Level: ui\nPersona: Finance\nType: positive\nAC: AC-07.5\nSuite: test-cases/002-partner-referral-story-07.sf-tests.yaml",
+      "description": "Level: ui\nPersona: Finance\nType: positive\nAC: AC-07.5\nSuite: automation-testing/test-cases/002-partner-referral-story-07.sf-tests.yaml",
       "labels": [
         "cref-002-S07-TC-07",
         "sdd",
@@ -2408,7 +2408,7 @@
       "parent": "07",
       "parentKey": "KAN-50",
       "summary": "[002-S07-TC-09] Mark paid sets the batch and every commission in it to Paid",
-      "description": "Level: ui\nPersona: Finance\nType: positive\nAC: AC-07.6\nSuite: test-cases/002-partner-referral-story-07.sf-tests.yaml",
+      "description": "Level: ui\nPersona: Finance\nType: positive\nAC: AC-07.6\nSuite: automation-testing/test-cases/002-partner-referral-story-07.sf-tests.yaml",
       "labels": [
         "cref-002-S07-TC-09",
         "sdd",
@@ -2488,7 +2488,7 @@
       "parent": "08",
       "parentKey": "KAN-51",
       "summary": "[002-S08-TC-01] Volume dashboard shows referrals per agency per week and per month",
-      "description": "Level: ui\nPersona: Partner Manager\nType: positive\nAC: AC-08.1\nSuite: test-cases/002-partner-referral-story-08.sf-tests.yaml",
+      "description": "Level: ui\nPersona: Partner Manager\nType: positive\nAC: AC-08.1\nSuite: automation-testing/test-cases/002-partner-referral-story-08.sf-tests.yaml",
       "labels": [
         "cref-002-S08-TC-01",
         "sdd",
@@ -2508,7 +2508,7 @@
       "parent": "08",
       "parentKey": "KAN-51",
       "summary": "[002-S08-TC-02] Conversion dashboard shows referrals in vs Connected per agency with the rate",
-      "description": "Level: ui\nPersona: Partner Manager\nType: positive\nAC: AC-08.2\nSuite: test-cases/002-partner-referral-story-08.sf-tests.yaml",
+      "description": "Level: ui\nPersona: Partner Manager\nType: positive\nAC: AC-08.2\nSuite: automation-testing/test-cases/002-partner-referral-story-08.sf-tests.yaml",
       "labels": [
         "cref-002-S08-TC-02",
         "sdd",
@@ -2528,7 +2528,7 @@
       "parent": "08",
       "parentKey": "KAN-51",
       "summary": "[002-S08-TC-03] Commission dashboard shows this month's Pending and Approved commission per agency in AUD",
-      "description": "Level: ui\nPersona: Finance\nType: positive\nAC: AC-08.3\nSuite: test-cases/002-partner-referral-story-08.sf-tests.yaml",
+      "description": "Level: ui\nPersona: Finance\nType: positive\nAC: AC-08.3\nSuite: automation-testing/test-cases/002-partner-referral-story-08.sf-tests.yaml",
       "labels": [
         "cref-002-S08-TC-03",
         "sdd",
@@ -2548,7 +2548,7 @@
       "parent": "08",
       "parentKey": "KAN-51",
       "summary": "[002-S08-TC-04] SLA dashboard lists uncontacted overdue Leads, late first contacts and moved-in referrals not connected",
-      "description": "Level: ui\nPersona: Partner Manager\nType: positive\nAC: AC-08.4\nSuite: test-cases/002-partner-referral-story-08.sf-tests.yaml",
+      "description": "Level: ui\nPersona: Partner Manager\nType: positive\nAC: AC-08.4\nSuite: automation-testing/test-cases/002-partner-referral-story-08.sf-tests.yaml",
       "labels": [
         "cref-002-S08-TC-04",
         "sdd",

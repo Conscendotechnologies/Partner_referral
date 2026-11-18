@@ -1,0 +1,6 @@
+node_modules/
+# SF AI Tester run output, saved browser sessions and Playwright artefacts (may hold session cookies)
+.sf-ai-tester/
+test-results/
+playwright-report/
+blob-report/
