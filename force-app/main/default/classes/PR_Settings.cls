@@ -133,10 +133,34 @@ public inherited sharing class PR_Settings {
     @TestVisible
     private static List<PR_State_Route__mdt> routesOverride;
 
-    /** State code -> queue Id, from PR_State_Route__mdt; falls back to the Unassigned queue. */
+    /**
+     * Full Australian state and territory names -> codes. Lead State is free text until the State and Country
+     * picklists are enabled (AC-09.2), so a rep may type "Victoria" rather than "VIC".
+     */
+    private static final Map<String, String> STATE_NAMES = new Map<String, String>{
+        'NEW SOUTH WALES' => 'NSW',
+        'AUSTRALIAN CAPITAL TERRITORY' => 'ACT',
+        'VICTORIA' => 'VIC',
+        'TASMANIA' => 'TAS',
+        'QUEENSLAND' => 'QLD',
+        'SOUTH AUSTRALIA' => 'SA',
+        'WESTERN AUSTRALIA' => 'WA',
+        'NORTHERN TERRITORY' => 'NT'
+    };
+
+    /** A state code or full state name (any case) -> the state code; anything else is returned trimmed. */
+    @TestVisible
+    private static String normaliseState(String state) {
+        String trimmed = state.trim();
+        String code = STATE_NAMES.get(trimmed.toUpperCase());
+        return code != null ? code : trimmed;
+    }
+
+    /** State code or full state name -> queue Id, from PR_State_Route__mdt; falls back to the Unassigned queue. */
     public static Id routeQueueId(String stateCode) {
         Map<String, Id> queues = queueIdsByDeveloperName();
         if (String.isNotBlank(stateCode)) {
+            stateCode = normaliseState(stateCode);
             for (PR_State_Route__mdt route : routesOverride != null ? routesOverride : PR_State_Route__mdt.getAll().values()) {
                 if (String.isBlank(route.State_Codes__c)) continue;
                 for (String code : route.State_Codes__c.split(',')) {

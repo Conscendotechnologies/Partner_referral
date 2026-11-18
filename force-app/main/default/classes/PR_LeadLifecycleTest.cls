@@ -220,6 +220,17 @@ private class PR_LeadLifecycleTest {
         Assert.areEqual([SELECT Id FROM Group WHERE DeveloperName = 'PR_SA_WA_NT'].Id, PR_Settings.routeQueueId('wa'));
     }
 
+    // TC: S03-TC-02
+    @IsTest
+    static void fullStateNamesRouteLikeTheirCodes() {
+        Assert.areEqual([SELECT Id FROM Group WHERE DeveloperName = 'PR_VIC_TAS'].Id, PR_Settings.routeQueueId('Victoria'));
+        Assert.areEqual([SELECT Id FROM Group WHERE DeveloperName = 'PR_NSW_ACT'].Id, PR_Settings.routeQueueId(' australian capital territory '));
+        Assert.areEqual([SELECT Id FROM Group WHERE DeveloperName = 'PR_SA_WA_NT'].Id, PR_Settings.routeQueueId('Northern Territory'));
+        Assert.areEqual([SELECT Id FROM Group WHERE DeveloperName = 'PR_Unassigned'].Id, PR_Settings.routeQueueId('Victoria Park'), 'only exact names match');
+        Assert.areEqual('QLD', PR_Settings.normaliseState('Queensland'));
+        Assert.areEqual('QLD', PR_Settings.normaliseState('QLD'));
+    }
+
     @IsTest
     static void firstContactAndPartnerStatus() {
         Test.startTest();
