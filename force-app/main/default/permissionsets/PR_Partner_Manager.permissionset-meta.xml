@@ -227,10 +227,10 @@
     <label>PR Partner Manager</label>
     <objectPermissions>
         <allowCreate>false</allowCreate>
-        <allowDelete>false</allowDelete>
+        <allowDelete>true</allowDelete>
         <allowEdit>true</allowEdit>
         <allowRead>true</allowRead>
-        <modifyAllRecords>false</modifyAllRecords>
+        <modifyAllRecords>true</modifyAllRecords>
         <object>Partner_Commission__c</object>
         <viewAllRecords>true</viewAllRecords>
     </objectPermissions>

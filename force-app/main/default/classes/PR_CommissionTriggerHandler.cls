@@ -5,6 +5,7 @@
  * - Any change after approval needs Manage_Partner_Payouts; Included in Payout and Paid are set by the payout run.
  * - Cancelling needs a reason and frees the Opportunity Key.
  * - Agency principals get read access through Apex managed sharing.
+ * - Commissions are never deleted (Partner Managers and Finance hold Modify All so they can edit any commission).
  */
 public without sharing class PR_CommissionTriggerHandler {
     private static final List<SObjectField> LOCKED = new List<SObjectField>{
@@ -119,6 +120,15 @@ public without sharing class PR_CommissionTriggerHandler {
     private static Boolean onlyFlagChanged(Partner_Commission__c c, Partner_Commission__c old) {
         return c.Cancellation_Reason__c == old.Cancellation_Reason__c && c.Approved_By__c == old.Approved_By__c &&
             c.Approved_On__c == old.Approved_On__c;
+    }
+
+    /** Partner Managers and Finance hold Modify All (which includes delete) so they can approve and correct any
+     *  commission; a commission is a financial record, so it is cancelled with a reason, never deleted. */
+    public static void beforeDelete(List<Partner_Commission__c> oldList) {
+        if (PR_CommissionService.bypassLocks) return;
+        for (Partner_Commission__c c : oldList) {
+            c.addError('Commissions cannot be deleted. Cancel the commission with a reason instead.');
+        }
     }
 
     public static void afterInsert(List<Partner_Commission__c> newList) {
