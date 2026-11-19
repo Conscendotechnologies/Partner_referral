@@ -5,6 +5,7 @@
 public with sharing class PR_QueueLeadsController {
     @TestVisible
     private static Integer rowLimit = 500;
+    private static final String PARTNER_QUEUE_PREFIX = 'PR_';
 
     @AuraEnabled(cacheable=false)
     public static PR_QueueLeadsResult getQueueLeads() {
@@ -51,13 +52,17 @@ public with sharing class PR_QueueLeadsController {
             members.add(m.GroupId);
         }
         Set<Id> queueIds = new Set<Id>();
+        // The PR_ prefix is checked in Apex: an escaped underscore in the LIKE pattern ('PR\\_%') reached SOQL as a
+        // literal backslash and matched no queue, so every rep saw an empty Referral Queue.
         for (GroupMember m : [
-            SELECT GroupId
+            SELECT GroupId, Group.DeveloperName
             FROM GroupMember
-            WHERE UserOrGroupId IN :members AND Group.Type = 'Queue' AND Group.DeveloperName LIKE 'PR\\_%'
+            WHERE UserOrGroupId IN :members AND Group.Type = 'Queue' AND Group.DeveloperName LIKE 'PR%'
             LIMIT 200
         ]) {
-            queueIds.add(m.GroupId);
+            if (m.Group.DeveloperName.startsWith(PARTNER_QUEUE_PREFIX)) {
+                queueIds.add(m.GroupId);
+            }
         }
         return queueIds;
     }
