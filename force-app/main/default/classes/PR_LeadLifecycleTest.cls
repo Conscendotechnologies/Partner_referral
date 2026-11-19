@@ -38,7 +38,10 @@ private class PR_LeadLifecycleTest {
         PR_QueueLeadsResult result;
         System.runAs(rep) {
             Assert.isTrue(PR_QueueLeadsController.partnerQueueIds(rep.Id).contains(qldQueue), 'the rep\'s queue lookup finds PR_QLD');
-            Assert.areEqual(3, [SELECT COUNT() FROM Lead WHERE OwnerId = :qldQueue], 'the rep can see the 3 Leads in PR_QLD');
+            // As the rep, under sharing and permissions (USER_MODE), one filter of getQueueLeads at a time.
+            Assert.areEqual(3, [SELECT COUNT() FROM Lead WHERE OwnerId = :qldQueue WITH USER_MODE], 'the rep can see the 3 Leads in PR_QLD');
+            Assert.areEqual(3, [SELECT COUNT() FROM Lead WHERE OwnerId = :qldQueue AND RecordType.DeveloperName = :PR_Settings.RT_DEV_NAME WITH USER_MODE], 'the 3 Leads have the Partner Referral record type');
+            Assert.areEqual(3, [SELECT COUNT() FROM Lead WHERE OwnerId = :qldQueue AND IsConverted = FALSE AND Status != :PR_Settings.LEAD_UNQUALIFIED WITH USER_MODE], 'the 3 Leads are open');
             result = PR_QueueLeadsController.getQueueLeads();
         }
         List<Id> ids = new List<Id>();
