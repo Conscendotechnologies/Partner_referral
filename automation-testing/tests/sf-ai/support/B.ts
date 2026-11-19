@@ -26,6 +26,18 @@ export function monthsAndDaysFromToday(months: number, days: number): Date {
   return d;
 }
 
+/**
+ * The first move-in date the portal must reject as "more than 6 months ahead": its limit is Apex
+ * `Date.today().addMonths(6)` on the portal user's (Sydney) calendar, and addMonths keeps the day number, clamped to the
+ * last day of the month. One day after that, whatever the tester's own time zone.
+ */
+export function dayAfterSixMonthLimit(): Date {
+  const [y, m, d] = new Intl.DateTimeFormat('en-CA', { timeZone: 'Australia/Sydney' }).format(new Date()).split('-').map(Number);
+  const lastDay = new Date(y, m - 1 + 7, 0).getDate();
+  const limit = new Date(y, m - 1 + 6, Math.min(d, lastDay));
+  return new Date(limit.getFullYear(), limit.getMonth(), limit.getDate() + 1);
+}
+
 /** The portal's date format (shown under the field as "Format: Dec 31, 2024"). */
 export function portalDate(d: Date): string {
   return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });

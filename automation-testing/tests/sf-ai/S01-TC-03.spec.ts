@@ -44,9 +44,10 @@ test("S01-TC-03: A Partner Manager can change an agency's Commission Rate", asyn
     });
 
     await test.step('7. Click "Save"; Expected: the Account is saved without an error', async () => {
+      // Cleanup runs after any attempted save, even if the checks below fail.
+      saved = true;
       await dialog.getByRole('button', { name: 'Save', exact: true }).click();
       await expect(toast(maya)).toContainText(`Account "${AGENCY}" was saved`, { timeout: 60_000 });
-      saved = true;
       await expect(dialog).toBeHidden();
     });
 

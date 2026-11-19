@@ -57,18 +57,19 @@ const ALL_VIEWS: Record<string, string> = {
  * click is retried until the record page whose heading is `recordName` is open.
  */
 export async function openFromListSettled(page: Page, objectApiName: string, search: string, recordName: string) {
-  await page.goto(`/lightning/o/${objectApiName}/list?filterName=${encodeURIComponent(ALL_VIEWS[objectApiName] ?? 'All')}`);
   const box = page.getByRole('searchbox', { name: 'Search this list...' });
-  await expect(box).toBeVisible({ timeout: 60_000 });
-  await box.fill(search);
-  await box.press('Enter');
   const link = page.getByRole('rowheader').getByRole('link', { name: recordName, exact: true });
-  await expect(link).toHaveCount(1, { timeout: 60_000 });
   const heading = page.locator('records-highlights2:visible').getByRole('heading', { level: 1 });
+  // Each attempt starts again from the list, so a stale row that opened the wrong record is not kept.
   await expect(async () => {
-    if (!/\/lightning\/r\//.test(page.url())) await link.click({ timeout: 5_000 });
-    await expect(heading).toHaveText(recordName, { timeout: 10_000 });
-  }).toPass({ timeout: 120_000 });
+    await page.goto(`/lightning/o/${objectApiName}/list?filterName=${encodeURIComponent(ALL_VIEWS[objectApiName] ?? 'All')}`);
+    await expect(box).toBeVisible({ timeout: 60_000 });
+    await box.fill(search);
+    await box.press('Enter');
+    await expect(link).toHaveCount(1, { timeout: 30_000 });
+    await link.click({ timeout: 10_000 });
+    await expect(heading).toHaveText(recordName, { timeout: 15_000 });
+  }).toPass({ timeout: 240_000 });
 }
 
 /** The Lightning toast whose message matches `text`, e.g. /^Opportunity "X" was saved\.$/. */

@@ -1,6 +1,7 @@
 import { test, expect } from './support/fixtures';
 import { loginAs } from './support/salesforce';
 import { payoutConsole } from './support/C';
+import { notedByEarlierCase } from './support/run-state';
 
 // Precondition: S07-TC-03 has run in this run (a Draft batch with lines). Must not run when the reset printed
 // "PR-QA S07: SKIP" (CI leaves the S07 specs out then).
@@ -18,10 +19,13 @@ test('S07-TC-07: Download Xero CSV downloads the file and moves the batch to Exp
 
   await test.step('4. Click "Download Xero CSV" on the Draft batch', async () => {
     const card = await payoutConsole(fiona);
-    const draft = card.getByRole('row').filter({ has: fiona.getByRole('cell', { name: 'Draft', exact: true }) });
+    // The batch S07-TC-03 created, by its month: an older Draft batch must not be taken instead.
+    const month = notedByEarlierCase('S07-TC-03-month');
+    const draft = card
+      .getByRole('row')
+      .filter({ has: fiona.getByRole('rowheader', { name: month, exact: true }) })
+      .filter({ has: fiona.getByRole('cell', { name: 'Draft', exact: true }) });
     await expect(draft).toHaveCount(1);
-    const month = (await draft.getByRole('rowheader').innerText()).trim();
-    expect(month).toMatch(/^\d{4}-\d{2}$/);
     const file = `connectnow-commissions-${month}.csv`;
 
     const download = fiona.waitForEvent('download', { timeout: 60_000 });

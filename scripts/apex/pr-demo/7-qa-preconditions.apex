@@ -2,6 +2,8 @@
 // Creates, through the same service path as the portal, two AI-TEST referrals from Tom Nguyen (Harbour & Co Realty):
 //  - "AI-TEST Convert QA": Lead, NSW, Electricity + Internet, owned by Sam Rep (PR test), status Working (S05-TC-01).
 //  - "AI-TEST Commission QA": converted, 3 products, Opportunity owned by Sam Rep at Connection Requested (S06-TC-02).
+//  - "AI-TEST Commission Pending QA": converted and at Utilities Connected, with exactly one Pending commission
+//    (S06-TC-11, which must not depend on what S06-TC-10 does to the S06-TC-02 commission).
 //  - "AI-TEST Payout QA": converted and at Utilities Connected, with its commission Approved and not yet in a batch
 //    (S07-TC-03), so the payout cases don't depend on S06-TC-10.
 // Run after 1-6, and after 9-qa-reset-commissions.apex, which retires fixtures that an earlier run moved on. Skips each record
@@ -56,6 +58,22 @@ if (commissionQa.isEmpty()) {
         throw new PR_Exception('"AI-TEST Commission QA" is not in its starting state (Connection Requested, 3 products, '
             + 'no commission). Run scripts/apex/pr-demo/9-qa-reset-commissions.apex first.');
     }
+}
+
+List<Opportunity> pendingQa = [SELECT Id FROM Opportunity WHERE Name = 'AI-TEST Commission Pending QA'];
+if (pendingQa.isEmpty()) {
+    Id oppId = convertedOpportunity('Pending QA', '0412000904', 'AI-TEST Commission Pending QA');
+    update new Opportunity(Id = oppId, StageName = PR_Settings.STAGE_WON);
+    Integer pending = [SELECT COUNT() FROM Partner_Commission__c WHERE Opportunity__c = :oppId AND Status__c = :PR_Settings.COM_PENDING];
+    if (pending != 1) {
+        throw new PR_Exception('Expected one Pending commission on AI-TEST Commission Pending QA, found ' + pending + '.');
+    }
+    System.debug('PR-QA: created AI-TEST Commission Pending QA opportunity ' + oppId);
+} else if (pendingQa.size() > 1
+        || [SELECT COUNT() FROM Partner_Commission__c WHERE Opportunity__c = :pendingQa[0].Id] != 1
+        || [SELECT COUNT() FROM Partner_Commission__c WHERE Opportunity__c = :pendingQa[0].Id AND Status__c = :PR_Settings.COM_PENDING] != 1) {
+    throw new PR_Exception('"AI-TEST Commission Pending QA" does not have exactly one Pending commission. '
+        + 'Run scripts/apex/pr-demo/9-qa-reset-commissions.apex first.');
 }
 
 // The S07 fixture is seeded only when S07 can run, by the same rule as 9-qa-reset-commissions.apex: no Approved

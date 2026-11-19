@@ -16,11 +16,15 @@ const reset = spawnSync(process.execPath, ['scripts/qa-data.mjs', alias], { enco
 if (reset.status !== 0) process.exit(reset.status ?? 1);
 
 const args = ['playwright', 'test', '--config', 'playwright.sf-ai.config.ts', ...extra];
-if (/^SF_SKIP_S07=1$/m.test(reset.stdout)) {
+// The reset's result alone decides S07: an inherited SF_SKIP_S07 is overwritten either way.
+const skipS07 = /^SF_SKIP_S07=1$/m.test(reset.stdout);
+process.env.SF_SKIP_S07 = skipS07 ? '1' : '0';
+// A fresh run id, so values noted by an earlier run (support/run-state.ts) are never used.
+delete process.env.SF_RUN_ID;
+if (skipS07) {
   console.error('S07-TC-03/07/09 (payout run) skipped: the reset found payout data that is not AI-TEST alone.');
   args.push('--grep-invert', 'S07-TC-0[379]:');
-  // fixtures.ts also skips them when this is set, in case a later filter selects them again.
-  process.env.SF_SKIP_S07 = '1';
+  // fixtures.ts also skips them when SF_SKIP_S07=1, in case a later filter selects them again.
 }
 // npx is a .cmd on Windows, so it runs through the shell there and arguments with spaces or quotes are quoted.
 const win = process.platform === 'win32';

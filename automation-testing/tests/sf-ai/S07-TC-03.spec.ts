@@ -1,6 +1,7 @@
 import { test, expect } from './support/fixtures';
 import { loginAs } from './support/salesforce';
 import { payoutConsole } from './support/C';
+import { noteForLaterCase } from './support/run-state';
 
 // Precondition: node scripts/qa-data.mjs <org> commissions printed "PR-QA S07: READY" (every Approved commission not yet
 // in a batch is AI-TEST, and the suggested month has no batch). On "PR-QA S07: SKIP" this case must not run (CI leaves
@@ -42,5 +43,7 @@ test('S07-TC-03: Finance runs the payout on demand from the Payouts console', as
     const row = (await payoutConsole(fiona)).getByRole('row').filter({ has: fiona.getByRole('rowheader', { name: month, exact: true }) });
     // Cells after the month: Status, Agencies, Total ex GST, Runs, Actions.
     await expect(row.getByRole('cell').nth(2)).toHaveText(/^\$[\d,]+\.\d{2}$/);
+    // S07-TC-07 and S07-TC-09 continue with this month's batch.
+    noteForLaterCase('S07-TC-03-month', month);
   });
 });

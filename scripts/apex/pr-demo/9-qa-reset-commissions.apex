@@ -1,7 +1,8 @@
 // 002 Partner referral QA, reset part 2 of 2 (commissions and payouts). AI-TEST data only.
 //  - S06: retires "AI-TEST Commission QA" when an earlier run moved it on (stage is no longer Connection Requested,
 //    it has a commission, or it no longer has 3 products). It is renamed "AI-TEST Retired QA <time>" and its open
-//    commissions are cancelled, so 7-qa-preconditions.apex creates a fresh one.
+//    commissions are cancelled, so 7-qa-preconditions.apex creates a fresh one. "AI-TEST Commission Pending QA"
+//    (S06-TC-11) is retired only when it no longer has exactly one Pending commission.
 //  - S05: retires any Opportunity an earlier S05-TC-01 run converted from "AI-TEST Convert QA" (named
 //    "AI-TEST Convert…"), so S05-TC-02/04 find only this run's conversion.
 //  - S07: removes the default payout period's batch when it holds commissions and every one of them is AI-TEST (its
@@ -50,13 +51,32 @@ if (s07Skip != null) {
 
 // --- 2 and 3. Retire used fixtures and clear this period's AI-TEST batch.
 List<Opportunity> retire = new List<Opportunity>();
-for (Opportunity o : [
+List<Opportunity> fixtures = [
     SELECT Id, Name, StageName, (SELECT Id FROM OpportunityLineItems)
-    FROM Opportunity WHERE Name IN ('AI-TEST Commission QA', 'AI-TEST Payout QA') OR Name LIKE 'AI-TEST Convert%'
-]) {
-    Integer commissions = [SELECT COUNT() FROM Partner_Commission__c WHERE Opportunity__c = :o.Id];
-    Boolean used = o.Name == 'AI-TEST Payout QA' || o.Name.startsWith('AI-TEST Convert')
-        || o.StageName != 'Connection Requested' || commissions > 0 || o.OpportunityLineItems.size() != 3;
+    FROM Opportunity
+    WHERE Name IN ('AI-TEST Commission QA', 'AI-TEST Commission Pending QA', 'AI-TEST Payout QA') OR Name LIKE 'AI-TEST Convert%'
+];
+// Commission counts in one query (not one per fixture): only Commission QA and Commission Pending QA use them.
+Map<Id, Integer> allCommissions = new Map<Id, Integer>();
+Map<Id, Integer> pendingCommissions = new Map<Id, Integer>();
+for (Partner_Commission__c c : [SELECT Opportunity__c, Status__c FROM Partner_Commission__c WHERE Opportunity__c IN :fixtures]) {
+    allCommissions.put(c.Opportunity__c, (allCommissions.containsKey(c.Opportunity__c) ? allCommissions.get(c.Opportunity__c) : 0) + 1);
+    if (c.Status__c == PR_Settings.COM_PENDING) {
+        pendingCommissions.put(c.Opportunity__c, (pendingCommissions.containsKey(c.Opportunity__c) ? pendingCommissions.get(c.Opportunity__c) : 0) + 1);
+    }
+}
+for (Opportunity o : fixtures) {
+    Integer total = allCommissions.containsKey(o.Id) ? allCommissions.get(o.Id) : 0;
+    Integer pending = pendingCommissions.containsKey(o.Id) ? pendingCommissions.get(o.Id) : 0;
+    Boolean used;
+    if (o.Name == 'AI-TEST Commission QA') {
+        used = o.StageName != 'Connection Requested' || total > 0 || o.OpportunityLineItems.size() != 3;
+    } else if (o.Name == 'AI-TEST Commission Pending QA') {
+        // S06-TC-11 only tries to approve it (and must fail), so it is reused while it has exactly one Pending commission.
+        used = total != 1 || pending != 1;
+    } else {
+        used = true; // Payout QA and earlier conversions are used once.
+    }
     if (used) retire.add(new Opportunity(Id = o.Id, Name = 'AI-TEST Retired QA ' + stamp));
 }
 

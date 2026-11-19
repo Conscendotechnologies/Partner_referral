@@ -108,12 +108,12 @@ cases:
   - regression
   - security
   preconditions:
-  - A Pending commission exists (create one as in S06-TC-02 if needed)
+  - '"AI-TEST Commission Pending QA" has exactly one Pending commission (seeded by scripts/apex/pr-demo/7-qa-preconditions.apex)'
   steps:
   - Open Setup > Users (/lightning/setup/ManageUsers/home)
   - Click "Login" next to the user "Sam Rep (PR test)"
   - Open the Opportunities tab
-  - Search "AI-TEST Commission" in the list search box and open the Opportunity
+  - Search "AI-TEST Commission Pending" in the list search box and open the Opportunity "AI-TEST Commission Pending QA"
   - Open a Pending commission from the "Partner Commissions" related list, if it is shown
   - If the commission opened, change Status to "Approved" and save
   expected:

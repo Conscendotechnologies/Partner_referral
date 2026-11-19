@@ -5,6 +5,9 @@ import { defineConfig } from '@playwright/test';
 // locally and in CI (see README.md). Specs never contain credentials.
 // SF_PW_AUTHORING is set only while the AI writes a spec: short timeouts so a wrong locator fails in seconds.
 const authoring = !!process.env.SF_PW_AUTHORING;
+// One id per run, set when the runner loads this config; workers inherit it. support/run-state.ts only returns
+// values noted in the same run.
+process.env.SF_RUN_ID ??= `${Date.now()}-${process.pid}`;
 
 export default defineConfig({
   testDir: './tests/sf-ai',

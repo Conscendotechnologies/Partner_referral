@@ -27,17 +27,24 @@ test('S01-TC-06: A Commission Rate change appears in Account History with old va
 
   await test.step('Expected: a "Commission Rate" history row shows the old value, the new value 61, "Maya Manager (PR test)" and the date and time', async () => {
     // Account History columns: Date, Field, User, Original Value, New Value. Maya's locale is en_AU.
-    const row = maya
-      .getByRole('grid')
+    // Columns are read by their headers, so a cleanup row (61 -> old rate) cannot pass for the change to 61.
+    const grid = maya.getByRole('grid');
+    const rows = grid
       .getByRole('row')
       .filter({ has: maya.getByRole('gridcell', { name: 'Commission Rate', exact: true }) })
-      .filter({ has: maya.getByRole('gridcell', { name: /\b61(\.00)?$/ }) })
-      .filter({ hasText: 'Maya Manager (PR test)' })
-      .first();
-    await expect(row).toBeVisible({ timeout: 60_000 });
-    await expect(row).toContainText(/\d{1,2}\/\d{1,2}\/\d{4},? \d{1,2}:\d{2}\s*[ap]m/i);
-    // The old value (Original Value) is a rate, not empty.
-    const cells = await row.getByRole('gridcell').allInnerTexts();
-    expect(cells.filter((c) => /\d/.test(c) && !/\b61(\.00)?$/.test(c.trim()) && !/\//.test(c)).length).toBeGreaterThan(0);
+      .filter({ hasText: 'Maya Manager (PR test)' });
+    await expect(rows.first()).toBeVisible({ timeout: 60_000 });
+    const headers = (await grid.getByRole('columnheader').allInnerTexts()).map((h) => h.trim().split('\n')[0]);
+    const oldCol = headers.findIndex((h) => h.startsWith('Original Value'));
+    const newCol = headers.findIndex((h) => h.startsWith('New Value'));
+    expect(oldCol, `"Original Value" column in ${headers.join(' | ')}`).toBeGreaterThanOrEqual(0);
+    expect(newCol, `"New Value" column in ${headers.join(' | ')}`).toBeGreaterThanOrEqual(0);
+    const sixtyOne = /^61(\.00)?%?$/;
+    const cellsPerRow = await Promise.all((await rows.all()).map((r) => r.locator('th, td').allInnerTexts()));
+    const change = cellsPerRow
+      .map((cells) => cells.map((c) => c.trim()))
+      .find((cells) => sixtyOne.test(cells[newCol] ?? '') && /\d/.test(cells[oldCol] ?? '') && !sixtyOne.test(cells[oldCol]));
+    expect(change, 'a Commission Rate row with New Value 61 and the old rate as Original Value').toBeDefined();
+    expect(change!.join(' ')).toMatch(/\d{1,2}\/\d{1,2}\/\d{4},? \d{1,2}:\d{2}\s*[ap]m/i);
   });
 });

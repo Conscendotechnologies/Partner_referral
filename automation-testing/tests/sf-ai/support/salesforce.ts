@@ -17,10 +17,17 @@ export async function loginAs(page: Page, firstName: string, lastName: string): 
   await frame.getByRole('link', { name: lastName[0].toUpperCase(), exact: true }).first().click();
   const row = frame.getByRole('row').filter({ has: frame.getByRole('link', { name: `${lastName}, ${firstName}`, exact: true }) });
   await expect(row).toHaveCount(1, { timeout: 60_000 });
-  const popup = page.context().waitForEvent('page', { timeout: 15_000 }).catch(() => null);
+  // Login opens the user's session in a new tab (sometimes only after 15 s or more), after which the original tab shows
+  // "Your session has ended"; in other orgs it stays in the same tab. Whichever happens first is the user's page.
+  const banner = `Logged in as ${firstName} ${lastName}`;
+  const newTab = page.context().waitForEvent('page', { timeout: 90_000 });
+  const sameTab = page.getByText(banner).waitFor({ timeout: 90_000 }).then(() => page);
+  // The way that does not happen times out later; that rejection is not a failure (the race below already settled).
+  newTab.catch(() => undefined);
+  sameTab.catch(() => undefined);
   await row.getByRole('link', { name: 'Login', exact: true }).click();
-  const app = (await popup) ?? page;
-  await expect(app.getByText(`Logged in as ${firstName} ${lastName}`)).toBeVisible({ timeout: 60_000 });
+  const app = await Promise.race([newTab, sameTab]);
+  await expect(app.getByText(banner)).toBeVisible({ timeout: 60_000 });
   return app;
 }
 

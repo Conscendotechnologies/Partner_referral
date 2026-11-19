@@ -41,14 +41,37 @@ export async function restoreAccountField(page: Page, agency: string, label: str
   await page.reload();
   await page.getByRole('tab', { name: 'Details' }).click();
   await expect(detailField(page, 'Account Name')).toContainText(agency, { timeout: 60_000 });
+  // Skipped only when Details shows exactly the original value. When Details doesn't show the field, the form still
+  // may have changed it, so the value is always put back.
   const field = detailField(page, label);
-  if ((await field.count()) === 0 || (await field.innerText()).includes(original)) return;
+  if ((await field.count()) === 1 && sameValue(shownValue(await field.innerText(), label), original)) return;
   await page.getByRole('button', { name: 'Edit', exact: true }).click();
   await expect(dialog.getByRole('textbox', { name: 'Account Name' })).toHaveValue(agency, { timeout: 60_000 });
   await set(dialog);
   await dialog.getByRole('button', { name: 'Save', exact: true }).click();
   await expect(dialog).toBeHidden({ timeout: 60_000 });
-  await expect(detailField(page, label)).toContainText(original);
+  const restored = detailField(page, label);
+  if ((await restored.count()) === 1) {
+    await expect.poll(async () => sameValue(shownValue(await restored.innerText(), label), original)).toBe(true);
+  }
+}
+
+/** The value line of a layout item's text (which also holds the label and the hidden "Edit <label>" button text). */
+function shownValue(text: string, label: string): string {
+  const lines = text.split('\n').map((l) => l.trim()).filter((l) => l && l !== label && !l.startsWith('Edit ') && !l.startsWith('Help '));
+  return lines[0] ?? '';
+}
+
+/**
+ * Whole-value comparison for restoreAccountField: numbers by value ("61" is not "6", "50.00" is "50"; spaces in an
+ * ABN ignored), anything else as trimmed text.
+ */
+function sameValue(shown: string, original: string): boolean {
+  const a = shown.trim();
+  const b = original.trim();
+  const num = (s: string) => (/^[\d\s.,%]+$/.test(s) ? Number(s.replace(/[\s,%]/g, '')) : NaN);
+  if (!Number.isNaN(num(a)) && !Number.isNaN(num(b))) return num(a) === num(b);
+  return a === b;
 }
 
 /**

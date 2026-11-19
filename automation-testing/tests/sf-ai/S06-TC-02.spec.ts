@@ -46,12 +46,12 @@ test('S06-TC-02: Moving an Opportunity to Utilities Connected shows a Pending co
     await expect(fieldValue(maya, 'Status')).toHaveText('Pending');
     await expect(fieldValue(maya, 'Services Connected')).toHaveText('3');
     await expect(fieldValue(maya, 'Agency').getByRole('link')).toHaveText('Harbour & Co Realty');
-    // R is the agency's Commission Rate, as the commission stamped it (D3: the Account page has no Commission Rate yet).
-    const rate = fieldValue(maya, 'Rate Applied');
-    await expect(rate).toHaveText(/^AUD [\d,]+\.\d{2}\b/);
-    const r = Number((await rate.innerText()).match(/^AUD ([\d,]+\.\d{2})/)![1].replace(/,/g, ''));
-    expect(r).toBeGreaterThan(0);
-    const amount = (3 * r).toLocaleString('en-AU', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
-    await expect(fieldValue(maya, 'Amount (ex GST)')).toHaveText(new RegExp(`^AUD ${amount.replace(/[.,]/g, '\\$&')}(\\s|$)`));
+    // R is Harbour & Co Realty's Commission Rate, read independently of the commission under test: 50, as
+    // scripts/apex/pr-demo/2-agencies-and-products.apex seeds it (no case changes it for good; S01 cases restore it).
+    // Once PR #8 puts Commission Rate on the Account page, this can be read there instead.
+    const R = 50;
+    const aud = (n: number) => new RegExp(`^AUD ${n.toLocaleString('en-AU')}\\.00(\\s|$)`);
+    await expect(fieldValue(maya, 'Rate Applied')).toHaveText(aud(R));
+    await expect(fieldValue(maya, 'Amount (ex GST)')).toHaveText(aud(3 * R));
   });
 });

@@ -31,6 +31,14 @@ test("S04-TC-09: Home page counts this month's visible referrals by partner stat
     await openTracker(page, 'My referrals');
     const rows: { referralNumber: string; submittedAt: string }[] = (await (await loaded).json()).returnValue;
     const thisMonth = sydneyMonth(new Date());
+    // The tracker loads the newest 200 referrals (PR_PortalController, ORDER BY CreatedDate DESC LIMIT 200), while the
+    // tiles count every referral of the month. The comparison is only valid if this month's are all in the tracker:
+    // it is not full, or its oldest row is from an earlier month. Otherwise the case cannot be checked on screen.
+    const TRACKER_LIMIT = 200;
+    expect(
+      rows.length < TRACKER_LIMIT || sydneyMonth(new Date(rows[rows.length - 1].submittedAt)) !== thisMonth,
+      `the tracker holds all of this month's referrals (it shows ${rows.length}, its limit is ${TRACKER_LIMIT})`
+    ).toBe(true);
     const thisMonthNumbers = new Set(rows.filter((r) => sydneyMonth(new Date(r.submittedAt)) === thisMonth).map((r) => r.referralNumber));
 
     await expect(trackerCards(page)).toHaveCount(rows.length);

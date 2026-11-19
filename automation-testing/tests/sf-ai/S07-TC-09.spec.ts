@@ -1,12 +1,13 @@
 import { test, expect } from './support/fixtures';
 import { loginAs } from './support/salesforce';
 import { fieldValue, payoutConsole, todayAU } from './support/C';
+import { notedByEarlierCase } from './support/run-state';
 
 // Precondition: S07-TC-07 has run in this run (the batch is Exported). Must not run when the reset printed
-// "PR-QA S07: SKIP" (CI leaves the S07 specs out then).
+// "PR-QA S07: SKIP" (CI leaves the S07 specs out then). The batch is the month S07-TC-03 ran, not any Exported one.
 test('S07-TC-09: Mark paid sets the batch and every commission in it to Paid', async ({ page }) => {
   let fiona = page;
-  let month = '';
+  const month = notedByEarlierCase('S07-TC-03-month');
 
   await test.step('1-2. Setup > Users, Login as Fiona Finance (PR test)', async () => {
     fiona = await loginAs(page, 'Fiona', 'Finance (PR test)');
@@ -19,9 +20,11 @@ test('S07-TC-09: Mark paid sets the batch and every commission in it to Paid', a
 
   await test.step('4. Click "Mark paid" on the Exported batch', async () => {
     const card = await payoutConsole(fiona);
-    const exported = card.getByRole('row').filter({ has: fiona.getByRole('cell', { name: 'Exported', exact: true }) });
+    const exported = card
+      .getByRole('row')
+      .filter({ has: fiona.getByRole('rowheader', { name: month, exact: true }) })
+      .filter({ has: fiona.getByRole('cell', { name: 'Exported', exact: true }) });
     await expect(exported).toHaveCount(1);
-    month = (await exported.getByRole('rowheader').innerText()).trim();
     await exported.getByRole('button', { name: 'Mark paid', exact: true }).click();
     // Expected: the message appears.
     await expect(card.getByRole('status').filter({ hasText: 'marked paid' })).toHaveText(

@@ -12,6 +12,8 @@ test("S01-TC-02: A sales rep cannot change an agency's Commission Rate", async (
   let sam = page;
   let editable = false;
   let rateBefore = '';
+  // The rate as the edit form shows it, read before the case types into it: what cleanup puts back.
+  let formRate = '';
 
   await test.step('1-2. Open Setup > Users and click "Login" next to "Sam Rep (PR test)"', async () => {
     sam = await loginAs(page, 'Sam', 'Rep (PR test)');
@@ -33,6 +35,10 @@ test("S01-TC-02: A sales rep cannot change an agency's Commission Rate", async (
     await sam.getByRole('button', { name: 'Edit', exact: true }).click();
     await expect(dialog.getByRole('textbox', { name: 'Account Name' })).toHaveValue(AGENCY, { timeout: 60_000 });
     editable = (await rateInput.count()) === 1 && (await rateInput.isEditable());
+    if (editable) {
+      formRate = (await rateInput.inputValue()).trim();
+      expect(formRate, 'the original Commission Rate is readable before it is changed').toMatch(/\d/);
+    }
   });
 
   try {
@@ -67,9 +73,9 @@ test("S01-TC-02: A sales rep cannot change an agency's Commission Rate", async (
       await expect(detailField(sam, 'Commission Rate')).toContainText(rateBefore);
     });
   } finally {
-    if (editable && rateBefore) {
-      const original = rateBefore.replace(/[^\d.]/g, '');
-      await restoreAccountField(sam, AGENCY, 'Commission Rate', rateBefore, async (form) => {
+    if (editable && formRate) {
+      const original = formRate.replace(/[^\d.]/g, '');
+      await restoreAccountField(sam, AGENCY, 'Commission Rate', original, async (form) => {
         await form
           .getByRole('textbox', { name: 'Commission Rate' })
           .or(form.getByRole('spinbutton', { name: 'Commission Rate' }))

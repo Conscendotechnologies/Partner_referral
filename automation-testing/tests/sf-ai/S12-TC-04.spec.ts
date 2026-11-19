@@ -17,7 +17,15 @@ test('S12-TC-04: Payout Line page shows agency, ABN, reference, total, count and
 
   await test.step('4. Click the month link of a batch (one with lines)', async () => {
     const card = await payoutConsole(fiona);
-    const link = card.getByRole('rowheader').getByRole('link').first();
+    // The first batch whose "Agencies" (its line count) is above 0: a batch can exist with no lines yet.
+    const rows = card.getByRole('row').filter({ has: fiona.getByRole('rowheader') });
+    await expect(rows.first()).toBeVisible();
+    // Cells after the month: Status, Agencies, Total ex GST, Runs, Actions.
+    const counts: number[] = [];
+    for (let i = 0; i < (await rows.count()); i++) counts.push(Number((await rows.nth(i).getByRole('cell').nth(1).innerText()).trim()));
+    const withLines = counts.findIndex((n) => n > 0);
+    expect(withLines, `a batch with lines (Agencies per row: ${counts.join(', ')})`).toBeGreaterThanOrEqual(0);
+    const link = rows.nth(withLines).getByRole('rowheader').getByRole('link');
     await expect(link).toHaveText(/^\d{4}-\d{2}$/);
     const month = (await link.innerText()).trim();
     await link.click();
