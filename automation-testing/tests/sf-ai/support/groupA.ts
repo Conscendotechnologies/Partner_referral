@@ -37,9 +37,19 @@ export async function openApp(page: Page, appName: string) {
  */
 export async function restoreAccountField(page: Page, agency: string, label: string, original: string, set: (dialog: Locator) => Promise<void>) {
   const dialog = page.getByRole('dialog', { name: `Edit ${agency}` });
-  // A reload drops any edit form still open.
+  // A caller may pass the whole layout-item text it noted (label, value and the hidden "Edit <label>" text): only the
+  // value line is compared.
+  original = shownValue(original, label);
+  // Cleanup after a failed check can find the edit form still open, and its unsaved changes block the reload. Cancel it
+  // first (this only tidies up; it decides nothing about the test's result), then reload for fresh values.
+  if (await dialog.isVisible()) {
+    await dialog.getByRole('button', { name: 'Cancel', exact: true }).click();
+    await expect(dialog).toBeHidden({ timeout: 30_000 });
+  }
   await page.reload();
-  await page.getByRole('tab', { name: 'Details' }).click();
+  const details = page.getByRole('tab', { name: 'Details' });
+  await expect(details).toBeVisible({ timeout: 90_000 });
+  await details.click();
   await expect(detailField(page, 'Account Name')).toContainText(agency, { timeout: 60_000 });
   // Skipped only when Details shows exactly the original value. When Details doesn't show the field, the form still
   // may have changed it, so the value is always put back.
@@ -54,6 +64,19 @@ export async function restoreAccountField(page: Page, agency: string, label: str
   if ((await restored.count()) === 1) {
     await expect.poll(async () => sameValue(shownValue(await restored.innerText(), label), original)).toBe(true);
   }
+}
+
+/**
+ * Replaces an input's whole value. `fill` on a Lightning number field (spinbutton) can append to the formatted value
+ * ("60" + "61" became "6061"), so the contents are selected and deleted, then typed, and the result is checked.
+ */
+export async function replaceValue(input: Locator, value: string) {
+  await input.click();
+  await input.press('ControlOrMeta+a');
+  await input.press('Delete');
+  await expect(input).toHaveValue('');
+  await input.pressSequentially(value);
+  await expect(input).toHaveValue(new RegExp(`^${value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}`));
 }
 
 /** The value line of a layout item's text (which also holds the label and the hidden "Edit <label>" button text). */
@@ -80,7 +103,10 @@ function sameValue(shown: string, original: string): boolean {
  */
 export async function openDashboardInFolder(page: Page, folder: string, dashboard: string) {
   await page.goto('/lightning/o/Dashboard/home');
-  await page.getByRole('tab', { name: 'All Folders' }).click();
+  // Lightning can take more than 30 s to start right after a Login-as.
+  const allFolders = page.getByRole('tab', { name: 'All Folders' });
+  await expect(allFolders).toBeVisible({ timeout: 90_000 });
+  await allFolders.click();
   const folderLink = page.getByRole('link', { name: folder, exact: true }).first();
   await expect(folderLink).toBeVisible({ timeout: 60_000 });
   await folderLink.click();

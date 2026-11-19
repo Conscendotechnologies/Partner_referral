@@ -51,7 +51,9 @@ cases:
     guarantee the run touches only test data: every Approved commission not yet in a batch is AI-TEST (the "AI-TEST
     Payout QA" one is seeded), and the suggested payout month has no batch, or only one made of AI-TEST commissions,
     which the reset removes. If either is not true, the reset prints "PR-QA S07: SKIP" and the S07 cases must not run
-    in that org'
+    in that org. The reset checks this once, before the run: it holds only if nobody else approves a commission in that
+    org between the reset and the end of S07-TC-09 (a dedicated QA sandbox, or an agreed quiet window), for CI and
+    manual runs alike'
   steps:
   - Open Setup > Users (/lightning/setup/ManageUsers/home)
   - Click "Login" next to the user "Fiona Finance (PR test)"

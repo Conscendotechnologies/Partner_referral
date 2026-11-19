@@ -1,5 +1,6 @@
 // Shared steps for the S05 / S06 / S07 / S12 specs (group C). Each one does the real UI action and asserts it worked.
-import { expect, type Locator, type Page } from '@playwright/test';
+import { expect, test, type Locator, type Page } from '@playwright/test';
+import { SEARCH_INDEX_WAIT } from './salesforce';
 
 /**
  * The displayed value of a field in the open record's Details (the visible record page only; Lightning keeps earlier
@@ -60,7 +61,9 @@ export async function openFromListSettled(page: Page, objectApiName: string, sea
   const box = page.getByRole('searchbox', { name: 'Search this list...' });
   const link = page.getByRole('rowheader').getByRole('link', { name: recordName, exact: true });
   const heading = page.locator('records-highlights2:visible').getByRole('heading', { level: 1 });
-  // Each attempt starts again from the list, so a stale row that opened the wrong record is not kept.
+  // Each attempt starts again from the list, so a stale row that opened the wrong record is not kept. Retried for up
+  // to 10 minutes: the list search finds a record the data reset just created only once the search index has it.
+  test.info().setTimeout(test.info().timeout + SEARCH_INDEX_WAIT);
   await expect(async () => {
     await page.goto(`/lightning/o/${objectApiName}/list?filterName=${encodeURIComponent(ALL_VIEWS[objectApiName] ?? 'All')}`);
     await expect(box).toBeVisible({ timeout: 60_000 });
@@ -69,7 +72,7 @@ export async function openFromListSettled(page: Page, objectApiName: string, sea
     await expect(link).toHaveCount(1, { timeout: 30_000 });
     await link.click({ timeout: 10_000 });
     await expect(heading).toHaveText(recordName, { timeout: 15_000 });
-  }).toPass({ timeout: 240_000 });
+  }).toPass({ timeout: SEARCH_INDEX_WAIT, intervals: [20_000] });
 }
 
 /** The Lightning toast whose message matches `text`, e.g. /^Opportunity "X" was saved\.$/. */

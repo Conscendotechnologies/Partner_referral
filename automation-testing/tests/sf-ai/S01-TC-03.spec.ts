@@ -1,6 +1,6 @@
 import { test, expect } from './support/fixtures';
 import { loginAs, openFromList } from './support/salesforce';
-import { detailField, restoreAccountField, toast } from './support/groupA';
+import { detailField, replaceValue, restoreAccountField, toast } from './support/groupA';
 
 const AGENCY = 'Bayside Property Group';
 
@@ -39,7 +39,7 @@ test("S01-TC-03: A Partner Manager can change an agency's Commission Rate", asyn
     });
 
     await test.step('6. Enter "61" in "Commission Rate"', async () => {
-      await rateInput.fill('61');
+      await replaceValue(rateInput, '61');
       await expect(rateInput).toHaveValue(/^61/);
     });
 
@@ -58,10 +58,10 @@ test("S01-TC-03: A Partner Manager can change an agency's Commission Rate", asyn
     if (saved) {
       const original = rateBefore.replace(/[^\d.]/g, '');
       await restoreAccountField(maya, AGENCY, 'Commission Rate', rateBefore, async (form) => {
-        await form
-          .getByRole('textbox', { name: 'Commission Rate' })
-          .or(form.getByRole('spinbutton', { name: 'Commission Rate' }))
-          .fill(original);
+        await replaceValue(
+          form.getByRole('textbox', { name: 'Commission Rate' }).or(form.getByRole('spinbutton', { name: 'Commission Rate' })),
+          original
+        );
       });
     }
   }

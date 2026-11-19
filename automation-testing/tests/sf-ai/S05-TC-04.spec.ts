@@ -29,7 +29,10 @@ test('S05-TC-04: A rep can delete a product that will not be connected before Ut
     const confirm = sam.getByRole('dialog').filter({ has: sam.getByRole('button', { name: 'Delete', exact: true }) });
     await expect(confirm).toBeVisible();
     await confirm.getByRole('button', { name: 'Delete', exact: true }).click();
-    await expect(sam.locator('.forceToastMessage').getByText(/was deleted\.$/)).toBeVisible({ timeout: 60_000 });
+    // Proof that it was deleted: the list's own count drops to "1 item". (The success toast is brief, and the grid
+    // re-renders with no rows for a moment, so "the Internet row is gone" alone is not proof.)
+    await expect(confirm).toBeHidden({ timeout: 60_000 });
+    await expect(sam.getByText(/^1 item\b/)).toBeVisible({ timeout: 60_000 });
   });
 
   await test.step('Expected: the product is deleted; only Electricity remains', async () => {

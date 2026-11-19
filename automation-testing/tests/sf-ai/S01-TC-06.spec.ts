@@ -17,8 +17,8 @@ test('S01-TC-06: A Commission Rate change appears in Account History with old va
     await expect(maya.locator('records-highlights2').getByText(AGENCY, { exact: true })).toBeVisible();
   });
 
-  await test.step('5. Open the "Related" tab and open "Account History"', async () => {
-    await maya.getByRole('tab', { name: 'Related', exact: true }).click();
+  await test.step('5. Open "Account History" from the related list links at the top of the page', async () => {
+    // The org's Account record page shows related lists as quick links, not under a "Related" tab.
     const historyLink = maya.getByRole('link', { name: /^Account History/ }).first();
     await expect(historyLink).toBeVisible({ timeout: 60_000 });
     await historyLink.click();
@@ -39,7 +39,8 @@ test('S01-TC-06: A Commission Rate change appears in Account History with old va
     const newCol = headers.findIndex((h) => h.startsWith('New Value'));
     expect(oldCol, `"Original Value" column in ${headers.join(' | ')}`).toBeGreaterThanOrEqual(0);
     expect(newCol, `"New Value" column in ${headers.join(' | ')}`).toBeGreaterThanOrEqual(0);
-    const sixtyOne = /^61(\.00)?%?$/;
+    // Commission Rate is a currency field: the history shows "AUD 61" (Original Value "AUD 60").
+    const sixtyOne = /^(AUD\s?)?61(\.00)?$/;
     const cellsPerRow = await Promise.all((await rows.all()).map((r) => r.locator('th, td').allInnerTexts()));
     const change = cellsPerRow
       .map((cells) => cells.map((c) => c.trim()))

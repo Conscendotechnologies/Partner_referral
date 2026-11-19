@@ -1,15 +1,7 @@
 {
-  "S01-TC-01": "PR #8 is deployed (D3: Partner Status is not on the Account page, so it cannot be checked after the save)",
-  "S01-TC-02": "PR #8 is deployed (D3: Commission Rate is not on the Account page, so it cannot be checked after the save)",
-  "S01-TC-03": "PR #8 is deployed (D3: Commission Rate is not on the Account page)",
-  "S01-TC-04": "PR #8 is deployed (D3: ABN is not on the Account page)",
-  "S01-TC-06": "PR #8 is deployed (D3: no Commission Rate field or Account History on the Account page)",
+  "S01-TC-01": "PR #12 is deployed (D3 follow-up: reps cannot read Partner Status)",
+  "S01-TC-02": "PR #12 is deployed (D3 follow-up: reps cannot read Commission Rate)",
   "S02-TC-06": "D5 is fixed (the portal form rejects \"+61 412 000 204\"; prReferralForm mobilePattern; no fix PR yet)",
-  "S02-TC-13": "PR #8 is deployed (D3: the precondition, agency Inactive, cannot be set on the Account page)",
-  "S03-TC-11": "PR #8 is deployed (D4: the Referral Queue tab)",
-  "S05-TC-01": "PR #8 is deployed (D1: a Standard User rep cannot convert, \"Unable to find default record type\")",
-  "S05-TC-02": "PR #8 is deployed (D1: needs the Opportunity S05-TC-01 converts)",
-  "S05-TC-04": "PR #8 is deployed (D1: needs the Opportunity S05-TC-01 converts)",
-  "S06-TC-10": "PR #8 is deployed (D2: a Partner Manager cannot edit a commission a rep owns)",
-  "S06-TC-13": "PR #8 is deployed (D2: needs the commission S06-TC-10 approves)"
+  "S02-TC-13": "an Inactive AI-TEST agency fixture exists (test data: the case needs an inactive agency, and automation must not edit the real agencies)",
+  "S03-TC-11": "PR #12 is deployed (D4 follow-up: the Referral Queue finds no queues)"
 }

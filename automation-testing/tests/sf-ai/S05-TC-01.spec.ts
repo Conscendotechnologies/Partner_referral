@@ -26,12 +26,12 @@ test('S05-TC-01: Converting a Partner Referral Lead creates a Person Account and
     await expect(dialog.getByRole('radio', { name: 'Create New Opportunity' })).toBeChecked();
     await expect(dialog.getByRole('checkbox', { name: "Don't create an opportunity upon conversion checkbox" })).not.toBeChecked();
     await dialog.getByRole('button', { name: 'Convert', exact: true }).click();
-    // D1: instead, the dialog stays open with the alert "Unable to find default record type".
-    await expect(sam.getByRole('dialog').filter({ hasText: 'Your lead has been converted' })).toBeVisible({ timeout: 60_000 });
+    // Before #8 (D1) the dialog stayed open with the alert "Unable to find default record type".
+    await expect(sam.getByRole('dialog', { name: 'Your lead has been converted' })).toBeVisible({ timeout: 60_000 });
   });
 
   await test.step('7. Click the new Opportunity link', async () => {
-    const converted = sam.getByRole('dialog').filter({ hasText: 'Your lead has been converted' });
+    const converted = sam.getByRole('dialog', { name: 'Your lead has been converted' });
     // The Opportunity card's record link (Opportunity URLs start with the 006 key prefix).
     await converted.locator('a[href*="/006"]').first().click();
     await expect(sam).toHaveURL(/\/lightning\/r\/(Opportunity\/)?006/, { timeout: 60_000 });
@@ -39,9 +39,10 @@ test('S05-TC-01: Converting a Partner Referral Lead creates a Person Account and
   });
 
   await test.step('Expected: record type Partner Referral, Stage Qualification, price book Partner Referral Utilities', async () => {
-    await expect(fieldValue(sam, 'Opportunity Record Type')).toHaveText('Partner Referral');
+    await expect(fieldValue(sam, 'Opportunity Record Type')).toHaveText(/^Partner Referral(Change Record Type)?$/);
     await expect(fieldValue(sam, 'Stage')).toHaveText('Qualification');
-    await expect(fieldValue(sam, 'Price Book')).toHaveText('Partner Referral Utilities');
+    // A lookup's value also holds its hover-card button text ("Preview"), as the record type holds "Change Record Type".
+    await expect(fieldValue(sam, 'Price Book')).toHaveText(/^Partner Referral Utilities(Preview)?$/);
   });
 
   await test.step('Expected: the Account created is a Person Account named after the mover', async () => {

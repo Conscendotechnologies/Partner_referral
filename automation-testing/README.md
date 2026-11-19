@@ -14,6 +14,8 @@ UI test automation for this Salesforce project. **Nothing in this folder is depl
 | `scripts/run-specs.mjs` | Resets the data, then runs the specs (leaving out the payout-run cases when the reset says so). CI uses it too |
 | `scripts/qa-data.mjs` | Puts the AI-TEST data into its starting state (`scripts/apex/pr-demo/8-`, `9-` and `7-*.apex`) |
 | `scripts/build-index.mjs` | Rebuilds `TEST-CASES.md` |
+| `scripts/evidence-pdf.mjs` | One evidence PDF per case from a run with `SF_EVIDENCE=1` (see Evidence) |
+| `evidence/` | The evidence PDFs of the last recorded run, linked from each case's Jira issue |
 | `playwright.sf-ai.config.ts` | Playwright config used by SF AI Tester, CI and local runs |
 
 The test design (`.specify/specs/<feature>/tests/story_NN.tc.json`), manual scripts and Jira map stay with the spec in
@@ -73,6 +75,18 @@ screenshots only. Locally, `SF_PW_TRACE=1` keeps traces of failed tests.
 
 In GitHub: **Actions → UI tests → Run workflow** (optionally with a title filter), and automatically at 06:00 Sydney
 time on weekdays. It logs in with the `SFDX_AUTH_URL` secret and uploads the Playwright report.
+
+## Evidence (PDF per case)
+
+```bash
+SF_EVIDENCE=1 PLAYWRIGHT_JSON_OUTPUT_NAME=.sf-ai-tester/evidence-report.json node scripts/run-specs.mjs <alias> --reporter=list,json
+node scripts/evidence-pdf.mjs .sf-ai-tester/evidence-report.json evidence "SDO (demo org)"
+```
+
+`SF_EVIDENCE=1` makes `support/fixtures.ts` take a screenshot after every top-level step and of the final state. The
+builder writes `evidence/<TC id>.pdf` with the verdict, steps, failure line (org URLs replaced by `<org>`) and the
+screenshots. Each case's Jira issue gets a comment that links to its PDF. Screenshots show user names (the "Logged in
+as" banner, which proves the persona); no password is ever on screen. `SF_PW_VIDEO=1` records each test as a video.
 
 ## What a spec must do
 

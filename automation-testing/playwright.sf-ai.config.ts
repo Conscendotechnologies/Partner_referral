@@ -24,7 +24,11 @@ export default defineConfig({
     viewport: { width: 1920, height: 1080 },
     actionTimeout: authoring ? 15_000 : 30_000,
     navigationTimeout: authoring ? 30_000 : 60_000,
-    screenshot: 'only-on-failure',
+    // With SF_EVIDENCE=1, support/fixtures.ts takes a screenshot after every step itself, so Playwright's is off.
+    screenshot: process.env.SF_EVIDENCE === '1' ? 'off' : 'only-on-failure',
+    // SF_PW_VIDEO=1 records each test (screen-recording evidence). Like the screenshots, it shows user names, never
+    // passwords.
+    video: process.env.SF_PW_VIDEO === '1' ? 'on' : 'off',
     // A trace records request headers and cookies, which hold the Salesforce session. CI uploads its report, so CI
     // keeps no traces (screenshots only); set SF_PW_TRACE=1 to keep them on your own machine.
     trace: !process.env.CI && process.env.SF_PW_TRACE ? 'retain-on-failure' : 'off',

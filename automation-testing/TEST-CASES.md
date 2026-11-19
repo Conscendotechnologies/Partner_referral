@@ -27,12 +27,12 @@ suites in `test-cases/` with a Playwright spec in `tests/sf-ai/`; `unit` cases a
 
 | TC | Level | AC | Persona | Title | Jira | Automation |
 |---|---|---|---|---|---|---|
-| S01-TC-01 | ui | AC-01.1 | Sales Rep | A sales rep cannot change an agency's Partner Status | KAN-82 | suite `002-partner-referral-story-01.sf-tests.yaml`, spec `S01-TC-01.spec.ts`, expected to fail until PR #8 is deployed (D3: Partner Status is not on the Account page, so it cannot be checked after the save) |
-| S01-TC-02 | ui | AC-01.1 | Sales Rep | A sales rep cannot change an agency's Commission Rate | KAN-83 | suite `002-partner-referral-story-01.sf-tests.yaml`, spec `S01-TC-02.spec.ts`, expected to fail until PR #8 is deployed (D3: Commission Rate is not on the Account page, so it cannot be checked after the save) |
-| S01-TC-03 | ui | AC-01.1 | Partner Manager | A Partner Manager can change an agency's Commission Rate | KAN-84 | suite `002-partner-referral-story-01.sf-tests.yaml`, spec `S01-TC-03.spec.ts`, expected to fail until PR #8 is deployed (D3: Commission Rate is not on the Account page) |
-| S01-TC-04 | ui | AC-01.2 | Partner Manager | An ABN with fewer than 11 digits is rejected | KAN-85 | suite `002-partner-referral-story-01.sf-tests.yaml`, spec `S01-TC-04.spec.ts`, expected to fail until PR #8 is deployed (D3: ABN is not on the Account page) |
+| S01-TC-01 | ui | AC-01.1 | Sales Rep | A sales rep cannot change an agency's Partner Status | KAN-82 | suite `002-partner-referral-story-01.sf-tests.yaml`, spec `S01-TC-01.spec.ts`, expected to fail until PR #12 is deployed (D3 follow-up: reps cannot read Partner Status) |
+| S01-TC-02 | ui | AC-01.1 | Sales Rep | A sales rep cannot change an agency's Commission Rate | KAN-83 | suite `002-partner-referral-story-01.sf-tests.yaml`, spec `S01-TC-02.spec.ts`, expected to fail until PR #12 is deployed (D3 follow-up: reps cannot read Commission Rate) |
+| S01-TC-03 | ui | AC-01.1 | Partner Manager | A Partner Manager can change an agency's Commission Rate | KAN-84 | suite `002-partner-referral-story-01.sf-tests.yaml`, spec `S01-TC-03.spec.ts` |
+| S01-TC-04 | ui | AC-01.2 | Partner Manager | An ABN with fewer than 11 digits is rejected | KAN-85 | suite `002-partner-referral-story-01.sf-tests.yaml`, spec `S01-TC-04.spec.ts` |
 | S01-TC-05 | unit | AC-01.2 | System | ABN boundaries: 12 digits and letters are rejected, exactly 11 digits is accepted | KAN-86 | Apex test |
-| S01-TC-06 | ui | AC-01.3 | Partner Manager | A Commission Rate change appears in Account History with old value, new value, user and time | KAN-87 | suite `002-partner-referral-story-01.sf-tests.yaml`, spec `S01-TC-06.spec.ts`, expected to fail until PR #8 is deployed (D3: no Commission Rate field or Account History on the Account page) |
+| S01-TC-06 | ui | AC-01.3 | Partner Manager | A Commission Rate change appears in Account History with old value, new value, user and time | KAN-87 | suite `002-partner-referral-story-01.sf-tests.yaml`, spec `S01-TC-06.spec.ts` |
 | S01-TC-07 | unit | AC-01.4 | Partner Manager | Enabling a Principal contact gives the Executive partner role and PR_Partner_Principal; an Agent gets the User role and PR_Partner_Agent | KAN-88 | Apex test |
 | S01-TC-08 | manual | AC-01.4 | Admin | Existing principal and agent users carry the right partner role and permission set | KAN-89 | manual script |
 | S01-TC-09 | manual | AC-01.5 | Partner Agent | A newly enabled partner user receives the welcome email, sets a password and logs in | KAN-90 | manual script |
@@ -55,7 +55,7 @@ suites in `test-cases/` with a Playwright spec in `tests/sf-ai/`; `unit` cases a
 | S02-TC-10 | unit | AC-02.4 | System | Boundary dates today -7 days and today +6 months are accepted; one day beyond each is rejected | KAN-102 | Apex test |
 | S02-TC-11 | unit | AC-02.5 | Partner Agent | Consent time and version are stamped on save and read-only to the partner | KAN-103 | Apex test |
 | S02-TC-12 | unit | AC-02.6 | Partner Agent | Agent and agency come from the running user; values in the request are ignored | KAN-104 | Apex test |
-| S02-TC-13 | ui | AC-02.7 | Partner Agent | An agent of an inactive agency cannot submit and nothing is created | KAN-105 | suite `002-partner-referral-story-02.sf-tests.yaml`, spec `S02-TC-13.spec.ts`, expected to fail until PR #8 is deployed (D3: the precondition, agency Inactive, cannot be set on the Account page) |
+| S02-TC-13 | ui | AC-02.7 | Partner Agent | An agent of an inactive agency cannot submit and nothing is created | KAN-105 | suite `002-partner-referral-story-02.sf-tests.yaml`, spec `S02-TC-13.spec.ts`, expected to fail until an Inactive AI-TEST agency fixture exists (test data: the case needs an inactive agency, and automation must not edit the real agencies) |
 | S02-TC-14 | unit | AC-02.7 | System | Inactive agency: no Referral or Lead is created (service level) | KAN-106 | Apex test |
 | S02-TC-15 | ui | AC-02.8 | Partner Agent | Same-agency duplicate shows a warning and can be sent anyway | KAN-107 | suite `002-partner-referral-story-02.sf-tests.yaml`, spec `S02-TC-15.spec.ts` |
 | S02-TC-16 | unit | AC-02.8 | System | No warning when the earlier referral is Connected or Closed Lost, or when emails differ | KAN-108 | Apex test |
@@ -81,7 +81,7 @@ suites in `test-cases/` with a Playwright spec in `tests/sf-ai/`; `unit` cases a
 | S03-TC-08 | ui | AC-03.5 | Admin | A new Lead shows SLA Due At | KAN-123 | suite `002-partner-referral-story-03.sf-tests.yaml`, spec `S03-TC-08.spec.ts` |
 | S03-TC-09 | ui | AC-03.6 | Sales Rep | First move to Working stamps First Contacted At | KAN-124 | suite `002-partner-referral-story-03.sf-tests.yaml`, spec `S03-TC-09.spec.ts` |
 | S03-TC-10 | unit | AC-03.6 | System | Later moves to Working keep the first stamp; first contact after SLA Due At sets SLA Breached | KAN-125 | Apex test |
-| S03-TC-11 | ui | AC-03.7 | Sales Rep | The rep's Referral Queue puts urgent Leads first, then by move-in date | KAN-126 | suite `002-partner-referral-story-03.sf-tests.yaml`, spec `S03-TC-11.spec.ts`, expected to fail until PR #8 is deployed (D4: the Referral Queue tab) |
+| S03-TC-11 | ui | AC-03.7 | Sales Rep | The rep's Referral Queue puts urgent Leads first, then by move-in date | KAN-126 | suite `002-partner-referral-story-03.sf-tests.yaml`, spec `S03-TC-11.spec.ts`, expected to fail until PR #12 is deployed (D4 follow-up: the Referral Queue finds no queues) |
 | S03-TC-12 | unit | AC-03.8 | System | 200 Leads inserted together get correct routing, urgency and SLA fields | KAN-127 | Apex test |
 | S03-TC-13 | unit | AC-03.9 | System | Leads of other record types are not routed, flagged or SLA-stamped | KAN-128 | Apex test |
 
@@ -106,10 +106,10 @@ suites in `test-cases/` with a Playwright spec in `tests/sf-ai/`; `unit` cases a
 
 | TC | Level | AC | Persona | Title | Jira | Automation |
 |---|---|---|---|---|---|---|
-| S05-TC-01 | ui | AC-05.1 | Sales Rep | Converting a Partner Referral Lead creates a Person Account and a Partner Referral Opportunity at Qualification | KAN-141 | suite `002-partner-referral-story-05.sf-tests.yaml`, spec `S05-TC-01.spec.ts`, expected to fail until PR #8 is deployed (D1: a Standard User rep cannot convert, "Unable to find default record type") |
-| S05-TC-02 | ui | AC-05.2 | Sales Rep | The converted Opportunity has exactly the Lead's utilities as products | KAN-142 | suite `002-partner-referral-story-05.sf-tests.yaml`, spec `S05-TC-02.spec.ts`, expected to fail until PR #8 is deployed (D1: needs the Opportunity S05-TC-01 converts) |
+| S05-TC-01 | ui | AC-05.1 | Sales Rep | Converting a Partner Referral Lead creates a Person Account and a Partner Referral Opportunity at Qualification | KAN-141 | suite `002-partner-referral-story-05.sf-tests.yaml`, spec `S05-TC-01.spec.ts` |
+| S05-TC-02 | ui | AC-05.2 | Sales Rep | The converted Opportunity has exactly the Lead's utilities as products | KAN-142 | suite `002-partner-referral-story-05.sf-tests.yaml`, spec `S05-TC-02.spec.ts` |
 | S05-TC-03 | unit | AC-05.3 | System | The Opportunity carries agency, agent, Referral and move-in date; the Referral links to it | KAN-143 | Apex test |
-| S05-TC-04 | ui | AC-05.4 | Sales Rep | A rep can delete a product that will not be connected before Utilities Connected | KAN-144 | suite `002-partner-referral-story-05.sf-tests.yaml`, spec `S05-TC-04.spec.ts`, expected to fail until PR #8 is deployed (D1: needs the Opportunity S05-TC-01 converts) |
+| S05-TC-04 | ui | AC-05.4 | Sales Rep | A rep can delete a product that will not be connected before Utilities Connected | KAN-144 | suite `002-partner-referral-story-05.sf-tests.yaml`, spec `S05-TC-04.spec.ts` |
 | S05-TC-05 | unit | AC-05.5 | System | 200 Leads converted together each get the right products and fields | KAN-145 | Apex test |
 | S05-TC-06 | unit | AC-05.6 | System | Converting a Lead of another record type runs none of this logic | KAN-146 | Apex test |
 | S05-TC-07 | unit | AC-05.1 | Sales Rep | A Lead owned by a Standard User sales rep (PR_Sales_Rep) converts to a Person Account and Partner Referral Opportunity when converted as that rep (System.runAs) | KAN-147 | Apex test |
@@ -127,10 +127,10 @@ suites in `test-cases/` with a Playwright spec in `tests/sf-ai/`; `unit` cases a
 | S06-TC-07 | manual | AC-06.4 | Finance | Finance receives the reopened-after-approval bell notification | KAN-154 | manual script |
 | S06-TC-08 | unit | AC-06.5 | Admin | Nobody, not even an admin without bypass, can edit Amount, Rate, Opportunity or Agency | KAN-155 | Apex test |
 | S06-TC-09 | ui | AC-06.5 | Admin | Editing a commission's Amount is refused with a clear message | KAN-156 | suite `002-partner-referral-story-06.sf-tests.yaml`, spec `S06-TC-09.spec.ts` |
-| S06-TC-10 | ui | AC-06.6 | Partner Manager | A Partner Manager approves a Pending commission and Approved By / On are stamped | KAN-157 | suite `002-partner-referral-story-06.sf-tests.yaml`, spec `S06-TC-10.spec.ts`, expected to fail until PR #8 is deployed (D2: a Partner Manager cannot edit a commission a rep owns) |
+| S06-TC-10 | ui | AC-06.6 | Partner Manager | A Partner Manager approves a Pending commission and Approved By / On are stamped | KAN-157 | suite `002-partner-referral-story-06.sf-tests.yaml`, spec `S06-TC-10.spec.ts` |
 | S06-TC-11 | ui | AC-06.6 | Sales Rep | A sales rep cannot approve a commission | KAN-158 | suite `002-partner-referral-story-06.sf-tests.yaml`, spec `S06-TC-11.spec.ts` |
 | S06-TC-12 | unit | AC-06.7 | Partner Manager | A Partner Manager cannot change an Approved commission; Finance can | KAN-159 | Apex test |
-| S06-TC-13 | ui | AC-06.7 | Partner Manager | Partner Manager is refused when moving an Approved commission back to Pending | KAN-160 | suite `002-partner-referral-story-06.sf-tests.yaml`, spec `S06-TC-13.spec.ts`, expected to fail until PR #8 is deployed (D2: needs the commission S06-TC-10 approves) |
+| S06-TC-13 | ui | AC-06.7 | Partner Manager | Partner Manager is refused when moving an Approved commission back to Pending | KAN-160 | suite `002-partner-referral-story-06.sf-tests.yaml`, spec `S06-TC-13.spec.ts` |
 | S06-TC-14 | unit | AC-06.8 | Partner Principal | Commission is shared read-only with the agency's Executive role only; agents and other agencies have no access | KAN-161 | Apex test |
 | S06-TC-15 | ui | AC-06.9 | Partner Principal | A principal sees this month's and last month's commission totals | KAN-162 | suite `002-partner-referral-story-06.sf-tests.yaml`, spec `S06-TC-15.spec.ts` |
 | S06-TC-16 | ui | AC-06.9 | Partner Agent | An agent does not see the commission tiles | KAN-163 | suite `002-partner-referral-story-06.sf-tests.yaml`, spec `S06-TC-16.spec.ts` |

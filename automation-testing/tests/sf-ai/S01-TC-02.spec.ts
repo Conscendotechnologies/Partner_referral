@@ -1,6 +1,6 @@
 import { test, expect } from './support/fixtures';
 import { loginAs, openFromList } from './support/salesforce';
-import { detailField, restoreAccountField, toast } from './support/groupA';
+import { detailField, replaceValue, restoreAccountField, toast } from './support/groupA';
 
 const AGENCY = 'Harbour & Co Realty';
 const LOCKED = "Only Partner Managers can change an agency's partner status or commission rate.";
@@ -45,7 +45,7 @@ test("S01-TC-02: A sales rep cannot change an agency's Commission Rate", async (
     await test.step('6. Enter "65" in "Commission Rate" if the field is editable', async () => {
       test.info().annotations.push({ type: 'Commission Rate on the edit form', description: editable ? 'editable' : 'missing or read-only' });
       if (editable) {
-        await rateInput.fill('65');
+        await replaceValue(rateInput, '65');
         await expect(rateInput).toHaveValue(/^65/);
       }
     });
@@ -76,10 +76,10 @@ test("S01-TC-02: A sales rep cannot change an agency's Commission Rate", async (
     if (editable && formRate) {
       const original = formRate.replace(/[^\d.]/g, '');
       await restoreAccountField(sam, AGENCY, 'Commission Rate', original, async (form) => {
-        await form
-          .getByRole('textbox', { name: 'Commission Rate' })
-          .or(form.getByRole('spinbutton', { name: 'Commission Rate' }))
-          .fill(original);
+        await replaceValue(
+          form.getByRole('textbox', { name: 'Commission Rate' }).or(form.getByRole('spinbutton', { name: 'Commission Rate' })),
+          original
+        );
       });
     }
   }

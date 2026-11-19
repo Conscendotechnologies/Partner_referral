@@ -129,7 +129,7 @@ cases:
   - Click "Login" next to the user "Maya Manager (PR test)"
   - Open the Accounts tab
   - Search "Bayside Property Group" in the list search box and open the Account
-  - Open the "Related" tab and open "Account History"
+  - Open "Account History" from the related list links at the top of the Account page
   expected:
   - A history row for "Commission Rate" shows the old value, the new value 61, the user "Maya Manager (PR test)" and the date
     and time of the change

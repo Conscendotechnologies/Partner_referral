@@ -1,6 +1,9 @@
 // Shared steps for the specs in tests/sf-ai. Each one does the real UI action the cases describe and asserts that it
 // worked, so a spec can never silently carry on as the admin or on the wrong record.
-import { expect, type Page } from '@playwright/test';
+import { expect, test, type Page } from '@playwright/test';
+
+/** How long a list search is retried while the search index catches up with new records. */
+export const SEARCH_INDEX_WAIT = 600_000;
 
 const usersFrame = (page: Page) => page.frameLocator('iframe[name^="vfFrameId"]');
 
@@ -50,13 +53,18 @@ export async function openFromList(
   recordName: string | RegExp,
   listView = ALL_VIEWS[objectApiName] ?? 'All'
 ) {
-  await page.goto(`/lightning/o/${objectApiName}/list?filterName=${encodeURIComponent(listView)}`);
   const box = page.getByRole('searchbox', { name: 'Search this list...' });
-  await expect(box).toBeVisible({ timeout: 60_000 });
-  await box.fill(search);
-  await box.press('Enter');
   const link = page.getByRole('rowheader').getByRole('link', { name: recordName, exact: typeof recordName === 'string' });
-  await expect(link).toHaveCount(1, { timeout: 60_000 });
+  // The list search uses the search index, which finds a record created minutes ago (e.g. by the data reset) only
+  // after a delay, so the search is repeated for up to 10 minutes.
+  test.info().setTimeout(test.info().timeout + SEARCH_INDEX_WAIT);
+  await expect(async () => {
+    await page.goto(`/lightning/o/${objectApiName}/list?filterName=${encodeURIComponent(listView)}`);
+    await expect(box).toBeVisible({ timeout: 60_000 });
+    await box.fill(search);
+    await box.press('Enter');
+    await expect(link).toHaveCount(1, { timeout: 30_000 });
+  }).toPass({ timeout: SEARCH_INDEX_WAIT, intervals: [20_000] });
   await link.click();
   await expect(page.locator('records-highlights2, records-record-layout-event-broker').first()).toBeVisible({ timeout: 60_000 });
 }
