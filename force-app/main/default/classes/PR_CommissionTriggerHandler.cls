@@ -121,6 +121,17 @@ public without sharing class PR_CommissionTriggerHandler {
             c.Approved_On__c == old.Approved_On__c;
     }
 
+    /**
+     * Commissions are never deleted: a wrong one is cancelled with a reason and a new one is created. Partner
+     * Managers and Finance hold Modify All (needed to work on commissions the rep owns), which includes delete.
+     */
+    public static void beforeDelete(List<Partner_Commission__c> oldList) {
+        if (PR_CommissionService.bypassLocks) return;
+        for (Partner_Commission__c c : oldList) {
+            c.addError('Commissions cannot be deleted. Cancel it with a reason instead.');
+        }
+    }
+
     public static void afterInsert(List<Partner_Commission__c> newList) {
         PR_CommissionSharing.share(newList);
     }

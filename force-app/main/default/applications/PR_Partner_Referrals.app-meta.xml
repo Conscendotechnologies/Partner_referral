@@ -14,6 +14,7 @@
     <navType>Standard</navType>
     <tabs>standard-home</tabs>
     <tabs>standard-Lead</tabs>
+    <tabs>PR_Referral_Queue</tabs>
     <tabs>standard-Opportunity</tabs>
     <tabs>Referral__c</tabs>
     <tabs>standard-Account</tabs>

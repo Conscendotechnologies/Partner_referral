@@ -4,6 +4,10 @@
         <application>PR_Partner_Referrals</application>
         <visible>true</visible>
     </applicationVisibilities>
+    <classAccesses>
+        <apexClass>PR_QueueLeadsController</apexClass>
+        <enabled>true</enabled>
+    </classAccesses>
     <description>002 Partner referral: Connectnow sales rep and team lead. Work Partner Referral Leads and Opportunities from the state queues.</description>
     <fieldPermissions>
         <editable>false</editable>
@@ -242,6 +246,10 @@
         <recordType>Opportunity.Partner_Referral</recordType>
         <visible>true</visible>
     </recordTypeVisibilities>
+    <tabSettings>
+        <tab>PR_Referral_Queue</tab>
+        <visibility>Visible</visibility>
+    </tabSettings>
     <tabSettings>
         <tab>Referral__c</tab>
         <visibility>Visible</visibility>

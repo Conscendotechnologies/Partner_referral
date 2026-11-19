@@ -160,3 +160,18 @@ Run in order with `sf apex run -f scripts/apex/pr-demo/<file>`:
 cross-agency flag, two-agency and agent-vs-principal isolation, routing, urgency both ways, first contact and SLA,
 status sync, Person Account conversion with products, commission create/approve/lock/cancel/reopen/rewin, principal
 sharing, payout grouping, idempotent re-run, Xero CSV, mark paid, and the first-business-day scheduler.
+
+## G6 defect fixes (D1 to D4)
+
+QA (G6, PR 7) found four build defects that the admin-profile unit tests could not see.
+
+| Defect | Story | Fix |
+| --- | --- | --- |
+| D1: a rep on the Standard User profile cannot convert ("Unable to find default record type") | S05 | `Standard` profile: PersonAccount record type visible and set as the person-account default, matching System Administrator. Profiles are touched only for this; the business-account default is unchanged |
+| D2: a Partner Manager cannot approve, and Finance cannot move, a commission owned by a rep | S06 | Modify All on `Partner_Commission__c` for `PR_Partner_Manager` and `PR_Finance`. Changing the internal sharing model to Read/Write is blocked by the Apex managed sharing (`Partner_Commission__Share`). Modify All includes delete, so a new before-delete trigger refuses every delete outside the services' bypass: commissions are cancelled, never deleted. The trigger still decides who may approve or change status |
+| D3: Partner Status, Commission Rate, ABN and Agreement Start Date not on the Account page; no Account History | S01, S12 | "Partner Agency" section and the Account History related list on `Account-Account Layout` (the layout every profile uses for Account). Field-level security still hides the fields from reps |
+| D4: queue list view not sorted urgent first | S03 | List view metadata cannot carry a sort. New **Referral Queue** tab (`PR_Referral_Queue` app page, `prQueueLeads` LWC, `PR_QueueLeadsController`) lists the open Partner Referral Leads of the rep's own PR_ queues, urgent first, then by move-in date. In the app and in `PR_Sales_Rep` |
+
+New tests use real Standard User personas (`PR_TestFactory.standardUser`): `aStandardUserRepConvertsToAPersonAccount`
+(S05-TC-07), `standardUserManagerAndFinanceWorkOnCommissionsTheyDoNotOwn` (S06-TC-19) and `PR_LeadLifecycleTest.referralQueue*` (S03-TC-11: a Standard User rep who reaches the queue through a public group, the row-limit warning, and a user in no queue)
+(S03-TC-11).

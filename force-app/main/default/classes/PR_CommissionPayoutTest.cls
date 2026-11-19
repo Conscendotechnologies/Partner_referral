@@ -45,6 +45,33 @@ private class PR_CommissionPayoutTest {
         }
     }
 
+    // S06-TC-19 (AC-06.6, AC-06.7): Standard User Partner Manager and Finance work on commissions they don't own.
+    @IsTest
+    static void standardUserManagerAndFinanceWorkOnCommissionsTheyDoNotOwn() {
+        User pm = PR_TestFactory.standardUser('prstdpm', new List<String>{ 'PR_Partner_Manager', 'PR_Sales_Rep' });
+        User fin = PR_TestFactory.standardUser('prstdfin', new List<String>{ 'PR_Finance' });
+        Partner_Commission__c c = commissions(PR_TestFactory.AGENCY_A, 1, 'Pending')[0];
+        Assert.areNotEqual(pm.Id, [SELECT OwnerId FROM Partner_Commission__c WHERE Id = :c.Id].OwnerId);
+        System.runAs(pm) {
+            Database.SaveResult approved = Database.update(new Partner_Commission__c(Id = c.Id, Status__c = 'Approved'), false);
+            Assert.isTrue(approved.isSuccess(), String.valueOf(approved.getErrors()));
+            Database.SaveResult back = Database.update(new Partner_Commission__c(Id = c.Id, Status__c = 'Pending'), false);
+            Assert.isFalse(back.isSuccess(), 'the Partner Manager cannot change an Approved commission');
+        }
+        Assert.areEqual(pm.Id, [SELECT Approved_By__c FROM Partner_Commission__c WHERE Id = :c.Id].Approved_By__c);
+        System.runAs(fin) {
+            Database.SaveResult back = Database.update(new Partner_Commission__c(Id = c.Id, Status__c = 'Pending'), false);
+            Assert.isTrue(back.isSuccess(), String.valueOf(back.getErrors()));
+        }
+        // Modify All includes delete; commissions are cancelled, never deleted.
+        System.runAs(pm) {
+            Assert.isFalse(Database.delete(c.Id, false).isSuccess(), 'a Partner Manager cannot delete a commission');
+        }
+        System.runAs(fin) {
+            Assert.isFalse(Database.delete(c.Id, false).isSuccess(), 'Finance cannot delete a commission');
+        }
+    }
+
     @IsTest
     static void aCommissionLandsOnOnlyOnePayoutLine() {
         Partner_Commission__c c = commissions(PR_TestFactory.AGENCY_A, 1, 'Approved')[0];

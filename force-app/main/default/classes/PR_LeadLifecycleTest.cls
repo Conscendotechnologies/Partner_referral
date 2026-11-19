@@ -9,6 +9,72 @@ private class PR_LeadLifecycleTest {
         return PR_TestFactory.submitAs('pa_ag1', PR_TestFactory.input(mobile, state, moveInDays, utilities));
     }
 
+    // S03-TC-11 (AC-03.7): the rep's Referral Queue lists urgent movers first, then by move-in date, and leaves out
+    // queues the rep is not in (PR_QueueLeadsController).
+    // The rep is a Standard User with PR_Sales_Rep who reaches PR_QLD through a public group (queue member).
+    @IsTest
+    static void referralQueueIsUrgentFirstThenMoveInDateForTheRepsQueuesOnly() {
+        User rep = PR_TestFactory.standardUser('prqrep', new List<String>{ 'PR_Sales_Rep' });
+        System.runAs(new User(Id = UserInfo.getUserId())) {
+            Group team = new Group(Name = 'PR Test QLD Team', DeveloperName = 'PR_Test_QLD_Team', Type = 'Regular');
+            insert team;
+            insert new List<GroupMember>{
+                new GroupMember(GroupId = team.Id, UserOrGroupId = rep.Id),
+                new GroupMember(GroupId = [SELECT Id FROM Group WHERE Type = 'Queue' AND DeveloperName = 'PR_QLD'].Id, UserOrGroupId = team.Id)
+            };
+        }
+        Test.startTest();
+        Referral__c later = submit('0411000051', 'QLD', 30, new List<String>{ 'Electricity' });
+        Referral__c urgent = submit('0411000052', 'QLD', 1, new List<String>{ 'Electricity' });
+        Referral__c sooner = submit('0411000053', 'QLD', 10, new List<String>{ 'Electricity' });
+        Referral__c otherQueue = submit('0411000054', 'NSW', 1, new List<String>{ 'Electricity' });
+        Test.stopTest();
+
+        PR_QueueLeadsResult result;
+        System.runAs(rep) {
+            result = PR_QueueLeadsController.getQueueLeads();
+        }
+        List<Id> ids = new List<Id>();
+        for (PR_QueueLeadRow r : result.rows) {
+            ids.add(r.id);
+        }
+        Assert.areEqual(new List<Id>{ urgent.Lead__c, sooner.Lead__c, later.Lead__c }, ids, 'urgent first, then by move-in date');
+        Assert.isFalse(ids.contains(otherQueue.Lead__c), 'Leads in queues the rep is not in are left out');
+        Assert.isFalse(result.hasMore);
+        Assert.isTrue(result.rows[0].urgent);
+        Assert.areEqual([SELECT Name FROM Group WHERE DeveloperName = 'PR_QLD'].Name, result.rows[0].queue, 'queue name is shown');
+        Assert.areEqual(PR_TestFactory.AGENCY_A, result.rows[0].agency);
+    }
+
+    // More open Leads than the row limit: the most urgent ones are shown and the list says it is cut.
+    @IsTest
+    static void referralQueueSaysWhenItIsCutAtTheRowLimit() {
+        Test.startTest();
+        Referral__c urgent = submit('0411000055', 'QLD', 1, new List<String>{ 'Electricity' });
+        submit('0411000056', 'QLD', 20, new List<String>{ 'Electricity' });
+        submit('0411000057', 'QLD', 40, new List<String>{ 'Electricity' });
+        Test.stopTest();
+        PR_QueueLeadsController.rowLimit = 2;
+        PR_QueueLeadsResult result;
+        // prrep is a direct member of PR_QLD (PR_TestFactory.buildWorld).
+        System.runAs(PR_TestFactory.user('prrep')) {
+            result = PR_QueueLeadsController.getQueueLeads();
+        }
+        Assert.areEqual(2, result.rows.size());
+        Assert.isTrue(result.hasMore, 'the third Lead is beyond the limit');
+        Assert.areEqual(2, result.rowLimit);
+        Assert.areEqual(urgent.Lead__c, result.rows[0].id);
+    }
+
+    @IsTest
+    static void referralQueueIsEmptyForAUserInNoPartnerQueue() {
+        System.runAs(PR_TestFactory.user('prnone')) {
+            PR_QueueLeadsResult result = PR_QueueLeadsController.getQueueLeads();
+            Assert.areEqual(0, result.rows.size());
+            Assert.isFalse(result.hasMore);
+        }
+    }
+
     @IsTest
     static void urgencyIsRecalculatedBothWays() {
         Test.startTest();
@@ -191,6 +257,33 @@ private class PR_LeadLifecycleTest {
         Test.stopTest();
         Assert.isTrue(PR_ReferralStatusSync.statusForLead('Converted') == null);
         Assert.areEqual('Connected', PR_ReferralStatusSync.statusForStage('Utilities Connected'));
+    }
+
+    // S05-TC-07 (AC-05.1): a sales rep on the Standard User profile converts their own Partner Referral Lead.
+    @IsTest
+    static void aStandardUserRepConvertsToAPersonAccount() {
+        User rep = PR_TestFactory.standardUser('prstdrep', new List<String>{ 'PR_Sales_Rep' });
+        Test.startTest();
+        Referral__c r = submit('0411000041', 'NSW', 20, new List<String>{ 'Electricity', 'Internet' });
+        update new Lead(Id = r.Lead__c, OwnerId = rep.Id, Status = 'Working');
+        Id oppId;
+        System.runAs(rep) {
+            Database.LeadConvert lc = new Database.LeadConvert();
+            lc.setLeadId(r.Lead__c);
+            lc.setConvertedStatus('Converted');
+            Database.LeadConvertResult res = Database.convertLead(lc, false);
+            Assert.isTrue(res.isSuccess(), String.valueOf(res.getErrors()));
+            oppId = res.getOpportunityId();
+        }
+        Test.stopTest();
+        Opportunity o = [
+            SELECT RecordType.DeveloperName, StageName, Account.IsPersonAccount, (SELECT Id FROM OpportunityLineItems)
+            FROM Opportunity WHERE Id = :oppId
+        ];
+        Assert.isTrue(o.Account.IsPersonAccount, 'the rep gets a Person Account');
+        Assert.areEqual('Partner_Referral', o.RecordType.DeveloperName);
+        Assert.areEqual('Qualification', o.StageName);
+        Assert.areEqual(2, o.OpportunityLineItems.size(), 'one product per utility');
     }
 
     @IsTest
