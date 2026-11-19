@@ -1,0 +1,168 @@
+name: 002-partner-referral S06 Commission creation, approval, locking and principal view
+context: 'Connectnow partner referral programme (feature 002) in the SDO org salesOrgSDO (a demo org, not a sandbox: every
+
+  record a case creates starts with AI-TEST so it can be cleaned up).
+
+  Partner portal: Experience Cloud site "Connectnow Partners" (https://co1778135180529.my.site.com/partners). Its home
+
+  page holds the "Referrals this month" tiles, the commission tiles (principals only), the "Refer a mover" form and the
+
+  referral tracker. Partner cases start as the admin and use "Log in to Experience as User" on the partner''s Contact.
+
+  Internal app: "Connectnow Partner Referrals". Internal cases log in as a test user from Setup > Users.
+
+  Personas:
+
+  - Tom Nguyen: partner Agent, agency Harbour & Co Realty (Active).
+
+  - Priya Shah: partner Principal, Harbour & Co Realty.
+
+  - Chloe Tan: partner Agent, agency Bayside Property Group (Active).
+
+  - Marco Rossi: partner Principal, Bayside Property Group.
+
+  - Sam Rep (PR test): sales rep (PR_Sales_Rep), member of queues PR_NSW_ACT and PR_VIC_TAS.
+
+  - Maya Manager (PR test): Partner Manager (PR_Partner_Manager + PR_Sales_Rep).
+
+  - Fiona Finance (PR test): Finance (PR_Finance).
+
+  Business terms: a referral (Referral__c, label "Referral") creates a Partner Referral Lead; converting it gives a
+
+  Partner Referral Opportunity; at stage "Utilities Connected" a Partner Commission is created; Finance pays approved
+
+  commissions monthly through a Payout Batch and the Xero CSV. Amounts are AUD ex GST.
+
+  Assumptions (no story files in the repo; designed from the Jira acceptance criteria): UI labels were read from the
+
+  org and the deployed components on 2026-11-18.
+
+  '
+cases:
+- id: S06-TC-02
+  title: Moving an Opportunity to Utilities Connected shows a Pending commission
+  section: S06 Commission creation, approval, locking and principal view
+  tags:
+  - story-06
+  - smoke
+  mode: both
+  preconditions:
+  - A Partner Referral Opportunity "AI-TEST Commission ..." from Harbour & Co Realty with 3 products exists at a stage before
+    Utilities Connected (run scripts/apex/pr-demo/7-qa-preconditions.apex); note the agency's Commission Rate (R)
+  steps:
+  - Open Setup > Users (/lightning/setup/ManageUsers/home)
+  - Click "Login" next to the user "Sam Rep (PR test)"
+  - Open the Opportunities tab
+  - Search "AI-TEST Commission" in the list search box and open the Opportunity
+  - Change Stage to "Utilities Connected" and save
+  - Log out of Sam's session with "Log out as Sam Rep (PR test)" and, from Setup > Users, click "Login" next to "Maya
+    Manager (PR test)" (sales reps have no access to commissions, so the commission is checked as the Partner Manager)
+  - Open the Opportunities tab, search "AI-TEST Commission" and open the Opportunity
+  - Open the "Partner Commissions" related list and open the commission
+  expected:
+  - Exactly one commission exists with Status "Pending"
+  - Services Count is 3, Rate Applied is R and Amount is 3 x R
+  - Agency is Harbour & Co Realty
+- id: S06-TC-09
+  title: Editing a commission's Amount is refused with a clear message
+  section: S06 Commission creation, approval, locking and principal view
+  tags:
+  - story-06
+  - regression
+  preconditions:
+  - S06-TC-02 has run
+  steps:
+  - Open the Opportunities tab
+  - Search "AI-TEST Commission" in the list search box and open the Opportunity
+  - Open the commission from the "Partner Commissions" related list
+  - Click "Edit"
+  - Change "Amount" to 1
+  - Click "Save"
+  expected:
+  - The commission is not saved
+  - The error "Amount, rate, services, Opportunity and agency cannot be changed. Cancel this commission and create a new one."
+    is shown
+- id: S06-TC-10
+  title: A Partner Manager approves a Pending commission and Approved By / On are stamped
+  section: S06 Commission creation, approval, locking and principal view
+  tags:
+  - story-06
+  - smoke
+  preconditions:
+  - S06-TC-02 has run (a Pending commission exists)
+  steps:
+  - Open Setup > Users (/lightning/setup/ManageUsers/home)
+  - Click "Login" next to the user "Maya Manager (PR test)"
+  - Open the Opportunities tab
+  - Search "AI-TEST Commission" in the list search box and open the Opportunity
+  - Open the commission from the "Partner Commissions" related list
+  - Change Status to "Approved" and save
+  expected:
+  - Status is "Approved"
+  - Approved By is "Maya Manager (PR test)" and Approved On is today
+- id: S06-TC-11
+  title: A sales rep cannot approve a commission
+  section: S06 Commission creation, approval, locking and principal view
+  tags:
+  - story-06
+  - regression
+  - security
+  preconditions:
+  - '"AI-TEST Commission Pending QA" has exactly one Pending commission (seeded by scripts/apex/pr-demo/7-qa-preconditions.apex)'
+  steps:
+  - Open Setup > Users (/lightning/setup/ManageUsers/home)
+  - Click "Login" next to the user "Sam Rep (PR test)"
+  - Open the Opportunities tab
+  - Search "AI-TEST Commission Pending" in the list search box and open the Opportunity "AI-TEST Commission Pending QA"
+  - Open a Pending commission from the "Partner Commissions" related list, if it is shown
+  - If the commission opened, change Status to "Approved" and save
+  expected:
+  - 'Sam cannot approve: either the commission is not reachable (sales reps have no access to commissions, so there is
+    no "Partner Commissions" related list), or the save fails with "Only Partner Managers can approve commissions."'
+  - The commission's Status is still "Pending" (check as admin if needed)
+- id: S06-TC-13
+  title: Partner Manager is refused when moving an Approved commission back to Pending
+  section: S06 Commission creation, approval, locking and principal view
+  tags:
+  - story-06
+  - regression
+  - security
+  preconditions:
+  - S06-TC-10 has run (an Approved commission exists)
+  steps:
+  - Open Setup > Users (/lightning/setup/ManageUsers/home)
+  - Click "Login" next to the user "Maya Manager (PR test)"
+  - Open the Opportunities tab
+  - Search "AI-TEST Commission" in the list search box and open the Opportunity
+  - Open the Approved commission from the "Partner Commissions" related list
+  - Change Status to "Pending" and save
+  expected:
+  - The commission is not saved
+  - The error "Only Finance can move an approved commission back to Pending." is shown
+- id: S06-TC-15
+  title: A principal sees this month's and last month's commission totals
+  section: S06 Commission creation, approval, locking and principal view
+  tags:
+  - story-06
+  - regression
+  steps:
+  - Open the Contacts tab
+  - Search "Priya Shah" in the list search box and open the Contact "Priya Shah"
+  - Click "Log in to Experience as User" (in the actions menu) and choose "Connectnow Partners" if asked
+  - Look at the commission tiles on the home page
+  expected:
+  - '"Commission this month" and "Commission last month" tiles are shown with an AUD amount and "ex GST"'
+- id: S06-TC-16
+  title: An agent does not see the commission tiles
+  section: S06 Commission creation, approval, locking and principal view
+  tags:
+  - story-06
+  - regression
+  - security
+  steps:
+  - Open the Contacts tab
+  - Search "Tom Nguyen" in the list search box and open the Contact "Tom Nguyen"
+  - Click "Log in to Experience as User" (in the actions menu) and choose "Connectnow Partners" if asked
+  - Look at the home page
+  expected:
+  - No "Commission this month" or "Commission last month" tile is shown

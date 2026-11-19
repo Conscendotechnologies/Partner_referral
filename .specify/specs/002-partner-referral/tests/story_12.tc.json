@@ -1,0 +1,70 @@
+{
+  "feature": "002-partner-referral",
+  "story": "12",
+  "title": "Page layouts and record pages",
+  "cases": [
+    {
+      "id": "S12-TC-01",
+      "ac": "AC-12.1",
+      "title": "Referral page shows the mover, address, dates, services, consent, status, rep, agent, agency, Lead and Opportunity links and Commissions",
+      "level": "ui",
+      "persona": "Admin",
+      "type": "positive",
+      "automated": true
+    },
+    {
+      "id": "S12-TC-02",
+      "ac": "AC-12.2",
+      "title": "Commission page shows all its fields; Amount, Rate Applied and Services Count are read-only",
+      "level": "ui",
+      "persona": "Partner Manager",
+      "type": "positive",
+      "automated": true
+    },
+    {
+      "id": "S12-TC-03",
+      "ac": "AC-12.3",
+      "title": "Payout Batch page shows its fields, Lines and the console for that batch only",
+      "level": "ui",
+      "persona": "Finance",
+      "type": "positive",
+      "automated": true
+    },
+    {
+      "id": "S12-TC-04",
+      "ac": "AC-12.3",
+      "title": "Payout Line page shows agency, ABN, reference, total, count and its Commissions",
+      "level": "ui",
+      "persona": "Finance",
+      "type": "positive",
+      "automated": true
+    },
+    {
+      "id": "S12-TC-05",
+      "ac": "AC-12.4",
+      "title": "Partner Referral Lead and Opportunity layouts show the partner referral fields",
+      "level": "ui",
+      "persona": "Sales Rep",
+      "type": "positive",
+      "automated": true
+    },
+    {
+      "id": "S12-TC-06",
+      "ac": "AC-12.4",
+      "title": "Partner Referral record type uses the partner layout for every profile that uses it",
+      "level": "manual",
+      "persona": "Admin",
+      "type": "positive",
+      "automated": false
+    },
+    {
+      "id": "S12-TC-07",
+      "ac": "AC-12.5",
+      "title": "Partner users still see only the portal components",
+      "level": "ui",
+      "persona": "Partner Agent",
+      "type": "negative",
+      "automated": true
+    }
+  ]
+}

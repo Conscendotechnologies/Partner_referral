@@ -1,0 +1,7 @@
+{
+  "S01-TC-01": "PR #12 is deployed (D3 follow-up: reps cannot read Partner Status)",
+  "S01-TC-02": "PR #12 is deployed (D3 follow-up: reps cannot read Commission Rate)",
+  "S02-TC-06": "D5 is fixed (the portal form rejects \"+61 412 000 204\"; prReferralForm mobilePattern; no fix PR yet)",
+  "S02-TC-13": "an Inactive AI-TEST agency fixture exists (test data: the case needs an inactive agency, and automation must not edit the real agencies)",
+  "S03-TC-11": "PR #12 is deployed (D4 follow-up: the Referral Queue finds no queues)"
+}

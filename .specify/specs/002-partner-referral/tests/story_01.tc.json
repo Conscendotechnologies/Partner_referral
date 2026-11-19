@@ -1,0 +1,106 @@
+{
+  "feature": "002-partner-referral",
+  "story": "01",
+  "title": "Partner agencies and partner users",
+  "cases": [
+    {
+      "id": "S01-TC-01",
+      "ac": "AC-01.1",
+      "title": "A sales rep cannot change an agency's Partner Status",
+      "level": "ui",
+      "persona": "Sales Rep",
+      "type": "negative",
+      "automated": true
+    },
+    {
+      "id": "S01-TC-02",
+      "ac": "AC-01.1",
+      "title": "A sales rep cannot change an agency's Commission Rate",
+      "level": "ui",
+      "persona": "Sales Rep",
+      "type": "negative",
+      "automated": true
+    },
+    {
+      "id": "S01-TC-03",
+      "ac": "AC-01.1",
+      "title": "A Partner Manager can change an agency's Commission Rate",
+      "level": "ui",
+      "persona": "Partner Manager",
+      "type": "positive",
+      "automated": true
+    },
+    {
+      "id": "S01-TC-04",
+      "ac": "AC-01.2",
+      "title": "An ABN with fewer than 11 digits is rejected",
+      "level": "ui",
+      "persona": "Partner Manager",
+      "type": "negative",
+      "automated": true
+    },
+    {
+      "id": "S01-TC-05",
+      "ac": "AC-01.2",
+      "title": "ABN boundaries: 12 digits and letters are rejected, exactly 11 digits is accepted",
+      "level": "unit",
+      "persona": "System",
+      "type": "boundary",
+      "automated": true
+    },
+    {
+      "id": "S01-TC-06",
+      "ac": "AC-01.3",
+      "title": "A Commission Rate change appears in Account History with old value, new value, user and time",
+      "level": "ui",
+      "persona": "Partner Manager",
+      "type": "positive",
+      "automated": true
+    },
+    {
+      "id": "S01-TC-07",
+      "ac": "AC-01.4",
+      "title": "Enabling a Principal contact gives the Executive partner role and PR_Partner_Principal; an Agent gets the User role and PR_Partner_Agent",
+      "level": "unit",
+      "persona": "Partner Manager",
+      "type": "positive",
+      "automated": true
+    },
+    {
+      "id": "S01-TC-08",
+      "ac": "AC-01.4",
+      "title": "Existing principal and agent users carry the right partner role and permission set",
+      "level": "manual",
+      "persona": "Admin",
+      "type": "positive",
+      "automated": false
+    },
+    {
+      "id": "S01-TC-09",
+      "ac": "AC-01.5",
+      "title": "A newly enabled partner user receives the welcome email, sets a password and logs in",
+      "level": "manual",
+      "persona": "Partner Agent",
+      "type": "positive",
+      "automated": false
+    },
+    {
+      "id": "S01-TC-10",
+      "ac": "AC-01.6",
+      "title": "Users of an Inactive agency can still log in to the portal",
+      "level": "manual",
+      "persona": "Partner Agent",
+      "type": "positive",
+      "automated": false
+    },
+    {
+      "id": "S01-TC-11",
+      "ac": "AC-01.7",
+      "title": "Many partner users enabled in one transaction get roles and permission sets without errors (50 users, licence limit)",
+      "level": "unit",
+      "persona": "System",
+      "type": "bulk",
+      "automated": true
+    }
+  ]
+}

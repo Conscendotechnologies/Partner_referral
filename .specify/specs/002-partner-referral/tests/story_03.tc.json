@@ -1,0 +1,124 @@
+{
+  "feature": "002-partner-referral",
+  "story": "03",
+  "title": "State routing, urgent movers and first-contact SLA",
+  "cases": [
+    {
+      "id": "S03-TC-01",
+      "ac": "AC-03.1",
+      "title": "A VIC Partner Referral Lead is routed to PR_VIC_TAS",
+      "level": "ui",
+      "persona": "Admin",
+      "type": "positive",
+      "automated": true
+    },
+    {
+      "id": "S03-TC-02",
+      "ac": "AC-03.1",
+      "title": "Each state routes to its queue (NSW/ACT, VIC/TAS, QLD, SA/WA/NT) and no state goes to PR_Unassigned",
+      "level": "unit",
+      "persona": "System",
+      "type": "positive",
+      "automated": true
+    },
+    {
+      "id": "S03-TC-03",
+      "ac": "AC-03.2",
+      "title": "A Lead with move-in inside 48 hours is urgent",
+      "level": "ui",
+      "persona": "Admin",
+      "type": "positive",
+      "automated": true
+    },
+    {
+      "id": "S03-TC-04",
+      "ac": "AC-03.2",
+      "title": "Urgent Lead: queue members get a bell notification and the queue email receives a message",
+      "level": "manual",
+      "persona": "Sales Rep",
+      "type": "positive",
+      "automated": false
+    },
+    {
+      "id": "S03-TC-05",
+      "ac": "AC-03.3",
+      "title": "Move-in changed into the window makes the Lead urgent and notifies once; out of the window clears it and sends nothing",
+      "level": "unit",
+      "persona": "System",
+      "type": "positive",
+      "automated": true
+    },
+    {
+      "id": "S03-TC-06",
+      "ac": "AC-03.4",
+      "title": "Scheduled check sends the urgent notification at move-in minus 2 days",
+      "level": "manual",
+      "persona": "Sales Rep",
+      "type": "positive",
+      "automated": false
+    },
+    {
+      "id": "S03-TC-07",
+      "ac": "AC-03.5",
+      "title": "SLA Due At is 2 business hours later on the Connectnow Sales calendar (Saturday 19:30 -> Monday 09:30)",
+      "level": "unit",
+      "persona": "System",
+      "type": "boundary",
+      "automated": true
+    },
+    {
+      "id": "S03-TC-08",
+      "ac": "AC-03.5",
+      "title": "A new Lead shows SLA Due At",
+      "level": "ui",
+      "persona": "Admin",
+      "type": "positive",
+      "automated": true
+    },
+    {
+      "id": "S03-TC-09",
+      "ac": "AC-03.6",
+      "title": "First move to Working stamps First Contacted At",
+      "level": "ui",
+      "persona": "Sales Rep",
+      "type": "positive",
+      "automated": true
+    },
+    {
+      "id": "S03-TC-10",
+      "ac": "AC-03.6",
+      "title": "Later moves to Working keep the first stamp; first contact after SLA Due At sets SLA Breached",
+      "level": "unit",
+      "persona": "System",
+      "type": "boundary",
+      "automated": true
+    },
+    {
+      "id": "S03-TC-11",
+      "ac": "AC-03.7",
+      "title": "The rep's Referral Queue puts urgent Leads first, then by move-in date",
+      "level": "ui",
+      "persona": "Sales Rep",
+      "type": "positive",
+      "automated": true
+    },
+    {
+      "id": "S03-TC-12",
+      "ac": "AC-03.8",
+      "title": "200 Leads inserted together get correct routing, urgency and SLA fields",
+      "level": "unit",
+      "persona": "System",
+      "type": "bulk",
+      "automated": true
+    },
+    {
+      "id": "S03-TC-13",
+      "ac": "AC-03.9",
+      "title": "Leads of other record types are not routed, flagged or SLA-stamped",
+      "level": "unit",
+      "persona": "System",
+      "type": "negative",
+      "automated": true
+    }
+  ]
+}

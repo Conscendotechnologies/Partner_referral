@@ -1,0 +1,84 @@
+# Runs the Playwright specs in automation-testing/ against the org. Nothing here deploys: the specs only drive the
+# browser and create AI-TEST records. Manual (Actions > UI tests > Run workflow) and nightly on weekdays.
+name: UI tests
+
+on:
+  workflow_dispatch:
+    inputs:
+      grep:
+        description: Only run specs whose title matches this text (for example "S02-" or "S06-TC-10"). Empty runs all.
+        required: false
+        default: ''
+  schedule:
+    # 06:00 Sydney time (AEDT) Monday to Friday.
+    - cron: '0 19 * * 0-4'
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ui-tests
+  cancel-in-progress: false
+
+jobs:
+  playwright:
+    runs-on: ubuntu-latest
+    timeout-minutes: 150
+    defaults:
+      run:
+        working-directory: automation-testing
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Install Playwright
+        run: |
+          npm ci --no-audit --no-fund --loglevel=error
+          npx playwright install --with-deps chromium
+
+      - name: Install Salesforce CLI
+        run: npm install --global @salesforce/cli
+
+      - name: Log in to the org
+        env:
+          SFDX_AUTH_URL: ${{ secrets.SFDX_AUTH_URL }}
+        run: |
+          if [ -z "$SFDX_AUTH_URL" ]; then
+            echo "::error::Repository secret SFDX_AUTH_URL is not set. See .github/README.md."
+            exit 1
+          fi
+          auth_file="$(mktemp)"
+          trap 'rm -f "$auth_file"' EXIT
+          printf %s "$SFDX_AUTH_URL" > "$auth_file"
+          sf org login sfdx-url --sfdx-url-file "$auth_file" --alias target --json > /dev/null
+
+      - name: Open a browser session
+        run: node scripts/sf-auth.mjs target "$PWD/.sf-ai-tester/auth/storage.json" >> "$GITHUB_ENV"
+
+      - name: Reset the AI-TEST data and run the specs
+        # scripts/run-specs.mjs is what a local run uses too. It runs 8-qa-reset-referrals, 9-qa-reset-commissions and
+        # 7-qa-preconditions (scripts/apex/pr-demo; data only, AI-TEST records only), then Playwright. When the reset
+        # finds payout data that is not AI-TEST alone it leaves out S07-TC-03/07/09, so they can't touch real commissions.
+        env:
+          CI: 'true'
+          GREP: ${{ github.event.inputs.grep }}
+        run: |
+          args=()
+          if [ -n "$GREP" ]; then args+=(--grep "$GREP"); fi
+          node scripts/run-specs.mjs target "${args[@]}"
+
+      - name: Keep the report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: ui-test-report
+          path: |
+            automation-testing/playwright-report
+            automation-testing/test-results
+            automation-testing/.sf-ai-tester/playwright-output
+            !automation-testing/.sf-ai-tester/auth
+          if-no-files-found: ignore
+          retention-days: 14

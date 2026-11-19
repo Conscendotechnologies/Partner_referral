@@ -1,0 +1,178 @@
+{
+  "feature": "002-partner-referral",
+  "story": "06",
+  "title": "Commission creation, approval, locking and principal view",
+  "cases": [
+    {
+      "id": "S06-TC-01",
+      "ac": "AC-06.1",
+      "title": "Utilities Connected with 3 products at rate 60 creates one Pending commission of 180",
+      "level": "unit",
+      "persona": "System",
+      "type": "positive",
+      "automated": true
+    },
+    {
+      "id": "S06-TC-02",
+      "ac": "AC-06.1",
+      "title": "Moving an Opportunity to Utilities Connected shows a Pending commission",
+      "level": "ui",
+      "persona": "Sales Rep",
+      "type": "positive",
+      "automated": true
+    },
+    {
+      "id": "S06-TC-03",
+      "ac": "AC-06.2",
+      "title": "Reopen and re-win, or two racing updates, never leave two live commissions",
+      "level": "unit",
+      "persona": "System",
+      "type": "boundary",
+      "automated": true
+    },
+    {
+      "id": "S06-TC-04",
+      "ac": "AC-06.3",
+      "title": "Changing the agency rate leaves existing commissions unchanged",
+      "level": "unit",
+      "persona": "System",
+      "type": "positive",
+      "automated": true
+    },
+    {
+      "id": "S06-TC-05",
+      "ac": "AC-06.4",
+      "title": "Reopening cancels a Pending commission with reason \"Opportunity reopened\"",
+      "level": "unit",
+      "persona": "System",
+      "type": "positive",
+      "automated": true
+    },
+    {
+      "id": "S06-TC-06",
+      "ac": "AC-06.4",
+      "title": "Reopening after approval keeps the commission, sets Reopened After Approval and notifies Finance (retried if the send fails)",
+      "level": "unit",
+      "persona": "System",
+      "type": "positive",
+      "automated": true
+    },
+    {
+      "id": "S06-TC-07",
+      "ac": "AC-06.4",
+      "title": "Finance receives the reopened-after-approval bell notification",
+      "level": "manual",
+      "persona": "Finance",
+      "type": "positive",
+      "automated": false
+    },
+    {
+      "id": "S06-TC-08",
+      "ac": "AC-06.5",
+      "title": "Nobody, not even an admin without bypass, can edit Amount, Rate, Opportunity or Agency",
+      "level": "unit",
+      "persona": "Admin",
+      "type": "negative",
+      "automated": true
+    },
+    {
+      "id": "S06-TC-09",
+      "ac": "AC-06.5",
+      "title": "Editing a commission's Amount is refused with a clear message",
+      "level": "ui",
+      "persona": "Admin",
+      "type": "negative",
+      "automated": true
+    },
+    {
+      "id": "S06-TC-10",
+      "ac": "AC-06.6",
+      "title": "A Partner Manager approves a Pending commission and Approved By / On are stamped",
+      "level": "ui",
+      "persona": "Partner Manager",
+      "type": "positive",
+      "automated": true
+    },
+    {
+      "id": "S06-TC-11",
+      "ac": "AC-06.6",
+      "title": "A sales rep cannot approve a commission",
+      "level": "ui",
+      "persona": "Sales Rep",
+      "type": "negative",
+      "automated": true
+    },
+    {
+      "id": "S06-TC-12",
+      "ac": "AC-06.7",
+      "title": "A Partner Manager cannot change an Approved commission; Finance can",
+      "level": "unit",
+      "persona": "Partner Manager",
+      "type": "negative",
+      "automated": true
+    },
+    {
+      "id": "S06-TC-13",
+      "ac": "AC-06.7",
+      "title": "Partner Manager is refused when moving an Approved commission back to Pending",
+      "level": "ui",
+      "persona": "Partner Manager",
+      "type": "negative",
+      "automated": true
+    },
+    {
+      "id": "S06-TC-14",
+      "ac": "AC-06.8",
+      "title": "Commission is shared read-only with the agency's Executive role only; agents and other agencies have no access",
+      "level": "unit",
+      "persona": "Partner Principal",
+      "type": "negative",
+      "automated": true
+    },
+    {
+      "id": "S06-TC-15",
+      "ac": "AC-06.9",
+      "title": "A principal sees this month's and last month's commission totals",
+      "level": "ui",
+      "persona": "Partner Principal",
+      "type": "positive",
+      "automated": true
+    },
+    {
+      "id": "S06-TC-16",
+      "ac": "AC-06.9",
+      "title": "An agent does not see the commission tiles",
+      "level": "ui",
+      "persona": "Partner Agent",
+      "type": "negative",
+      "automated": true
+    },
+    {
+      "id": "S06-TC-17",
+      "ac": "AC-06.9",
+      "title": "Tile totals count non-cancelled commissions by created month",
+      "level": "unit",
+      "persona": "System",
+      "type": "positive",
+      "automated": true
+    },
+    {
+      "id": "S06-TC-18",
+      "ac": "AC-06.10",
+      "title": "200 Opportunities to Utilities Connected create and share 200 commissions",
+      "level": "unit",
+      "persona": "System",
+      "type": "bulk",
+      "automated": true
+    },
+    {
+      "id": "S06-TC-19",
+      "ac": "AC-06.6",
+      "title": "A Partner Manager (Standard User + PR_Partner_Manager) who does not own the commission can approve a Pending commission owned by a sales rep (System.runAs)",
+      "level": "unit",
+      "persona": "Partner Manager",
+      "type": "positive",
+      "automated": true
+    }
+  ]
+}
