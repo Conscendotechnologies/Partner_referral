@@ -60,7 +60,9 @@ private class PR_LeadLifecycleTest {
     // unchanged) but cannot edit them; changes stay with Partner Managers (Manage_Partner_Agencies).
     @IsTest
     static void repReadsButCannotEditAgencyStatusAndRate() {
-        System.runAs(PR_TestFactory.user('prrep')) {
+        // A Standard User with only PR_Sales_Rep, like a real rep (prrep has the System Administrator profile).
+        User rep = PR_TestFactory.standardUser('prfls', new List<String>{ 'PR_Sales_Rep' });
+        System.runAs(rep) {
             for (Schema.DescribeFieldResult f : new List<Schema.DescribeFieldResult>{
                 Schema.SObjectType.Account.fields.Partner_Status__c,
                 Schema.SObjectType.Account.fields.Commission_Rate__c
