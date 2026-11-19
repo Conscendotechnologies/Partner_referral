@@ -30,8 +30,15 @@ private class PR_LeadLifecycleTest {
         Referral__c otherQueue = submit('0411000054', 'NSW', 1, new List<String>{ 'Electricity' });
         Test.stopTest();
 
+        // The three QLD Leads are in PR_QLD, and the rep's queue lookup finds PR_QLD through the public group.
+        Id qldQueue = [SELECT Id FROM Group WHERE Type = 'Queue' AND DeveloperName = 'PR_QLD'].Id;
+        for (Lead l : [SELECT OwnerId, Owner.Name FROM Lead WHERE Id IN :new List<Id>{ later.Lead__c, urgent.Lead__c, sooner.Lead__c }]) {
+            Assert.areEqual(qldQueue, l.OwnerId, 'QLD Lead is owned by PR_QLD, not ' + l.Owner.Name);
+        }
         PR_QueueLeadsResult result;
         System.runAs(rep) {
+            Assert.isTrue(PR_QueueLeadsController.partnerQueueIds(rep.Id).contains(qldQueue), 'the rep\'s queue lookup finds PR_QLD');
+            Assert.areEqual(3, [SELECT COUNT() FROM Lead WHERE OwnerId = :qldQueue], 'the rep can see the 3 Leads in PR_QLD');
             result = PR_QueueLeadsController.getQueueLeads();
         }
         List<Id> ids = new List<Id>();

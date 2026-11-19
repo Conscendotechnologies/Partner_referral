@@ -41,6 +41,7 @@ public with sharing class PR_QueueLeadsController {
      * The PR_ queues the user belongs to, directly or through a public group that is a queue member
      * (one level of group nesting, the way queues are set up in this org).
      */
+    @TestVisible
     private static Set<Id> partnerQueueIds(Id userId) {
         Set<Id> members = new Set<Id>{ userId };
         for (GroupMember m : [
@@ -58,8 +59,9 @@ public with sharing class PR_QueueLeadsController {
             SELECT GroupId, Group.DeveloperName
             FROM GroupMember
             WHERE UserOrGroupId IN :members AND Group.Type = 'Queue' AND Group.DeveloperName LIKE 'PR%'
-            LIMIT 200
         ]) {
+            // No LIMIT: a cap applied before the PR_ filter below could drop a partner queue. A user's queue
+            // memberships are few.
             if (m.Group.DeveloperName.startsWith(PARTNER_QUEUE_PREFIX)) {
                 queueIds.add(m.GroupId);
             }
