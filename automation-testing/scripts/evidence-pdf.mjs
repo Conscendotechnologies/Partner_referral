@@ -39,10 +39,12 @@ function* tests(suite) {
 function verdict(t, r) {
   const reason = (t.annotations ?? []).find((a) => a.type === 'fail' || a.type === 'skip')?.description ?? '';
   if (r.status === 'skipped') return { label: 'NOT RUN', css: 'skip', note: reason };
+  // A run that did not complete is neither a pass nor the expected failure.
+  if (r.status === 'timedOut') return { label: 'TIMED OUT (did not complete)', css: 'fail', note: reason };
+  if (r.status === 'interrupted') return { label: 'INTERRUPTED (did not complete)', css: 'skip', note: reason };
   if (t.expectedStatus === 'failed') {
-    return r.status === 'failed'
-      ? { label: 'EXPECTED FAIL (known defect)', css: 'xfail', note: reason }
-      : { label: 'PASSED, BUT A FAILURE WAS EXPECTED (fix deployed?)', css: 'fail', note: reason };
+    if (r.status === 'failed') return { label: 'EXPECTED FAIL (known defect)', css: 'xfail', note: reason };
+    if (r.status === 'passed') return { label: 'PASSED, BUT A FAILURE WAS EXPECTED (fix deployed?)', css: 'fail', note: reason };
   }
   return r.status === 'passed' ? { label: 'PASS', css: 'pass', note: '' } : { label: 'FAIL', css: 'fail', note: '' };
 }

@@ -43,15 +43,17 @@ test('S01-TC-04: An ABN with fewer than 11 digits is rejected', async ({ page })
     });
 
     await test.step('Expected: the error "ABN must be exactly 11 digits." is shown on the ABN field', async () => {
-      // The field-level message is tied to the ABN input (aria-describedby), so it is that textbox's accessible
-      // description. Then the "We hit a snag." popover opens and names ABN as the field in error.
-      await expect(abn).toHaveAccessibleDescription(new RegExp(ABN_ERROR.replace(/\./g, '\\.')), { timeout: 60_000 });
+      // The "We hit a snag." popover names ABN as the field in error. While it is open the edit form is hidden from the
+      // accessibility tree, so the field itself is read after the popover is closed: its message is tied to the ABN
+      // input (aria-describedby), i.e. it is that textbox's accessible description.
       await expect(snag).toBeVisible({ timeout: 60_000 });
       await expect(snag.getByRole('listitem').filter({ hasText: /^ABN$/ })).toHaveCount(1);
+      await snag.getByRole('button', { name: 'Close error dialog' }).click();
+      await expect(dialog).toBeVisible();
+      await expect(abn).toHaveAccessibleDescription(new RegExp(ABN_ERROR.replace(/\./g, '\\.')));
     });
 
     await test.step('Expected: the Account is not saved', async () => {
-      await snag.getByRole('button', { name: 'Close error dialog' }).click();
       await expect(dialog).toBeVisible();
       await expect(abn).toHaveValue('1234567890');
       await dialog.getByRole('button', { name: 'Cancel', exact: true }).click();
