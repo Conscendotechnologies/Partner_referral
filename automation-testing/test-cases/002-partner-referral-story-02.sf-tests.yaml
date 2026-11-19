@@ -46,6 +46,10 @@ cases:
   - story-02
   - smoke
   mode: both
+  preconditions:
+  - scripts/apex/pr-demo/8-qa-reset-referrals.apex has run since the last run (CI runs it first; locally run
+    automation-testing/scripts/qa-data.mjs). It closes the AI-TEST referrals earlier runs left open, so mobile 0412 000 201
+    has no open referral at Tom's agency and S02-TC-15 / S02-TC-17 see only the referral this run's S02-TC-01 sent
   steps:
   - Open the Contacts tab
   - Search "Tom Nguyen" in the list search box and open the Contact "Tom Nguyen"

@@ -111,6 +111,7 @@ cases:
   - Search "Tom Nguyen" in the list search box and open the Contact "Tom Nguyen"
   - Click "Log in to Experience as User" (in the actions menu) and choose "Connectnow Partners" if asked
   - Look at the "Referrals this month" tiles
+  - In the referral tracker, count this month's referrals for each partner status
   expected:
   - Each status tile (Received, In Progress, Connected, Closed Lost) shows a number
-  - The numbers add up to the referrals of this month in Tom's tracker
+  - Each tile's number equals the number of this month's tracker referrals with that status

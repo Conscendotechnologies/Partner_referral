@@ -32,7 +32,10 @@ function sf(args) {
 const { instanceUrl } = sf(['org', 'display', '--target-org', alias]);
 const { url } = sf(['org', 'open', '--target-org', alias, '--url-only', '--path', '/lightning/page/home']);
 
+// Playwright puts the full URL (with the session token) into navigation errors and their call logs, so any failure
+// from here on is reported with a fixed message and the original error is dropped.
 const browser = await chromium.launch();
+let failure = null;
 try {
   const context = await browser.newContext();
   const page = await context.newPage();
@@ -40,11 +43,19 @@ try {
   // Lightning lives on a second domain; waiting for it to load stores the session cookies for both.
   await page.waitForURL(/\/lightning\//, { timeout: 120_000 });
   await page.waitForLoadState('networkidle', { timeout: 120_000 }).catch(() => {});
-  if (/\/login|secur\/frontdoor/i.test(page.url())) throw new Error('the frontdoor login did not reach Lightning');
-  mkdirSync(dirname(storageFile), { recursive: true });
-  await context.storageState({ path: storageFile });
+  if (/\/login|secur\/frontdoor/i.test(page.url())) failure = 'the frontdoor login did not reach Lightning';
+  else {
+    mkdirSync(dirname(storageFile), { recursive: true });
+    await context.storageState({ path: storageFile });
+  }
+} catch {
+  failure = 'the browser could not open the org from the CLI login (timed out or the page failed to load)';
 } finally {
-  await browser.close();
+  await browser.close().catch(() => {});
+}
+if (failure) {
+  console.error(`sf-auth: ${failure}. Check the login with: sf org display --target-org ${alias}`);
+  process.exit(1);
 }
 
 console.log(`SF_INSTANCE_URL=${instanceUrl}`);

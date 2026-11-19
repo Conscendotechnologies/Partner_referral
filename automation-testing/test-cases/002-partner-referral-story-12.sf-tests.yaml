@@ -64,7 +64,8 @@ cases:
   - story-12
   - regression
   preconditions:
-  - A Partner Commission exists
+  - 'S06-TC-02 has run in this run: the Opportunity "AI-TEST Commission QA" (seeded at Connection Requested by
+    7-qa-preconditions.apex) has reached Utilities Connected and has its Partner Commission'
   steps:
   - Open Setup > Users (/lightning/setup/ManageUsers/home)
   - Click "Login" next to the user "Maya Manager (PR test)"

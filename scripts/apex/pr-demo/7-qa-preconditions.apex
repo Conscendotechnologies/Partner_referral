@@ -2,7 +2,10 @@
 // Creates, through the same service path as the portal, two AI-TEST referrals from Tom Nguyen (Harbour & Co Realty):
 //  - "AI-TEST Convert QA": Lead, NSW, Electricity + Internet, owned by Sam Rep (PR test), status Working (S05-TC-01).
 //  - "AI-TEST Commission QA": converted, 3 products, Opportunity owned by Sam Rep at Connection Requested (S06-TC-02).
-// Run after 1-6. Skips each record that already exists, so it is safe to re-run.
+//  - "AI-TEST Payout QA": converted and at Utilities Connected, with its commission Approved and not yet in a batch
+//    (S07-TC-03), so the payout cases don't depend on S06-TC-10.
+// Run after 1-6, and after 9-qa-reset-commissions.apex, which retires fixtures that an earlier run moved on. Skips each record
+// that already exists in its starting state, and stops if one exists in any other state.
 User tom = [SELECT Id, ContactId, Contact.AccountId FROM User WHERE FirstName = 'Tom' AND Username LIKE '%@connectnow-partners.demo' AND IsActive = TRUE LIMIT 1];
 User sam = [SELECT Id FROM User WHERE Name = 'Sam Rep (PR test)' AND IsActive = TRUE LIMIT 1];
 Partner_Referral_Setting__mdt s = PR_Settings.get();
@@ -27,15 +30,49 @@ if ([SELECT COUNT() FROM Lead WHERE LastName = 'Convert QA' AND FirstName = 'AI-
     System.debug('PR-QA: created AI-TEST Convert QA lead ' + ref.Lead__c);
 }
 
-if ([SELECT COUNT() FROM Opportunity WHERE Name = 'AI-TEST Commission QA'] == 0) {
-    Referral__c ref = newReferral('Commission QA', '0412000902', 'Electricity;Gas;Internet');
-    // The admin owns the Lead while it converts: a Lead owned by Sam Rep (Standard User) fails conversion with
-    // UNAVAILABLE_RECORDTYPE_EXCEPTION (QA defect, S05). The Opportunity is handed to Sam afterwards.
+// The admin owns the Lead while it converts: a Lead owned by Sam Rep (Standard User) failed conversion with
+// UNAVAILABLE_RECORDTYPE_EXCEPTION before the fix in PR 8 (D1). The Opportunity is handed to Sam afterwards.
+Id convertedOpportunity(String last, String mobile, String name) {
+    Referral__c ref = newReferral(last, mobile, 'Electricity;Gas;Internet');
     update new Lead(Id = ref.Lead__c, OwnerId = UserInfo.getUserId(), Status = 'Working');
     Database.LeadConvert lc = new Database.LeadConvert();
     lc.setLeadId(ref.Lead__c);
     lc.setConvertedStatus('Converted');
     Id oppId = Database.convertLead(lc).getOpportunityId();
-    update new Opportunity(Id = oppId, OwnerId = sam.Id, Name = 'AI-TEST Commission QA', StageName = 'Connection Requested');
+    update new Opportunity(Id = oppId, OwnerId = sam.Id, Name = name, StageName = 'Connection Requested');
+    return oppId;
+}
+
+List<Opportunity> commissionQa = [
+    SELECT Id, StageName, (SELECT Id FROM OpportunityLineItems) FROM Opportunity WHERE Name = 'AI-TEST Commission QA'
+];
+if (commissionQa.isEmpty()) {
+    Id oppId = convertedOpportunity('Commission QA', '0412000902', 'AI-TEST Commission QA');
     System.debug('PR-QA: created AI-TEST Commission QA opportunity ' + oppId);
+} else {
+    Opportunity o = commissionQa[0];
+    Integer commissions = [SELECT COUNT() FROM Partner_Commission__c WHERE Opportunity__c = :o.Id];
+    if (commissionQa.size() > 1 || o.StageName != 'Connection Requested' || commissions > 0 || o.OpportunityLineItems.size() != 3) {
+        throw new PR_Exception('"AI-TEST Commission QA" is not in its starting state (Connection Requested, 3 products, '
+            + 'no commission). Run scripts/apex/pr-demo/9-qa-reset-commissions.apex first.');
+    }
+}
+
+if ([SELECT COUNT() FROM Partner_Commission__c WHERE Opportunity__r.Name = 'AI-TEST Payout QA'
+        AND Status__c = :PR_Settings.COM_APPROVED AND Payout_Line__c = NULL] == 0) {
+    if ([SELECT COUNT() FROM Opportunity WHERE Name = 'AI-TEST Payout QA'] > 0) {
+        throw new PR_Exception('"AI-TEST Payout QA" has no Approved commission waiting for a payout. '
+            + 'Run scripts/apex/pr-demo/9-qa-reset-commissions.apex first.');
+    }
+    Id oppId = convertedOpportunity('Payout QA', '0412000903', 'AI-TEST Payout QA');
+    update new Opportunity(Id = oppId, StageName = PR_Settings.STAGE_WON);
+    List<Partner_Commission__c> created = [SELECT Id FROM Partner_Commission__c WHERE Opportunity__c = :oppId];
+    if (created.size() != 1) {
+        throw new PR_Exception('Expected one commission on AI-TEST Payout QA, found ' + created.size() + '.');
+    }
+    created[0].Status__c = PR_Settings.COM_APPROVED;
+    created[0].Approved_By__c = UserInfo.getUserId();
+    created[0].Approved_On__c = System.now();
+    PR_CommissionService.withBypass(created, false);
+    System.debug('PR-QA: created AI-TEST Payout QA opportunity ' + oppId + ' with Approved commission ' + created[0].Id);
 }

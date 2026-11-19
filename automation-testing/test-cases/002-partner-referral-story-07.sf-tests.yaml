@@ -47,7 +47,11 @@ cases:
   - smoke
   mode: both
   preconditions:
-  - At least one Approved commission is not yet in a batch
+  - 'scripts/apex/pr-demo/9-qa-reset-commissions.apex then 7-qa-preconditions.apex have run (CI runs both first). Together they
+    guarantee the run touches only test data: every Approved commission not yet in a batch is AI-TEST (the "AI-TEST
+    Payout QA" one is seeded), and the suggested payout month has no batch, or only one made of AI-TEST commissions,
+    which the reset removes. If either is not true, the reset prints "PR-QA S07: SKIP" and the S07 cases must not run
+    in that org'
   steps:
   - Open Setup > Users (/lightning/setup/ManageUsers/home)
   - Click "Login" next to the user "Fiona Finance (PR test)"

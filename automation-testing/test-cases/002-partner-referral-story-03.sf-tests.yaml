@@ -104,15 +104,18 @@ cases:
   - story-03
   - regression
   preconditions:
-  - A Partner Referral Lead "AI-TEST SLA ..." from S03-TC-08 exists in a queue Sam can see, or create one with state NSW
+  - 'S03-TC-08 has run in this run: Lead "AI-TEST SLA <suffix>" (state NSW, Lead Status "New", First Contact Due in the
+    future) exists in the PR - NSW + ACT queue. Note its full name'
   steps:
   - Open Setup > Users (/lightning/setup/ManageUsers/home)
   - Click "Login" next to the user "Sam Rep (PR test)"
   - Open the Leads tab
   - Select the "PR - NSW + ACT queue" list view
-  - Open the newest "AI-TEST" Lead
+  - Search the full name of the S03-TC-08 Lead in the list search box and open it
+  - Check that Lead Status is "New" and "First Contacted At" is empty
   - Change Lead Status to "Working" and save
   expected:
+  - Before the change, Lead Status is "New" and "First Contacted At" is empty
   - '"First Contacted At" now shows the current date and time'
   - '"SLA Breached" is not ticked when that time is before "First Contact Due"'
 - id: S03-TC-11

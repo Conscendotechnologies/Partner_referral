@@ -10,5 +10,5 @@ Persona: Developer. Type: negative.
 
 | Step | Action | Expected | Pass/Fail |
 |---|---|---|---|
-| 1 | Open a PR that changes only non-Apex files after the zero-test check is built |  | |
+| 1 | After the zero-test check is built, open a PR whose head has no Apex test class under `force-app` (for example, one that removes the last test class) |  | |
 | 2 | Look at the pr-validate run | The check fails and says that no Apex tests ran (or passes only with the agreed opt-out label) | |

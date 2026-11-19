@@ -58,16 +58,23 @@ jobs:
       - name: Open a browser session
         run: node scripts/sf-auth.mjs target "$PWD/.sf-ai-tester/auth/storage.json" >> "$GITHUB_ENV"
 
+      - name: Reset the AI-TEST data
+        # 8-qa-reset-referrals, 9-qa-reset-commissions then 7-qa-preconditions (scripts/apex/pr-demo): data only, AI-TEST records only. Sets SF_SKIP_S07=1 when
+        # the org's payout data is not all AI-TEST, so the payout cases can't touch real commissions.
+        run: node scripts/qa-data.mjs target >> "$GITHUB_ENV"
+
       - name: Run the specs
         env:
           CI: 'true'
           GREP: ${{ github.event.inputs.grep }}
         run: |
-          if [ -n "$GREP" ]; then
-            npx playwright test --config playwright.sf-ai.config.ts --grep "$GREP"
-          else
-            npx playwright test --config playwright.sf-ai.config.ts
+          args=(--config playwright.sf-ai.config.ts)
+          if [ -n "$GREP" ]; then args+=(--grep "$GREP"); fi
+          if [ "${SF_SKIP_S07:-}" = 1 ]; then
+            echo "::notice::S07 payout specs skipped: the reset found payout data that is not AI-TEST (see the reset step)."
+            args+=(--grep-invert "S07-")
           fi
+          npx playwright test "${args[@]}"
 
       - name: Keep the report
         if: always()
@@ -78,5 +85,6 @@ jobs:
             automation-testing/playwright-report
             automation-testing/test-results
             automation-testing/.sf-ai-tester/playwright-output
+            !automation-testing/.sf-ai-tester/auth
           if-no-files-found: ignore
           retention-days: 14
