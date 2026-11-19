@@ -58,7 +58,17 @@ if (commissionQa.isEmpty()) {
     }
 }
 
-if ([SELECT COUNT() FROM Partner_Commission__c WHERE Opportunity__r.Name = 'AI-TEST Payout QA'
+// The S07 fixture is seeded only when S07 can run, by the same rule as 9-qa-reset-commissions.apex: no Approved
+// commission that is not AI-TEST waits for a payout, and the default period has no batch (9 removed an AI-TEST one).
+// Otherwise it prints "PR-QA S07: SKIP" (qa-data.mjs then sets SF_SKIP_S07=1) and creates nothing for S07.
+Boolean s07Ready = [
+        SELECT COUNT() FROM Partner_Commission__c
+        WHERE Status__c = :PR_Settings.COM_APPROVED AND Payout_Line__c = NULL AND (NOT Opportunity__r.Name LIKE 'AI-TEST%')
+    ] == 0
+    && [SELECT COUNT() FROM Payout_Batch__c WHERE Period_Month__c = :PR_PayoutService.defaultPeriod()] == 0;
+if (!s07Ready) {
+    System.debug('PR-QA S07: SKIP the payout data is not AI-TEST alone, so the AI-TEST Payout QA fixture is not seeded');
+} else if ([SELECT COUNT() FROM Partner_Commission__c WHERE Opportunity__r.Name = 'AI-TEST Payout QA'
         AND Status__c = :PR_Settings.COM_APPROVED AND Payout_Line__c = NULL] == 0) {
     if ([SELECT COUNT() FROM Opportunity WHERE Name = 'AI-TEST Payout QA'] > 0) {
         throw new PR_Exception('"AI-TEST Payout QA" has no Approved commission waiting for a payout. '

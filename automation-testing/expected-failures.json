@@ -1,5 +1,7 @@
 {
-  "S01-TC-03": "PR #8 is deployed (D3: Partner Status is not on the Account page)",
+  "S01-TC-01": "PR #8 is deployed (D3: Partner Status is not on the Account page, so it cannot be checked after the save)",
+  "S01-TC-02": "PR #8 is deployed (D3: Commission Rate is not on the Account page, so it cannot be checked after the save)",
+  "S01-TC-03": "PR #8 is deployed (D3: Commission Rate is not on the Account page)",
   "S01-TC-04": "PR #8 is deployed (D3: ABN is not on the Account page)",
   "S01-TC-06": "PR #8 is deployed (D3: no Commission Rate field or Account History on the Account page)",
   "S02-TC-06": "D5 is fixed (the portal form rejects \"+61 412 000 204\"; prReferralForm mobilePattern; no fix PR yet)",

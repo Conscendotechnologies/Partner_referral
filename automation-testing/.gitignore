@@ -7,3 +7,4 @@ blob-report/
 # Screenshots SF AI Tester / ad-hoc runs leave in this folder
 /*.png
 tests/sf-ai/_explore-*
+/snapshot-*.txt

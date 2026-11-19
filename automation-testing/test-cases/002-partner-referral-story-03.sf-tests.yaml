@@ -90,7 +90,7 @@ cases:
   - Select record type "Partner Referral" and click "Next"
   - Enter "AI-TEST SLA <unique suffix>" in "Last Name"
   - Enter "AI-TEST Co" in "Company" if the field is shown
-  - Enter "QLD" in "State/Province" of the address
+  - Enter "NSW" in "State/Province" of the address
   - Enter a date 30 days from today in "Move-in Date"
   - Tick "Electricity" in "Utilities"
   - Click "Save"
@@ -111,7 +111,7 @@ cases:
   - Click "Login" next to the user "Sam Rep (PR test)"
   - Open the Leads tab
   - Select the "PR - NSW + ACT queue" list view
-  - Search the full name of the S03-TC-08 Lead in the list search box and open it
+  - Click the "Created Date" column header until the list is sorted newest first, then open the S03-TC-08 Lead by its full name
   - Check that Lead Status is "New" and "First Contacted At" is empty
   - Change Lead Status to "Working" and save
   expected:

@@ -6,7 +6,7 @@ Set<String> fixtureLastNames = new Set<String>{ 'Convert QA', 'Commission QA', '
 // --- 1. S02 referrals.
 List<Referral__c> stale = [
     SELECT Id FROM Referral__c
-    WHERE First_Name__c = 'AI-TEST' AND Last_Name__c NOT IN :fixtureLastNames
+    WHERE (First_Name__c LIKE 'AI-TEST%' OR Last_Name__c LIKE 'AI-TEST%') AND Last_Name__c NOT IN :fixtureLastNames
         AND Partner_Status__c NOT IN (:PR_Settings.REF_CONNECTED, :PR_Settings.REF_CLOSED_LOST)
 ];
 for (Referral__c r : stale) r.Partner_Status__c = PR_Settings.REF_CLOSED_LOST;

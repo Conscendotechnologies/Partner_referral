@@ -7,10 +7,11 @@ UI test automation for this Salesforce project. **Nothing in this folder is depl
 |---|---|
 | `test-cases/*.sf-tests.yaml` | SF AI Tester suites, one per story. The case id is the designed TC id (`S02-TC-01`) |
 | `tests/sf-ai/*.spec.ts` | One Playwright spec per `ui` case, verified against the org (see "What a spec must do") |
-| `tests/sf-ai/support/` | `salesforce.ts`: shared steps (Login-as, list search, portal login). `fixtures.ts`: the `test` every spec imports |
+| `tests/sf-ai/support/` | `salesforce.ts`: shared steps (Login-as, list search, portal login). `fixtures.ts`: the `test` every spec imports. `groupA.ts` (stories 00, 01, 03, 08, 10), `B.ts` (02, 04, 12 referral pages), `C.ts` (05, 06, 07, 12 commission and payout pages): page helpers. `run-state.ts`: a value one case notes for a later one |
 | `TEST-CASES.md` | Every designed test case (ui, unit and manual) with its Jira key and automation status |
 | `expected-failures.json` | `ui` cases waiting on a fix that isn't deployed yet: TC id → defect / PR. Those specs run with `test.fail()` |
 | `scripts/sf-auth.mjs` | Opens a logged-in browser session from a Salesforce CLI login (for CI and local runs) |
+| `scripts/run-specs.mjs` | Resets the data, then runs the specs (leaving out the payout-run cases when the reset says so). CI uses it too |
 | `scripts/qa-data.mjs` | Puts the AI-TEST data into its starting state (`scripts/apex/pr-demo/8-`, `9-` and `7-*.apex`) |
 | `scripts/build-index.mjs` | Rebuilds `TEST-CASES.md` |
 | `playwright.sf-ai.config.ts` | Playwright config used by SF AI Tester, CI and local runs |
@@ -25,10 +26,13 @@ cd automation-testing
 npm ci
 npx playwright install chromium
 node scripts/sf-auth.mjs <org alias>     # prints SF_INSTANCE_URL=... and SF_STORAGE_STATE=...; export both
-node scripts/qa-data.mjs <org alias>     # reset the AI-TEST data; prints SF_SKIP_S07=1 if S07 must not run
-npx playwright test --config playwright.sf-ai.config.ts               # all specs
-npx playwright test --config playwright.sf-ai.config.ts --grep S06-   # one story
+node scripts/run-specs.mjs <org alias>                  # reset the AI-TEST data, then run all specs
+node scripts/run-specs.mjs <org alias> --grep "S06-"    # reset, then one story
 ```
+
+Always run through `run-specs.mjs`: it applies the S07 rule below, as CI does. A filter must include the cases a
+selected case depends on: S02-TC-15 and S02-TC-17 need S02-TC-01 (`--grep "S02-TC-(01|15|17):"`), S03-TC-09 needs
+S03-TC-08, S06-TC-10/11/13 and S12-TC-02 need S06-TC-02.
 
 Specs run in file order with one worker, because some cases use records an earlier case created (S02-TC-01 creates
 the referral that S02-TC-02 and S12-TC-01 check). They create only records whose names start with `AI-TEST`.
@@ -36,17 +40,30 @@ the referral that S02-TC-02 and S12-TC-01 check). They create only records whose
 **Test data.** Run `scripts/qa-data.mjs` before every full run (CI does). It changes AI-TEST records only:
 - `8-qa-reset-referrals.apex` closes the AI-TEST referrals earlier runs left open, so S02's fixed mobiles don't
   raise a duplicate warning.
-- `9-qa-reset-commissions.apex` retires a used "AI-TEST Commission QA" Opportunity and the AI-TEST payout batch of
-  the payout month.
+- `9-qa-reset-commissions.apex` retires the used "AI-TEST Commission QA", "AI-TEST Payout QA" and "AI-TEST Convert…"
+  Opportunities, and removes the payout month's batch when it holds only AI-TEST commissions.
 - `7-qa-preconditions.apex` seeds the fixtures S05, S06 and S07 start from.
 
 The payout cases (S07) run a real payout of every Approved commission in the org. The reset therefore allows them
-only when the payout month and the waiting commissions are all AI-TEST. Otherwise it prints `PR-QA S07: SKIP`, and
-CI leaves S07 out. In the SDO this is the case for November 2026: its 2026-10 batch is the org's own demo data.
+only when the payout month and the waiting commissions are all AI-TEST. Otherwise it prints `PR-QA S07: SKIP`, changes no
+payout data, seeds no payout fixture, and `run-specs.mjs` leaves out the cases that run or change a payout (S07-TC-03,
+07 and 09; `fixtures.ts` also skips them when `SF_SKIP_S07=1`). The read-only S07-TC-04 still runs. In the SDO this is
+the case for November 2026: its 2026-10 batch is the org's own demo data. The check runs just before the specs; a
+non-test commission approved during a run could still be picked up, so run S07 only in an org where nobody else
+approves commissions at the same time (a dedicated QA sandbox for a shared org).
 
 **Expected failures.** A case listed in `expected-failures.json` is marked `test.fail()` by `support/fixtures.ts`.
 While the defect is open, the run stays green. When the fix is deployed and the spec passes, Playwright reports an
-unexpected pass and the run goes red, so remove the entry then.
+unexpected pass and the run goes red, so remove the entry then. An expected failure passes the run whatever
+breaks it (a dead session too), so check the failing line in its report before trusting it.
+
+**When PR #8 is deployed**, besides removing the D1 to D4 entries: S06-TC-10 will then approve the commission that
+S06-TC-11 expects to find still Pending. Give S06-TC-11 its own Pending commission (in `7-qa-preconditions.apex`)
+at that point.
+
+**Finding new records.** The list search box uses the search index, which finds a new record only minutes later. Specs
+that open a record created earlier in the same run sort an "All" view by Created Date instead (`openNewestLead`), or
+retry the search (`S03-TC-09`).
 
 **No traces in CI.** A Playwright trace records cookies, which hold the Salesforce session, so CI keeps
 screenshots only. Locally, `SF_PW_TRACE=1` keeps traces of failed tests.

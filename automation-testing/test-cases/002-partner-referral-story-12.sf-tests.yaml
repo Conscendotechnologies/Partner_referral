@@ -56,9 +56,9 @@ cases:
   - The page shows mover name, mobile, new address, Move-in Date, Utilities, consent time and version, Status and Rep First
     Name
   - It shows Referring Agent, Referring Agency and the Lead and Opportunity links
-  - A "Partner Commissions" related list is on the page
+  - A "Commissions" related list is on the page
 - id: S12-TC-02
-  title: Commission page shows all its fields; Amount, Rate Applied and Services Count are read-only
+  title: Commission page shows all its fields; Amount, Rate Applied and Services Connected are read-only
   section: S12 Page layouts and record pages
   tags:
   - story-12
@@ -93,7 +93,7 @@ cases:
   - Click the month link of a batch
   expected:
   - The page shows Period Month, Status, Run Count, Total and Paid On
-  - A "Payout Lines" related list is shown
+  - A "Lines" related list is shown
   - The "Commission payouts" console on the page lists only this batch and has no "Run payout" button
 - id: S12-TC-04
   title: Payout Line page shows agency, ABN, reference, total, count and its Commissions
@@ -108,10 +108,10 @@ cases:
   - Click "Login" next to the user "Fiona Finance (PR test)"
   - Open the "Payouts" tab in the Connectnow Partner Referrals app
   - Click the month link of a batch
-  - Open a line from the "Payout Lines" related list
+  - Open a line from the "Lines" related list
   expected:
   - The line shows Agency, ABN, Payment Reference, Total ex GST and Commission Count
-  - A "Partner Commissions" related list shows its commissions
+  - On the Related tab, a "Commissions" related list shows its commissions
 - id: S12-TC-05
   title: Partner Referral Lead and Opportunity layouts show the partner referral fields
   section: S12 Page layouts and record pages
