@@ -30,8 +30,18 @@ private class PR_LeadLifecycleTest {
         Referral__c otherQueue = submit('0411000054', 'NSW', 1, new List<String>{ 'Electricity' });
         Test.stopTest();
 
+        // The three QLD Leads are in PR_QLD, and the rep's queue lookup finds PR_QLD through the public group.
+        Id qldQueue = [SELECT Id FROM Group WHERE Type = 'Queue' AND DeveloperName = 'PR_QLD'].Id;
+        for (Lead l : [SELECT OwnerId, Owner.Name FROM Lead WHERE Id IN :new List<Id>{ later.Lead__c, urgent.Lead__c, sooner.Lead__c }]) {
+            Assert.areEqual(qldQueue, l.OwnerId, 'QLD Lead is owned by PR_QLD, not ' + l.Owner.Name);
+        }
         PR_QueueLeadsResult result;
         System.runAs(rep) {
+            Assert.isTrue(PR_QueueLeadsController.partnerQueueIds(rep.Id).contains(qldQueue), 'the rep\'s queue lookup finds PR_QLD');
+            // As the rep, under sharing and permissions (USER_MODE), one filter of getQueueLeads at a time.
+            Assert.areEqual(3, [SELECT COUNT() FROM Lead WHERE OwnerId = :qldQueue WITH USER_MODE], 'the rep can see the 3 Leads in PR_QLD');
+            Assert.areEqual(3, [SELECT COUNT() FROM Lead WHERE OwnerId = :qldQueue AND RecordType.DeveloperName = :PR_Settings.RT_DEV_NAME WITH USER_MODE], 'the 3 Leads have the Partner Referral record type');
+            Assert.areEqual(3, [SELECT COUNT() FROM Lead WHERE OwnerId = :qldQueue AND IsConverted = FALSE AND Status != :PR_Settings.LEAD_UNQUALIFIED WITH USER_MODE], 'the 3 Leads are open');
             result = PR_QueueLeadsController.getQueueLeads();
         }
         List<Id> ids = new List<Id>();
@@ -44,6 +54,24 @@ private class PR_LeadLifecycleTest {
         Assert.isTrue(result.rows[0].urgent);
         Assert.areEqual([SELECT Name FROM Group WHERE DeveloperName = 'PR_QLD'].Name, result.rows[0].queue, 'queue name is shown');
         Assert.areEqual(PR_TestFactory.AGENCY_A, result.rows[0].agency);
+    }
+
+    // D3 follow-up: a rep sees an agency's Partner Status and Commission Rate (so a locked change can be seen as
+    // unchanged) but cannot edit them; changes stay with Partner Managers (Manage_Partner_Agencies).
+    @IsTest
+    static void repReadsButCannotEditAgencyStatusAndRate() {
+        // A Standard User with only PR_Sales_Rep, like a real rep (prrep has the System Administrator profile).
+        User rep = PR_TestFactory.standardUser('prfls', new List<String>{ 'PR_Sales_Rep' });
+        System.runAs(rep) {
+            for (Schema.DescribeFieldResult f : new List<Schema.DescribeFieldResult>{
+                Schema.SObjectType.Account.fields.Partner_Status__c,
+                Schema.SObjectType.Account.fields.Commission_Rate__c
+            }) {
+                Assert.isTrue(f.isAccessible(), f.getName() + ' is readable for a rep');
+                Assert.isFalse(f.isUpdateable(), f.getName() + ' is read-only for a rep');
+            }
+            Assert.isFalse(Schema.SObjectType.Account.fields.ABN__c.isAccessible(), 'ABN stays hidden from reps');
+        }
     }
 
     // More open Leads than the row limit: the most urgent ones are shown and the list says it is cut.
