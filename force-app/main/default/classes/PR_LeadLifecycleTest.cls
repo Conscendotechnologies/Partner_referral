@@ -56,6 +56,22 @@ private class PR_LeadLifecycleTest {
         Assert.areEqual(PR_TestFactory.AGENCY_A, result.rows[0].agency);
     }
 
+    // D3 follow-up: a rep sees an agency's Partner Status and Commission Rate (so a locked change can be seen as
+    // unchanged) but cannot edit them; changes stay with Partner Managers (Manage_Partner_Agencies).
+    @IsTest
+    static void repReadsButCannotEditAgencyStatusAndRate() {
+        System.runAs(PR_TestFactory.user('prrep')) {
+            for (Schema.DescribeFieldResult f : new List<Schema.DescribeFieldResult>{
+                Schema.SObjectType.Account.fields.Partner_Status__c,
+                Schema.SObjectType.Account.fields.Commission_Rate__c
+            }) {
+                Assert.isTrue(f.isAccessible(), f.getName() + ' is readable for a rep');
+                Assert.isFalse(f.isUpdateable(), f.getName() + ' is read-only for a rep');
+            }
+            Assert.isFalse(Schema.SObjectType.Account.fields.ABN__c.isAccessible(), 'ABN stays hidden from reps');
+        }
+    }
+
     // More open Leads than the row limit: the most urgent ones are shown and the list says it is cut.
     @IsTest
     static void referralQueueSaysWhenItIsCutAtTheRowLimit() {
