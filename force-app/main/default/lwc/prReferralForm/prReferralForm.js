@@ -1,6 +1,7 @@
 import { LightningElement, wire } from 'lwc';
 import getFormConfig from '@salesforce/apex/PR_PortalController.getFormConfig';
 import submitReferral from '@salesforce/apex/PR_PortalController.submitReferral';
+import { MOBILE_PATTERN } from './mobilePattern';
 
 const EMPTY = () => ({
     firstName: '',
@@ -29,7 +30,7 @@ export default class PrReferralForm extends LightningElement {
     errorMessage;
     duplicates;
     result;
-    mobilePattern = '(04[0-9]{8}|\\+614[0-9]{8}|04[0-9]{2} [0-9]{3} [0-9]{3})';
+    mobilePattern = MOBILE_PATTERN;
 
     @wire(getFormConfig)
     wiredConfig({ data, error }) {
