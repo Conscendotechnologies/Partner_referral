@@ -1,12 +1,17 @@
 import { MOBILE_PATTERN } from '../mobilePattern';
 
-// The browser anchors a `pattern` attribute to the whole value, so the test does the same.
-const matches = (value) => new RegExp(`^(?:${MOBILE_PATTERN})$`).test(value);
+// The browser anchors a `pattern` attribute to the whole value and compiles it with the `v` flag (an invalid pattern is
+// then ignored), so the test does the same.
+const matches = (value) => new RegExp(`^(?:${MOBILE_PATTERN})$`, 'v').test(value);
 
 // What PR_ReferralService accepts: spaces/hyphens/brackets removed, then ^(04\d{8}|\+614\d{8})$.
 const serverAccepts = (value) => /^(04\d{8}|\+614\d{8})$/.test(value.replace(/[\s\-()]/g, ''));
 
 describe('prReferralForm mobile pattern (D5)', () => {
+    it('is a valid pattern under the v flag, as browsers compile it', () => {
+        expect(() => new RegExp(MOBILE_PATTERN, 'v')).not.toThrow();
+    });
+
     const valid = [
         '0412345678',
         '0412 345 678',
